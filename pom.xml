@@ -14,7 +14,7 @@
     <name>course_service</name>
     <description>Demo project for Spring Boot</description>
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
         <mybatis-plus.version>3.4.3.1</mybatis-plus.version>
         <velocity.version>2.0</velocity.version>
         <lombok.version>1.18.18</lombok.version>
@@ -108,18 +108,27 @@
     </dependencies>
 
     <build>
+        <resources>
+            <!--            项目打包把xml也打包进去-->
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <!--                    两颗星代表多层目录-->
+                    <include>**/*.xml</include>
+                </includes>
+                <filtering>false</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
-                </configuration>
             </plugin>
         </plugins>
     </build>
