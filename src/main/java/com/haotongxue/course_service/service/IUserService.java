@@ -2,6 +2,8 @@ package com.haotongxue.course_service.service;
 
 import com.haotongxue.course_service.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.haotongxue.course_service.entity.WeChatLoginResponse;
+import com.haotongxue.course_service.entity.dto.QuicklyWeChatLoginDTO;
 
 /**
  * <p>
@@ -13,4 +15,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IUserService extends IService<User> {
 
+    WeChatLoginResponse getLoginResponse(String code);
+
+    String quicklyLogin(QuicklyWeChatLoginDTO quicklyWeChatLoginDTO);
 }
