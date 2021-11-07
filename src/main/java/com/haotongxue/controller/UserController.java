@@ -10,6 +10,7 @@ import com.haotongxue.service.EduLoginService;
 import com.haotongxue.service.IUserService;
 import com.haotongxue.utils.JwtUtils;
 import com.haotongxue.utils.R;
+import com.haotongxue.utils.ResultCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,10 @@ public class UserController {
         User user = (User) cache.get("logi" + openid);
         boolean isDoPa = true; //是否执行校园网登录验证
         if (user == null){
+            //快捷登录失败
+            if (loginDTO.getNickName() == null){
+                return R.error().code(ResultCode.QUICK_LOGIN_ERROR);
+            }
             user = new User();
             user.setOpenid(loginResponse.getOpenid());
             user.setNickName(loginDTO.getNickName());

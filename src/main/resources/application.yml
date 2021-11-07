@@ -3,7 +3,7 @@ spring:
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     driverClassName: com.mysql.cj.jdbc.Driver #com.mysql.jdbc.Driver
-    url: jdbc:mysql://sh-cynosdbmysql-grp-owlz7pwe.sql.tencentcdb.com:20162/tiaozao?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
+    url: jdbc:mysql://sh-cynosdbmysql-grp-owlz7pwe.sql.tencentcdb.com:20162/zkcourse?useSSL=false&useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
     username: root
     password: zkcourse8346@
     # Hikari 连接池配置
@@ -37,8 +37,8 @@ mybatis-plus:
 
 #小程序信息
 wechat:
-  appid: wx285b5452a5557140
-  secret: 8c4f4bd7116597426f4b6eeadc180db6
+  appid: wx07ba00d351fa34c4
+  secret: 70426973c5a4eda1ad65c8d79d76a594
 springfox:
   documentation:
     swagger-ui:

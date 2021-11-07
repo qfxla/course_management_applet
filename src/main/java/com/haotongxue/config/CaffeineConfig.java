@@ -3,6 +3,7 @@ package com.haotongxue.config;
 import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.haotongxue.entity.User;
 import com.haotongxue.service.IUserService;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,8 @@ public class CaffeineConfig {
                         String cacheType = key.substring(0, 4);
                         String realKey = key.substring(4);
                         if (cacheType.equals("logi")){
-                            return userService.getById(realKey);
+                            User byId = userService.getById(realKey);
+                            return byId;
                         }
                         return null;
                     }
