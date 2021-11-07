@@ -9,15 +9,15 @@ public class InfoVo {
 
     private String infoId;
 
-    private Integer courseId;
+    private String course;
 
-    private Integer classroomId;
+    private String classroom;
 
-    private Integer teacherId;
+    private String teacher;
 
-    private Integer sectionId;
+    private Integer section;
 
-    private Integer weekId;
+    private Integer week;
 
     private Integer xingqi;
 
