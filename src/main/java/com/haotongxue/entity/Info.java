@@ -1,9 +1,10 @@
 package com.haotongxue.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
+import java.time.LocalDateTime;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -29,23 +30,19 @@ public class Info implements Serializable {
       @TableId(value = "info_id", type = IdType.ASSIGN_ID)
     private String infoId;
 
-    @ApiModelProperty("课程ID")
-    private Integer courseId;
-
-    @ApiModelProperty("教室ID")
-    private Integer classroomId;
-
-    @ApiModelProperty("教师ID")
-    private Integer teacherId;
-
-    @ApiModelProperty("节次ID")
-    private Integer sectionId;
-
-    @ApiModelProperty("周次ID")
-    private Integer weekId;
-
     @ApiModelProperty("星期几")
     private Integer xingqi;
 
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createTime;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updateTime;
+
+    @Version
+    private Integer version;
+
+    @TableLogic
+    private Integer isDeleted;
 
 }
