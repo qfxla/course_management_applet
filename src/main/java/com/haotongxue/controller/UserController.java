@@ -13,6 +13,7 @@ import com.haotongxue.utils.R;
 import com.haotongxue.utils.ResultCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,29 +50,28 @@ public class UserController {
         String openid = loginResponse.getOpenid();
         User user = (User) cache.get("logi" + openid);
         boolean isDoPa = true; //是否执行校园网登录验证
+        HtmlPage page = null;
         if (user == null){
             //快捷登录失败
-            if (loginDTO.getNickName() == null){
+            if (loginDTO.getNickName() == null || loginDTO.getNo() == null || loginDTO.getPassword() == null){
                 return R.error().code(ResultCode.QUICK_LOGIN_ERROR);
             }
+            page = eduLoginService.login(loginDTO.getNo(), loginDTO.getPassword());
+            //学校官网登录失败
+            if (page == null){
+                return R.error().code(ResultCode.NO_OR_PASSWORD_ERROR);
+            }
             user = new User();
-            user.setOpenid(loginResponse.getOpenid());
-            user.setNickName(loginDTO.getNickName());
-            user.setAvatarUrl(loginDTO.getAvatarUrl());
-            user.setGender(loginDTO.getGender());
+            BeanUtils.copyProperties(loginDTO,user);
+            user.setOpenid(openid);
             userService.save(user);
             cache.put("logi"+openid,user);
         }else {
-            isDoPa = user.getIsPa() == 1;
+            //如果为0，则爬虫还没执行成功
+            isDoPa = user.getIsPa() == 0;
         }
-
         if (isDoPa){
-            HtmlPage login = eduLoginService.login(loginDTO.getNo(), loginDTO.getPassward());
-            if (login != null){
-                System.out.println("执行爬虫");
-            }else {
-                R.error();
-            }
+            System.out.println("执行爬虫");
         }
         String token = JwtUtils.generate(openid);
         return R.ok().data("Authority",token).data("openid",openid);
