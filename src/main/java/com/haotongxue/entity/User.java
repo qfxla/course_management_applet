@@ -49,7 +49,7 @@ public class User implements Serializable {
     private String no;
 
     @ApiModelProperty("密码")
-    private String passward;
+    private String password;
 
     private Integer isPa;
 

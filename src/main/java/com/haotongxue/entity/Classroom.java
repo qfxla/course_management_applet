@@ -24,8 +24,8 @@ public class Classroom implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-      @TableId(value = "classromm_id", type = IdType.AUTO)
-    private Integer classrommId;
+      @TableId(value = "classroom_id", type = IdType.AUTO)
+    private Integer classroomId;
 
     private String location;
 

@@ -4,12 +4,14 @@ import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.haotongxue.entity.User;
+import com.haotongxue.service.IInfoService;
 import com.haotongxue.service.IUserService;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
@@ -17,6 +19,9 @@ public class CaffeineConfig {
 
     @Autowired
     IUserService userService;
+
+    @Autowired
+    IInfoService iInfoService;
 
     /**
      * 用于做商品的本地缓存处理
@@ -34,6 +39,9 @@ public class CaffeineConfig {
                         if (cacheType.equals("logi")){
                             User byId = userService.getById(realKey);
                             return byId;
+                        }else if (cacheType.equals("cour")){
+                            List<List> timeTables = iInfoService.getInfo(Integer.valueOf(realKey));
+                            return timeTables;
                         }
                         return null;
                     }

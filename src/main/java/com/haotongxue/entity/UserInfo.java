@@ -30,9 +30,10 @@ public class UserInfo implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-      @TableId(value = "openid", type = IdType.ASSIGN_ID)
+
     private String openid;
 
+    @TableId(value = "infoId", type = IdType.ASSIGN_ID)
     private String infoId;
 
       @TableField(fill = FieldFill.INSERT)

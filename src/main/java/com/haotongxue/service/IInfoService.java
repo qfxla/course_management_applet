@@ -15,5 +15,5 @@ import java.util.List;
  * @since 2021-11-06
  */
 public interface IInfoService extends IService<Info> {
-    List<InfoVo> getInfo(int week);
+    List<List> getInfo(int week) throws InterruptedException;
 }

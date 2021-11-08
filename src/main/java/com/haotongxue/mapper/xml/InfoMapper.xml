@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haotongxue.mapper.InfoMapper">
+
+    <select id="getInfoByOpenidAndWeek" resultType="com.haotongxue.entity.Info">
+        SELECT i.info_id,i.xingqi
+        FROM t_info i LEFT JOIN t_user_info uf
+        ON i.info_id = uf.info_id
+        LEFT JOIN t_info_week wf
+        ON i.info_id = wf.info_id
+        WHERE uf.openid = #{openid}
+        AND wf.week_id = #{week}
+        ORDER BY i.xingqi
+    </select>
+
+    <select id="getSectionByInfoId" resultType="java.lang.Integer">
+        SELECT s.section_id
+        FROM t_info_section s
+        WHERE s.info_id = #{infoId}
+        ORDER BY s.section_id
+    </select>
+    <select id="getCourseNameByInfoId" resultType="java.lang.String">
+        SELECT c.name
+        FROM t_info_course ic
+        LEFT JOIN t_course c
+        ON ic.course_id = c.course_id
+        WHERE ic.info_id = #{infoId}
+    </select>
+    <select id="getClassRoomByInfoId" resultType="java.lang.String">
+        SELECT c.location
+        FROM t_info_classroom ic
+        LEFT JOIN t_classroom c
+        ON ic.classroom_id = c.classroom_id
+        WHERE ic.info_id = #{infoId}
+    </select>
+    <select id="getTeacherListByInfoId" resultType="java.lang.String">
+        SELECT NAME
+        FROM t_info_teacher it
+        LEFT JOIN t_teacher t
+        ON it.teacher_id = t.teacher_id
+        WHERE it.info_id = #{infoId}
+    </select>
+
+</mapper>
