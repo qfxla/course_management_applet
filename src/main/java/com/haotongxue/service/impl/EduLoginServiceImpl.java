@@ -4,10 +4,19 @@ import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
 import com.haotongxue.service.EduLoginService;
+import com.haotongxue.utils.UserContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageOutputStream;
+import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 
 @Service
@@ -54,6 +63,20 @@ public class EduLoginServiceImpl implements EduLoginService{
             click = submit.click();
         }catch (Exception e){
             e.printStackTrace();
+            HtmlImage vcodeimg = (HtmlImage) click.getElementById("vcodeimg");
+            if (vcodeimg != null){
+                ImageReader imageReader;
+                BufferedImage read;
+                try {
+                    imageReader = vcodeimg.getImageReader();
+                    read = imageReader.read(0);
+                    String property = System.getProperty("user.dir");
+                    File file = new File(property+"hhhhh");
+                    ImageIO.write(read,"jpg",file);
+                } catch (IOException ioException) {
+                    ioException.printStackTrace();
+                }
+            }
             return null;
         }
         return click;

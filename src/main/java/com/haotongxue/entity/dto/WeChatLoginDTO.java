@@ -20,5 +20,5 @@ public class WeChatLoginDTO {
 
     private String no;
 
-    private String passward;
+    private String password;
 }
