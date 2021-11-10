@@ -12,5 +12,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @since 2021-11-06
  */
 public interface CourseMapper extends BaseMapper<Course> {
-
+    //根据课程名查询是否已有该课程存在
+    int isExistCourse(String courseName);
 }

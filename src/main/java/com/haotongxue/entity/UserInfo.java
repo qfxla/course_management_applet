@@ -33,7 +33,7 @@ public class UserInfo implements Serializable {
 
     private String openid;
 
-    @TableId(value = "infoId", type = IdType.ASSIGN_ID)
+    @TableId(value = "info_id", type = IdType.ASSIGN_ID)
     private String infoId;
 
       @TableField(fill = FieldFill.INSERT)

@@ -1,6 +1,8 @@
 package com.haotongxue.service.impl;
 
+import com.haotongxue.entity.InfoClassroom;
 import com.haotongxue.entity.InfoTeacher;
+import com.haotongxue.exceptionhandler.CourseException;
 import com.haotongxue.mapper.InfoTeacherMapper;
 import com.haotongxue.service.IInfoTeacherService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -17,4 +19,19 @@ import org.springframework.stereotype.Service;
 @Service
 public class InfoTeacherServiceImpl extends ServiceImpl<InfoTeacherMapper, InfoTeacher> implements IInfoTeacherService {
 
+    @Override
+    public boolean insertInfoTeacher(String infoId, Integer teacherId) {
+        InfoTeacher infoTeacher = new InfoTeacher();
+        infoTeacher.setInfoId(infoId);
+        infoTeacher.setTeacherId(teacherId);
+        boolean flag = save(infoTeacher);
+        if(flag){
+            return true;
+        }else{
+            CourseException courseException = new CourseException();
+            courseException.setCode(505);
+            courseException.setMsg("插入对象到t_info_teacher失败。");
+            return false;
+        }
+    }
 }

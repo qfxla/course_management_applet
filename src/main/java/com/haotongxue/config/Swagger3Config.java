@@ -35,9 +35,9 @@ public class Swagger3Config {
      */
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("仲恺课程小程序")
+                .title("仲恺跳蚤后端")
                 .description("一次编码处处停运")
-                .contact(new Contact("川川 杰杰 涛涛","localhost","834616898@qq.com"))
+                .contact(new Contact("邓景涛","localhost","834616898@qq.com"))
                 .version("1.0")
                 .build();
     }

@@ -12,5 +12,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @since 2021-11-06
  */
 public interface ClassroomMapper extends BaseMapper<Classroom> {
-
+    //根据教室名查询是否已有该教室存在
+    int isExistClassroom(String classroomName);
 }
