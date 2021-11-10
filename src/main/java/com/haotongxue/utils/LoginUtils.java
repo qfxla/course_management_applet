@@ -25,7 +25,7 @@ public class LoginUtils {
             afterClick.getHtmlElementById("loginForm");
             //如果没有找到元素则抛出异常（证明loginForm1不是登录页，账号和密码正确）
         }catch (ElementNotFoundException notFoundException){
-            notFoundException.printStackTrace();
+            //notFoundException.printStackTrace();
             //标记登录成功
             return afterClick;
         }
