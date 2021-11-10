@@ -17,6 +17,7 @@
         SELECT s.section_id
         FROM t_info_section s
         WHERE s.info_id = #{infoId}
+        AND s.section_id > 0
         ORDER BY s.section_id
     </select>
     <select id="getCourseNameByInfoId" resultType="java.lang.String">
@@ -39,6 +40,11 @@
         LEFT JOIN t_teacher t
         ON it.teacher_id = t.teacher_id
         WHERE it.info_id = #{infoId}
+    </select>
+    <select id="getWeekByToday" resultType="java.lang.Integer">
+        SELECT week_id
+        FROM t_week
+        WHERE YEARWEEK(NOW()) - YEARWEEK(DATE_FORMAT(start_time,'%Y-%m-%d')) &lt; 7;
     </select>
 
 </mapper>

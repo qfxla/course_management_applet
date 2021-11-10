@@ -32,4 +32,8 @@ public interface InfoMapper extends BaseMapper<Info> {
 
     //根据每个info查该info对应的老师列表(可能有多个)
     List<String> getTeacherListByInfoId(@Param("infoId")String infoId);
+
+
+    //查今天是第几周
+    Integer getWeekByToday();
 }
