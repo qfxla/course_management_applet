@@ -55,7 +55,7 @@ public class UserController {
     public R login(@RequestBody WeChatLoginDTO loginDTO) throws IOException {
         WeChatLoginResponse loginResponse = userService.getLoginResponse(loginDTO.getCode());
         String openid = loginResponse.getOpenid();
-        User user = (User) cache.get("logi" + openid);
+        User user = (User) cache.get(openid);
         boolean isDoPa = true; //是否执行学校系统登录验证
         if (user == null){
             //快捷登录失败
@@ -102,7 +102,7 @@ public class UserController {
             BeanUtils.copyProperties(loginDTO,user);
             user.setOpenid(openid);
             userService.save(user);
-            cache.put("logi"+openid,user);
+            cache.put(openid,user);
         }else {
             //如果为0，则爬虫还没执行成功
             isDoPa = user.getIsPa() == 0;

@@ -36,13 +36,7 @@ public class CaffeineConfig {
                 .build(new CacheLoader<String, Object>() {
                     @Override
                     public @Nullable Object load(String key) throws Exception {
-                        String cacheType = key.substring(0, 4);
-                        String realKey = key.substring(4);
-                        if (cacheType.equals("logi")){
-                            User byId = userService.getById(realKey);
-                            return byId;
-                        }
-                        return null;
+                        return userService.getById(key);
                     }
                 });
     }
