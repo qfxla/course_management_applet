@@ -32,17 +32,11 @@ public class CaffeineConfig {
     @Bean("loginCache")
     public LoadingCache<String,Object> getCache(){
         return Caffeine.newBuilder()
-                .expireAfterAccess(30, TimeUnit.MINUTES)
+                .expireAfterAccess(3, TimeUnit.DAYS)
                 .build(new CacheLoader<String, Object>() {
                     @Override
                     public @Nullable Object load(String key) throws Exception {
-                        String cacheType = key.substring(0, 4);
-                        String realKey = key.substring(4);
-                        if (cacheType.equals("logi")){
-                            User byId = userService.getById(realKey);
-                            return byId;
-                        }
-                        return null;
+                        return userService.getById(key);
                     }
                 });
     }
