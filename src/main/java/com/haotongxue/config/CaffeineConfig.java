@@ -69,7 +69,7 @@ public class CaffeineConfig {
                 });
     }
 
-    //今日的PushCourseVo
+    //今日的课表
     @Bean("todayCourseCache")
     public LoadingCache<String,Object> getTodayCourseCache(){
         return Caffeine.newBuilder()

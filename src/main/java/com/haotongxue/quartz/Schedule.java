@@ -3,11 +3,13 @@ package com.haotongxue.quartz;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * @author zcj
  * @creat 2021-11-09-12:04
  */
+@Component
 public class Schedule {
     StdSchedulerFactory stdSchedulerFactory = new StdSchedulerFactory();
 
