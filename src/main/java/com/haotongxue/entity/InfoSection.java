@@ -29,9 +29,10 @@ public class InfoSection implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "info_id", type = IdType.ASSIGN_ID)
+
     private String id;
 
+    @TableId(value = "info_id", type = IdType.ASSIGN_ID)
     private String infoId;
 
     private Integer sectionId;

@@ -1,28 +1,29 @@
 package com.haotongxue.controller;
 
 
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.gargoylesoftware.htmlunit.*;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.haotongxue.entity.PasswordEditEntity;
 import com.haotongxue.entity.User;
 import com.haotongxue.entity.WeChatLoginResponse;
-import com.haotongxue.entity.dto.PushSettingDTO;
 import com.haotongxue.entity.dto.WeChatLoginDTO;
 import com.haotongxue.service.EduLoginService;
 import com.haotongxue.service.IUserService;
-import com.haotongxue.utils.*;
+import com.haotongxue.utils.JwtUtils;
+import com.haotongxue.utils.R;
+import com.haotongxue.utils.ResultCode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import sun.rmi.runtime.Log;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -54,37 +55,52 @@ public class UserController {
     public R login(@RequestBody WeChatLoginDTO loginDTO) throws IOException {
         WeChatLoginResponse loginResponse = userService.getLoginResponse(loginDTO.getCode());
         String openid = loginResponse.getOpenid();
-        //用来标记是否是快捷登录
-        boolean isQuickLogin = false;
-        //是否让用户重新刷新他的个人信息
-        boolean isRefreshInfo = false;
-        if (loginDTO.getPassword() == null && loginDTO.getNo() == null){
-            isQuickLogin = true;
-            if (!cache.asMap().containsKey(openid)){
-                //每三天用户信息就要更新一次，起码确保头像是最新的
-                isRefreshInfo = true;
-            }
-        }
         User user = (User) cache.get(openid);
         boolean isDoPa = true; //是否执行学校系统登录验证
         if (user == null){
             //快捷登录失败
-            if (isQuickLogin){
+            if (loginDTO.getNickName() == null || loginDTO.getNo() == null || loginDTO.getPassword() == null){
                 return R.error().code(ResultCode.QUICK_LOGIN_ERROR);
             }
+            //执行官网的登录
+            WebClient webClient = new WebClient();
+            //配置webClient
+            webClient.getOptions().setCssEnabled(false);
+            webClient.getOptions().setJavaScriptEnabled(true);
+            webClient.setAjaxController(new NicelyResynchronizingAjaxController());
+            webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
+            webClient.getOptions().setThrowExceptionOnScriptError(false);
+            webClient.waitForBackgroundJavaScript(3*1000);
+            webClient.getCookieManager().setCookiesEnabled(true);
 
-            WebClient webClient = WebClientUtils.getWebClient();
             //执行表单提交
-            HtmlPage afterLogin = LoginUtils.login(webClient, loginDTO.getNo(), loginDTO.getPassword());
+            HtmlPage page = webClient.getPage("http://edu-admin.zhku.edu.cn");
+            HtmlForm loginForm = page.getHtmlElementById("loginForm");
+            HtmlInput username = loginForm.getInputByName("username");
+            username.setValueAttribute(loginDTO.getNo());
+            HtmlInput password = loginForm.getInputByName("password");
+            password.setValueAttribute(loginDTO.getPassword());
+            HtmlElement submit = page.getHtmlElementById("submit");
+            HtmlPage afterClick = submit.click();
+            webClient.waitForBackgroundJavaScript(1000);
 
-            if (afterLogin == null){
+            boolean isSuccessLogin = false;
+            try {
+                afterClick.getHtmlElementById("loginForm");
+                //如果没有找到元素则抛出异常（证明loginForm1不是登录页，账号和密码正确）
+            }catch (ElementNotFoundException notFoundException){
+                notFoundException.printStackTrace();
+                //标记登录成功
+                isSuccessLogin = true;
+            }
+
+            if (!isSuccessLogin){
                 return R.error().code(ResultCode.NO_OR_PASSWORD_ERROR);
             }
+
             user = new User();
             BeanUtils.copyProperties(loginDTO,user);
             user.setOpenid(openid);
-            //记得在爬虫完以后要设置这条数据失效
-            user.setIsPa(0);
             userService.save(user);
             cache.put(openid,user);
         }else {
@@ -94,57 +110,8 @@ public class UserController {
         if (isDoPa){
             System.out.println("执行爬虫");
         }
-        if (isRefreshInfo){
-            return R.error().code(ResultCode.NEED_REFRESH_INFO);
-        }
         String token = JwtUtils.generate(openid);
         return R.ok().data("Authority",token).data("openid",openid);
-    }
-
-    @ApiOperation("修改用户密码")
-    @PostMapping("/authority")
-    public R editPassword(@RequestBody PasswordEditEntity passwordEditEntity) throws IOException {
-        String no = passwordEditEntity.getNo();
-        String password = passwordEditEntity.getPassword();
-        if (StringUtils.isEmpty(no) || StringUtils.isEmpty(password)){
-            return R.error();
-        }
-        //验证账号和密码对不对
-        WebClient webClient = WebClientUtils.getWebClient();
-        HtmlPage afterLogin = LoginUtils.login(webClient, no, password);
-        if (afterLogin == null){
-            return R.error().code(ResultCode.NO_OR_PASSWORD_ERROR);
-        }
-        String currentOpenid = UserContext.getCurrentOpenid();
-        //使缓存失效
-        cache.invalidate(currentOpenid);
-        UpdateWrapper<User> userUpdateWrapper = new UpdateWrapper<>();
-        userUpdateWrapper.set("no",no).set("password",password).eq("openid",currentOpenid);
-        userService.update(userUpdateWrapper);
-        return R.ok();
-    }
-
-    @ApiOperation("查看用户推送设置")
-    @GetMapping("/authority")
-    public R isSubscribe(){
-        String currentOpenid = UserContext.getCurrentOpenid();
-        User user = (User) cache.get(currentOpenid);
-        if (user == null){
-            return R.error();
-        }
-        return R.ok().data("isSubscribe",user.getSubscribe());
-    }
-
-    @ApiOperation("重新设置信息推送规则")
-    @PostMapping("/authority/setting")
-    public R pushSetting(@RequestBody PushSettingDTO pushSettingDTO){
-        String currentOpenid = UserContext.getCurrentOpenid();
-        cache.invalidate(currentOpenid);
-        UpdateWrapper<User> userUpdateWrapper = new UpdateWrapper<>();
-        userUpdateWrapper.set("subscribe",pushSettingDTO.getSubscribe());
-        userUpdateWrapper.eq("openid",currentOpenid);
-        userService.update(userUpdateWrapper);
-        return R.ok();
     }
 
 }
