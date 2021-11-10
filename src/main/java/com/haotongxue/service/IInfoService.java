@@ -22,4 +22,7 @@ public interface IInfoService extends IService<Info> {
 
     //获得今天的课表（02点调用存入缓存），便于消息推送
     List getTodayCourse(String openId);   //map的key为一次课的第一小节，value为课程详细信息
+
+    //插入课程信息
+    String addCourseInfo(int week);
 }
