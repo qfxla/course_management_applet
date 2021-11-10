@@ -17,6 +17,6 @@ public class testCode {
     private InfoServiceImpl infoServiceImpl;
     @Test
     public void test() throws InterruptedException {
-        infoServiceImpl.getInfo(10);
+        infoServiceImpl.getTodayCourse("1");
     }
 }

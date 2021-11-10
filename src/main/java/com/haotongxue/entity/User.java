@@ -51,7 +51,11 @@ public class User implements Serializable {
     @ApiModelProperty("密码")
     private String password;
 
+    @ApiModelProperty("是否爬完")
     private Integer isPa;
+
+    @ApiModelProperty("是否订阅推送")
+    private Integer subscribe;
 
       @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;

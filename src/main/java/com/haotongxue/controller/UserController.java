@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 
 /**
@@ -43,7 +44,7 @@ public class UserController {
     @Autowired
     IUserService userService;
 
-    @Autowired
+    @Resource(name = "loginCache")
     LoadingCache<String,Object> cache;
 
     @Autowired
