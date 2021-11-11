@@ -3,11 +3,8 @@ package com.haotongxue.config;
 import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.haotongxue.controller.UserController;
-import com.haotongxue.entity.User;
 import com.haotongxue.service.IInfoService;
 import com.haotongxue.service.IUserService;
-import com.haotongxue.utils.UserContext;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -32,7 +29,7 @@ public class CaffeineConfig {
     @Bean("loginCache")
     public LoadingCache<String,Object> getCache(){
         return Caffeine.newBuilder()
-                .expireAfterAccess(3, TimeUnit.DAYS)
+                .expireAfterAccess(30, TimeUnit.MINUTES)
                 .build(new CacheLoader<String, Object>() {
                     @Override
                     public @Nullable Object load(String key) throws Exception {

@@ -1,13 +1,12 @@
 package com.haotongxue.service.impl;
 
-import com.gargoylesoftware.htmlunit.javascript.host.PushManager;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.haotongxue.entity.Info;
 import com.haotongxue.entity.vo.TodayCourseVo;
+import com.haotongxue.exceptionhandler.CourseException;
 import com.haotongxue.mapper.InfoMapper;
 import com.haotongxue.service.IInfoService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.haotongxue.utils.UserContext;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -27,6 +25,7 @@ import java.util.stream.Collectors;
  * @since 2021-11-06
  */
 @Service
+@Slf4j
 public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements IInfoService {
     private static Logger logger = LoggerFactory.getLogger(InfoServiceImpl.class);
 
@@ -240,4 +239,30 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
 //        return timeTables;
 //        return null;
 //    }
+
+
+    @Override
+    public String addCourseInfo(int week) {
+        UUID infoUUID = UUID.randomUUID();
+        String infoId = infoUUID.toString();
+        Info info = new Info();
+        info.setInfoId(infoId);
+        if(week >= 1 && week <= 7){
+            info.setXingqi(week);
+        }else {
+            CourseException courseException = new CourseException();
+            courseException.setCode(555);
+            courseException.setMsg("星期数超过1~7范围，插入t_info失败。");
+            throw courseException;
+        }
+        boolean flag = save(info);
+        if(flag){
+            return infoId;
+        }else{
+            CourseException courseException = new CourseException();
+            courseException.setCode(505);
+            courseException.setMsg("插入对象到t_info失败。");
+            throw courseException;
+        }
+    }
 }

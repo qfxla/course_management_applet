@@ -12,5 +12,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2021-11-06
  */
 public interface ITeacherService extends IService<Teacher> {
-
+    Integer addTeacher(String teacherName);
 }

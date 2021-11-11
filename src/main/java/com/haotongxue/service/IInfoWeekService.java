@@ -12,5 +12,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2021-11-06
  */
 public interface IInfoWeekService extends IService<InfoWeek> {
-
+    boolean insertInfoWeek(String infoId,Integer weekId);
 }

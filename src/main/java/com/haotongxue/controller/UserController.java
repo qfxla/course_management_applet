@@ -15,9 +15,11 @@ import com.haotongxue.entity.dto.PushSettingDTO;
 import com.haotongxue.entity.dto.WeChatLoginDTO;
 import com.haotongxue.service.EduLoginService;
 import com.haotongxue.service.IUserService;
+import com.haotongxue.service.ReptileService;
 import com.haotongxue.utils.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,7 @@ import java.io.IOException;
 @Api(tags = "用户管理")
 @RestController
 @RequestMapping("/user")
+@Slf4j
 public class UserController {
 
     @Autowired
@@ -47,6 +50,9 @@ public class UserController {
 
     @Autowired
     EduLoginService eduLoginService;
+
+    @Autowired
+    ReptileService reptileService;
 
     @ApiOperation(value = "微信登录")
     @PostMapping("/login")
@@ -66,13 +72,14 @@ public class UserController {
         }
         User user = (User) cache.get(openid);
         boolean isDoPa = true; //是否执行学校系统登录验证
+        WebClient webClient = null;
         if (user == null){
             //快捷登录失败
             if (isQuickLogin){
                 return R.error().code(ResultCode.QUICK_LOGIN_ERROR);
             }
 
-            WebClient webClient = WebClientUtils.getWebClient();
+            webClient = WebClientUtils.getWebClient();
             //执行表单提交
             HtmlPage afterLogin = LoginUtils.login(webClient, loginDTO.getNo(), loginDTO.getPassword());
 
@@ -91,7 +98,8 @@ public class UserController {
             isDoPa = user.getIsPa() == 0;
         }
         if (isDoPa){
-            System.out.println("执行爬虫");
+            log.info(openid+"开始爬虫");
+            reptileService.pa(webClient);
         }
         if (isRefreshInfo){
             return R.error().code(ResultCode.NEED_REFRESH_INFO);

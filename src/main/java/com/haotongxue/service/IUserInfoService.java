@@ -15,5 +15,5 @@ import java.util.List;
  * @since 2021-11-07
  */
 public interface IUserInfoService extends IService<UserInfo> {
-
+    boolean insertUserInfo(String openId,String infoId);
 }
