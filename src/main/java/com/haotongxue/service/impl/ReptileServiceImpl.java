@@ -226,6 +226,10 @@ public class ReptileServiceImpl implements ReptileService {
     public static ArrayList<Integer> getSectionCount(String weekAndSection){
         int begin = weekAndSection.indexOf("[") + 1;
         int end = weekAndSection.indexOf("节");
+        if(end == -1){
+            log.info("要报错了。。。。");
+            log.info(weekAndSection);
+        }
         String section = weekAndSection.substring(begin, end);
         int len = section.length();
         String first = section.substring(0,2);
