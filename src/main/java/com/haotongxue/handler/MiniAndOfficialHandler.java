@@ -12,9 +12,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.BiConsumer;
 
 /**
  * 用来处理小程序和公众号之间的一些关联
@@ -39,8 +37,12 @@ public class MiniAndOfficialHandler {
         officialWrapper.select("openid");
         List<OfficialUser> officialUserList = officialUserService.list(officialWrapper);
         ConcurrentMap<String, Object> map = cache.asMap();
-//        for (OfficialUser  officialUser : officialUserList){
-//            officialUser
-//        }
+        for (OfficialUser officialUser : officialUserList){
+            String openid = officialUser.getOpenid();
+            if (map.containsKey(openid)){
+                User user = (User) cache.get(openid);
+
+            }
+        }
     }
 }
