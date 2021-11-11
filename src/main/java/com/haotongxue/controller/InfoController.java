@@ -54,12 +54,6 @@ public class InfoController {
     public R getInfo(@RequestParam(value = "week",required = false,defaultValue = "0")int week) throws InterruptedException {
 
         String openId = UserContext.getCurrentOpenid();
-//        User user = iUserService.getById(openId);
-//        //如果没爬完，让他等待
-//        while (user.getIsPa() == 0){
-//            Thread.sleep(2000);
-//            user = iUserService.getById(openId);
-//        }
 
         List<List> timeTables = (List<List>)cache.get("cour" + openId + ":" + week);
 

@@ -20,6 +20,7 @@ import java.util.List;
  * @creat 2021-11-09-11:03
  */
 
+@Deprecated
 //用于每节课推送消息
 public class SubscribeCourseJob implements Job {
     @Autowired
