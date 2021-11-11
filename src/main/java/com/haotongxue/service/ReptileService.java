@@ -1,8 +1,7 @@
 package com.haotongxue.service;
 
 import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
 
 public interface ReptileService {
-    void pa(WebClient webClient);
+    void pa(WebClient webClient ,String openid);
 }
