@@ -9,6 +9,7 @@ import com.haotongxue.entity.User;
 import com.haotongxue.exceptionhandler.CourseException;
 import com.haotongxue.service.*;
 import com.haotongxue.utils.UserContext;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 @Service
+@Slf4j
 public class ReptileServiceImpl implements ReptileService {
 
     @Resource
@@ -53,7 +55,7 @@ public class ReptileServiceImpl implements ReptileService {
 
 
     @Override
-    public void pa(WebClient webClient) {
+    public void pa(WebClient webClient,String currentOpenid) {
         HtmlPage page = null;
         try {
             page = webClient.getPage("http://edu-admin.zhku.edu.cn/jsxsd/xskb/xskb_list.do");
@@ -80,7 +82,6 @@ public class ReptileServiceImpl implements ReptileService {
         }
 
         String infoId;
-        String currentOpenid = UserContext.getCurrentOpenid();
         //String currentOpenid = "o2LPU5iId1G-iwcxH46GwuQzcuNw";
         for (int i = 0;i < 7;i++){     //星期一到星期日
             for (int j = 0;j <= 5;j++){     //sectionIds[0]到sectionIds[5]
@@ -169,12 +170,13 @@ public class ReptileServiceImpl implements ReptileService {
                             infoSectionService.insertInfoSection(infoId,sectionId);
                         }
                     }
-                    System.out.println("课程名===" + courseInfo[0]);
-                    System.out.println("教师名===" + courseInfo[1]);
-                    System.out.println("周次===" + weekList);
-                    System.out.println("节次===" + sectionList);
-                    System.out.println("地点===" + courseInfo[3]);
-                    System.out.println("星期" + (i+1));
+//                    System.out.println("课程名===" + courseInfo[0]);
+//                    System.out.println("教师名===" + courseInfo[1]);
+//                    System.out.println("周次===" + weekList);
+//                    System.out.println("节次===" + sectionList);
+//                    System.out.println("地点===" + courseInfo[3]);
+//                    System.out.println("星期" + (i+1));
+                    log.info(String.valueOf(courseTotal));
                 }
             }
         }

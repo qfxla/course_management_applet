@@ -56,6 +56,7 @@ public class UserController {
     public R login(@RequestBody WeChatLoginDTO loginDTO) throws IOException {
         WeChatLoginResponse loginResponse = userService.getLoginResponse(loginDTO.getCode());
         String openid = loginResponse.getOpenid();
+        UserContext.add(openid);
         //用来标记是否是快捷登录
         boolean isQuickLogin = false;
         //是否让用户重新刷新他的个人信息
