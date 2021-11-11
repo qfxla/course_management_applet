@@ -30,7 +30,7 @@ public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-      @TableId(value = "openid", type = IdType.ASSIGN_ID)
+    @TableId(value = "openid", type = IdType.ASSIGN_ID)
     private String openid;
 
     @ApiModelProperty("用户统一标识符(跨公众号和小程序)")
@@ -54,13 +54,16 @@ public class User implements Serializable {
     @ApiModelProperty("是否爬完")
     private Integer isPa;
 
+    @ApiModelProperty("是否正在爬")
+    private Integer isPaing;
+
     @ApiModelProperty("是否订阅推送")
     private Integer subscribe;
 
-      @TableField(fill = FieldFill.INSERT)
+    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
-      @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
 
     @Version

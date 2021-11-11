@@ -8,6 +8,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.haotongxue.entity.User;
 import com.haotongxue.exceptionhandler.CourseException;
 import com.haotongxue.service.*;
+import com.haotongxue.utils.UserContext;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -79,8 +80,8 @@ public class ReptileServiceImpl implements ReptileService {
         }
 
         String infoId;
-//                    String currentOpenid = UserContext.getCurrentOpenid();
-        String currentOpenid = "o2LPU5iId1G-iwcxH46GwuQzcuNw";
+        String currentOpenid = UserContext.getCurrentOpenid();
+        //String currentOpenid = "o2LPU5iId1G-iwcxH46GwuQzcuNw";
         for (int i = 0;i < 7;i++){     //星期一到星期日
             for (int j = 0;j <= 5;j++){     //sectionIds[0]到sectionIds[5]
                 if(j == 2){     //由于第5节为空，略过

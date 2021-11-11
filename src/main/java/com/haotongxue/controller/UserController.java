@@ -77,7 +77,6 @@ public class UserController {
             }
 
             webClient = WebClientUtils.getWebClient();
-            //执行表单提交
             HtmlPage afterLogin = LoginUtils.login(webClient, loginDTO.getNo(), loginDTO.getPassword());
 
             if (afterLogin == null){
@@ -94,14 +93,14 @@ public class UserController {
             //如果为0，则爬虫还没执行成功
             isDoPa = user.getIsPa() == 0;
         }
-        if (isDoPa){
+        if (isDoPa && user.getIsPaing() == 0){
             log.info(openid+"开始爬虫");
-            reptileHandler.pa(webClient);
-        }
-        if (isRefreshInfo){
-            return R.error().code(ResultCode.NEED_REFRESH_INFO);
+            reptileHandler.pa(webClient,user.getNo(),user.getPassword());
         }
         String token = JwtUtils.generate(openid);
+        if (isRefreshInfo){
+            return R.ok().code(ResultCode.NEED_REFRESH_INFO).data("Authority",token);
+        }
         return R.ok().data("Authority",token).data("openid",openid);
     }
 
