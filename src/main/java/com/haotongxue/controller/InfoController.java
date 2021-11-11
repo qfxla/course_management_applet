@@ -46,7 +46,7 @@ public class InfoController {
     public R successPa(){
         String openId = UserContext.getCurrentOpenid();
         User user = iUserService.getById(openId);
-        return user.getIsPa() == 1? R.ok() : R.error();
+        return user.getIsPa() == 1? R.ok().message("爬取成功") : R.error().message("尚未爬取成功");
     }
 
     @ApiOperation(value = "获得课程表信息")
