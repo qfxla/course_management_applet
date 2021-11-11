@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @Service
 @Slf4j
@@ -128,6 +129,8 @@ public class ReptileServiceImpl implements ReptileService {
                             temp[k] = temp[k].substring(idx+1);
                             cnum++;
                         }
+                        log.info("courseInfo...");
+                        log.info(Arrays.toString(courseInfo));
                         weekList = getWeekCount(courseInfo[2]);
                         sectionList = getSectionCount(courseInfo[2]);
                     }
