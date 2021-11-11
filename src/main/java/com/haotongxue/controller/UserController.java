@@ -3,9 +3,6 @@ package com.haotongxue.controller;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.gargoylesoftware.htmlunit.*;
-import com.gargoylesoftware.htmlunit.html.HtmlElement;
-import com.gargoylesoftware.htmlunit.html.HtmlForm;
-import com.gargoylesoftware.htmlunit.html.HtmlInput;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.haotongxue.entity.PasswordEditEntity;
@@ -13,6 +10,7 @@ import com.haotongxue.entity.User;
 import com.haotongxue.entity.WeChatLoginResponse;
 import com.haotongxue.entity.dto.PushSettingDTO;
 import com.haotongxue.entity.dto.WeChatLoginDTO;
+import com.haotongxue.handler.ReptileHandler;
 import com.haotongxue.service.EduLoginService;
 import com.haotongxue.service.IUserService;
 import com.haotongxue.service.ReptileService;
@@ -24,7 +22,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import sun.rmi.runtime.Log;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -53,7 +50,7 @@ public class UserController {
     EduLoginService eduLoginService;
 
     @Autowired
-    ReptileService reptileService;
+    ReptileHandler reptileHandler;
 
     @ApiOperation(value = "微信登录")
     @PostMapping("/login")
@@ -100,7 +97,7 @@ public class UserController {
         }
         if (isDoPa){
             log.info(openid+"开始爬虫");
-            reptileService.pa(webClient);
+            reptileHandler.pa(webClient);
         }
         if (isRefreshInfo){
             return R.error().code(ResultCode.NEED_REFRESH_INFO);
