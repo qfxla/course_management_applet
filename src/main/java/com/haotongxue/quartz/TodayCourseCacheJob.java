@@ -20,6 +20,7 @@ import java.util.List;
  * @creat 2021-11-09-19:41
  */
 
+@Deprecated
 //定时缓存每个学生每天课程
 public class TodayCourseCacheJob implements Job {
 

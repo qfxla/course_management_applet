@@ -1,4 +1,5 @@
 package com.haotongxue.controller;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.haotongxue.entity.User;
 import com.haotongxue.service.IInfoService;
@@ -40,16 +41,19 @@ public class InfoController {
     @Resource(name = "courseCache")
     LoadingCache<String,Object> cache;
 
+    @ApiOperation(value = "判断是否爬完")
+    @GetMapping("/successPa")
+    public R successPa(){
+        String openId = UserContext.getCurrentOpenid();
+        User user = iUserService.getById(openId);
+        return user.getIsPa() == 1? R.ok() : R.error();
+    }
+
     @ApiOperation(value = "获得课程表信息")
     @GetMapping("/getInfo")
     public R getInfo(@RequestParam(value = "week",required = false,defaultValue = "0")int week) throws InterruptedException {
 
-        System.out.println(UserContext.getCurrentOpenid());
         String openId = UserContext.getCurrentOpenid();
-        User user = iUserService.getById(openId);
-        if (user.getIsPa() == 0){
-            return R.error().code(ResultCode.COURSE_IMPORT_UNFINISHED);
-        }
 
         List<List> timeTables = (List<List>)cache.get("cour" + openId + ":" + week);
 
