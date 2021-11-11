@@ -74,7 +74,6 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
                             for (int j = 1;j <= 12;j++) {
                                 oneDayVo.add("");
                             }
-                            System.out.println(day + "号的课为" + oneDayVo);
                             map.put(day - 1,oneDayVo);
                         }else {
                             //如果该天有课，那就另外根据该天的info的id去关联其他课程学习
@@ -88,15 +87,16 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
                                 String str1 = "";
                                 String str2 = "";
                                 String courseName = ((str1 = infoMapper.getCourseNameByInfoId(info.getInfoId())).equals("无")?"":str1);
-                                String classRoom = ((str2 = infoMapper.getClassRoomByInfoId(info.getInfoId())).equals("无")?"":str2);
-                                List<String> teacherNameList = infoMapper.getTeacherListByInfoId(info.getInfoId());
-                                String teacherName = "";
-                                if (teacherNameList.size() != 0){
-                                    for (String s : teacherNameList) {
-                                        teacherName += s + " ";
-                                    }
-                                }
-                                String tableItem = courseName + "  " + classRoom + "  " + teacherName;
+                                String classRoom = ((str2 = infoMapper.getClassRoomByInfoId(info.getInfoId())).equals("无")?"":str2.substring(5));
+//                                List<String> teacherNameList = infoMapper.getTeacherListByInfoId(info.getInfoId());
+//                                String teacherName = "";
+//                                if (teacherNameList.size() != 0){
+//                                    for (String s : teacherNameList) {
+//                                        teacherName += s + " ";
+//                                    }
+//                                }
+//                                String tableItem = courseName + "  " + classRoom + "  " + teacherName;
+                                String tableItem = courseName + "  @" + classRoom;
                                 for (Integer section : sections) {
                                     arr[section - 1] = tableItem;
                                 }
@@ -125,9 +125,6 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
         }
         for (Map.Entry<Integer, List> entry : map.entrySet()) {
             timeTables.add(entry.getKey(),entry.getValue());
-        }
-        for (int j = 0;j < 7;j++){
-            System.out.println(timeTables.get(j));
         }
         return timeTables;
     }

@@ -2,18 +2,14 @@ package com.haotongxue.handler;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.haotongxue.entity.User;
 import com.haotongxue.runnable.ReptileRunnable;
 import com.haotongxue.service.IUserService;
 import com.haotongxue.service.ReptileService;
-import com.haotongxue.utils.LoginUtils;
 import com.haotongxue.utils.UserContext;
-import com.haotongxue.utils.WebClientUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.concurrent.ExecutorService;

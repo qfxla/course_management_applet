@@ -131,7 +131,6 @@ public class ReptileServiceImpl implements ReptileService {
                         weekList = getWeekCount(courseInfo[2]);
                         sectionList = getSectionCount(courseInfo[2]);
                     }
-                    System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
                     int xingqiId = i+1;     //星期几
 
                     if(weekList == null || weekList.size() == 0){

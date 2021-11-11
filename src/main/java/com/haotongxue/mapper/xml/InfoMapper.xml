@@ -42,9 +42,10 @@
         WHERE it.info_id = #{infoId}
     </select>
     <select id="getWeekByToday" resultType="java.lang.Integer">
-        SELECT week_id
+        SELECT (week_id - 1) week_id
         FROM t_week
-        WHERE YEARWEEK(NOW()) - YEARWEEK(DATE_FORMAT(start_time,'%Y-%m-%d')) &lt; 7;
+        WHERE NOW() - start_time &lt;= 0
+        LIMIT 1
     </select>
 
 </mapper>

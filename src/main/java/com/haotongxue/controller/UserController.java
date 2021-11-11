@@ -88,6 +88,7 @@ public class UserController {
             user.setOpenid(openid);
             //记得在爬虫完以后要设置这条数据失效
             user.setIsPa(0);
+            user.setIsPaing(0);
             userService.save(user);
             cache.put(openid,user);
         }else {
