@@ -53,7 +53,7 @@ public class ReptileServiceImpl implements ReptileService {
 
 
     @Override
-    public void pa(WebClient webClient) {
+    public void pa(WebClient webClient,String currentOpenid) {
         HtmlPage page = null;
         try {
             page = webClient.getPage("http://edu-admin.zhku.edu.cn/jsxsd/xskb/xskb_list.do");
@@ -80,7 +80,6 @@ public class ReptileServiceImpl implements ReptileService {
         }
 
         String infoId;
-        String currentOpenid = UserContext.getCurrentOpenid();
         //String currentOpenid = "o2LPU5iId1G-iwcxH46GwuQzcuNw";
         for (int i = 0;i < 7;i++){     //星期一到星期日
             for (int j = 0;j <= 5;j++){     //sectionIds[0]到sectionIds[5]

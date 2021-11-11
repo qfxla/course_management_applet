@@ -33,17 +33,13 @@ public class ReptileHandler {
 
     private ExecutorService executorService = Executors.newCachedThreadPool();
 
-    @Transactional
     public void pa(WebClient webClient,String no,String password){
         String currentOpenid = UserContext.getCurrentOpenid();
         UpdateWrapper<User> userUpdateWrapper = new UpdateWrapper<>();
         userUpdateWrapper.set("is_paing",1).eq("openid",currentOpenid);
         if (userService.update(userUpdateWrapper)){
             cache.invalidate(currentOpenid);
-            executorService.execute(new ReptileRunnable(webClient,no,password));
-            UpdateWrapper<User> userUpdateWrapperTwo = new UpdateWrapper<>();
-            userUpdateWrapper.set("is_paing",0).eq("openid",currentOpenid);
-            userService.update(userUpdateWrapperTwo);
+            executorService.execute(new ReptileRunnable(webClient,no,password,currentOpenid));
         }
     }
 }
