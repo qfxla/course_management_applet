@@ -30,7 +30,6 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     CourseMapper courseMapper;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public String addCourse(String courseName) {
         int existCourseCount = courseMapper.isExistCourse(courseName);
         if(existCourseCount == 1){

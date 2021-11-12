@@ -23,7 +23,6 @@ import java.util.UUID;
 public class InfoSectionServiceImpl extends ServiceImpl<InfoSectionMapper, InfoSection> implements IInfoSectionService {
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public boolean insertInfoSection(String infoId, Integer sectionId) {
         InfoSection infoSection = new InfoSection();
         infoSection.setInfoId(infoId);

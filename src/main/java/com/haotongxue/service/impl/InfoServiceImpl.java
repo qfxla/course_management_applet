@@ -240,7 +240,6 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
 
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public String addCourseInfo(int week) {
         UUID infoUUID = UUID.randomUUID();
         String infoId = infoUUID.toString();

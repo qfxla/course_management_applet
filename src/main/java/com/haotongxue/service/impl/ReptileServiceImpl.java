@@ -11,6 +11,7 @@ import com.haotongxue.service.*;
 import com.haotongxue.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 
 @Service
 @Slf4j
+@Transactional(rollbackFor = Exception.class)
 public class ReptileServiceImpl implements ReptileService {
 
     @Resource
@@ -142,26 +144,26 @@ public class ReptileServiceImpl implements ReptileService {
 //                            courseInfo[2] = "罗智杰,呼增讲师";
 //                            courseInfo[3] = "16-17(周)[06-07节]";
 //                        }
-                        for (int l = 0; l < courseInfo.length; l++) {
-                            if(courseInfo[l]!=null){
-                                if(courseInfo[l].equals("")){
-                                    System.out.println("数组成员存在空字符串");
-                                    for (int m = l; m+1 < courseInfo.length; m++) {
-                                        String tmp = "";
-                                        tmp = courseInfo[m+1];
-                                        courseInfo[m+1] = courseInfo[m];
-                                        courseInfo[m] = tmp;
-                                    }
-                                    courseInfo[3] = didian;
-                                    System.out.println("##############");
-                                    System.out.println(courseInfo[0]);
-                                    System.out.println(courseInfo[1]);
-                                    System.out.println(courseInfo[2]);
-                                    System.out.println(courseInfo[3]);
-                                    System.out.println("##############");
-                                }
-                            }
-                        }
+//                        for (int l = 0; l < courseInfo.length; l++) {
+//                            if(courseInfo[l]!=null){
+//                                if(courseInfo[l].equals("")){
+//                                    System.out.println("数组成员存在空字符串");
+//                                    for (int m = l; m+1 < courseInfo.length; m++) {
+//                                        String tmp = "";
+//                                        tmp = courseInfo[m+1];
+//                                        courseInfo[m+1] = courseInfo[m];
+//                                        courseInfo[m] = tmp;
+//                                    }
+//                                    courseInfo[3] = didian;
+//                                    System.out.println("##############");
+//                                    System.out.println(courseInfo[0]);
+//                                    System.out.println(courseInfo[1]);
+//                                    System.out.println(courseInfo[2]);
+//                                    System.out.println(courseInfo[3]);
+//                                    System.out.println("##############");
+//                                }
+//                            }
+//                        }
 
                         weekList = getWeekCount(courseInfo[2]);
                         sectionList = getSectionCount(courseInfo[2]);
@@ -210,7 +212,7 @@ public class ReptileServiceImpl implements ReptileService {
 //                    System.out.println("节次===" + sectionList);
 //                    System.out.println("地点===" + courseInfo[3]);
 //                    System.out.println("星期" + (i+1));
-                    log.info(String.valueOf(courseTotal));
+                    System.out.println(courseTotal);
                 }
             }
         }
@@ -261,8 +263,7 @@ public class ReptileServiceImpl implements ReptileService {
         int begin = weekAndSection.indexOf("[") + 1;
         int end = weekAndSection.indexOf("节");
         if(end == -1){
-            log.info("要报错了。。。。");
-            log.info(weekAndSection);
+            throw new CourseException(555,"没有节字");
         }
         String section = weekAndSection.substring(begin, end);
         int len = section.length();

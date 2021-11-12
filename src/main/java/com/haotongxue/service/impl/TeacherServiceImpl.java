@@ -29,7 +29,6 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
     TeacherMapper teacherMapper;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public Integer addTeacher(String teacherName) {
         if(teacherName == null){
             teacherName = "无";

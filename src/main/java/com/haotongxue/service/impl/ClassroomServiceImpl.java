@@ -25,7 +25,6 @@ public class ClassroomServiceImpl extends ServiceImpl<ClassroomMapper, Classroom
     ClassroomMapper classroomMapper;
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public Integer addClassroom(String classroomName) {
         if(classroomName == null){
             classroomName = "无";

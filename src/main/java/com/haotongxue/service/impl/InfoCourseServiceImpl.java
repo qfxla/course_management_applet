@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class InfoCourseServiceImpl extends ServiceImpl<InfoCourseMapper, InfoCourse> implements IInfoCourseService {
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public boolean insertInfoCourse(String infoId, String courseId) {
         InfoCourse infoCourse = new InfoCourse();
         infoCourse.setInfoId(infoId);

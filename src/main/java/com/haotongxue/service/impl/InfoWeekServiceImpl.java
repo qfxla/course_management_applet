@@ -20,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class InfoWeekServiceImpl extends ServiceImpl<InfoWeekMapper, InfoWeek> implements IInfoWeekService {
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public boolean insertInfoWeek(String infoId, Integer weekId) {
         InfoWeek infoWeek = new InfoWeek();
         infoWeek.setInfoId(infoId);

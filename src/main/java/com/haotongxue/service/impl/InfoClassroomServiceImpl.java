@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class InfoClassroomServiceImpl extends ServiceImpl<InfoClassroomMapper, InfoClassroom> implements IInfoClassroomService {
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public boolean insertInfoClassroom(String infoId, Integer classroomId) {
         InfoClassroom infoClassroom = new InfoClassroom();
         infoClassroom.setInfoId(infoId);

@@ -25,7 +25,6 @@ import java.util.List;
 public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> implements IUserInfoService {
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public boolean insertUserInfo(String openId, String infoId) {
         UserInfo userInfo = new UserInfo();
         userInfo.setOpenid(openId);
