@@ -2,6 +2,7 @@ package com.haotongxue.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.haotongxue.entity.User;
+import com.haotongxue.mapper.InfoMapper;
 import com.haotongxue.service.IInfoService;
 import com.haotongxue.service.IUserService;
 import com.haotongxue.utils.R;
@@ -37,6 +38,8 @@ public class InfoController {
     private IInfoService iInfoService;
     @Autowired
     private IUserService iUserService;
+    @Autowired
+    private InfoMapper infoMapper;
 
     @Resource(name = "courseCache")
     LoadingCache<String,Object> cache;
@@ -60,5 +63,12 @@ public class InfoController {
         return timeTables != null?R.ok().data("timeTables",timeTables) : R.error();
     }
 
+    @ApiOperation(value = "获得当前是哪周")
+    @GetMapping("/getWhichWeek")
+    public R getWhichWeek(){
+        //查今天是第几周
+        Integer week = infoMapper.getWeekByToday();
+        return R.ok().data("week",week);
+    }
 }
 

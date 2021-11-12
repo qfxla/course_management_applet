@@ -6,6 +6,7 @@ import com.haotongxue.mapper.InfoWeekMapper;
 import com.haotongxue.service.IInfoWeekService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * <p>

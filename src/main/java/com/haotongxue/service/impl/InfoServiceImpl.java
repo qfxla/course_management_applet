@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -68,6 +69,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
                 executor.execute(new Runnable() {
                     @Override
                     public void run() {
+                        logger.info("调用课表用的线程为：" + Thread.currentThread().getName());
                         //如果这周的该星期几没课，那就都置为空
                         if (!xingqiMap.containsKey(day)){
                             List<String> oneDayVo = new ArrayList<>();
