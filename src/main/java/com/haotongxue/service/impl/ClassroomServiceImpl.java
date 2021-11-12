@@ -7,6 +7,7 @@ import com.haotongxue.mapper.ClassroomMapper;
 import com.haotongxue.service.IClassroomService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
@@ -22,8 +23,9 @@ import javax.annotation.Resource;
 public class ClassroomServiceImpl extends ServiceImpl<ClassroomMapper, Classroom> implements IClassroomService {
     @Resource
     ClassroomMapper classroomMapper;
-    @Override
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public Integer addClassroom(String classroomName) {
         if(classroomName == null){
             classroomName = "无";

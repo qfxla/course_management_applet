@@ -7,6 +7,7 @@ import com.haotongxue.mapper.InfoSectionMapper;
 import com.haotongxue.service.IInfoSectionService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -22,6 +23,7 @@ import java.util.UUID;
 public class InfoSectionServiceImpl extends ServiceImpl<InfoSectionMapper, InfoSection> implements IInfoSectionService {
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean insertInfoSection(String infoId, Integer sectionId) {
         InfoSection infoSection = new InfoSection();
         infoSection.setInfoId(infoId);

@@ -9,6 +9,7 @@ import com.haotongxue.mapper.UserInfoMapper;
 import com.haotongxue.service.IUserInfoService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,6 +25,7 @@ import java.util.List;
 public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> implements IUserInfoService {
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean insertUserInfo(String openId, String infoId) {
         UserInfo userInfo = new UserInfo();
         userInfo.setOpenid(openId);

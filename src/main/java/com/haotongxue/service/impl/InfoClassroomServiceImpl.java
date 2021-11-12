@@ -7,6 +7,7 @@ import com.haotongxue.mapper.InfoClassroomMapper;
 import com.haotongxue.service.IInfoClassroomService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * <p>
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 public class InfoClassroomServiceImpl extends ServiceImpl<InfoClassroomMapper, InfoClassroom> implements IInfoClassroomService {
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean insertInfoClassroom(String infoId, Integer classroomId) {
         InfoClassroom infoClassroom = new InfoClassroom();
         infoClassroom.setInfoId(infoId);

@@ -7,6 +7,7 @@ import com.haotongxue.mapper.InfoCourseMapper;
 import com.haotongxue.service.IInfoCourseService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * <p>
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 public class InfoCourseServiceImpl extends ServiceImpl<InfoCourseMapper, InfoCourse> implements IInfoCourseService {
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean insertInfoCourse(String infoId, String courseId) {
         InfoCourse infoCourse = new InfoCourse();
         infoCourse.setInfoId(infoId);

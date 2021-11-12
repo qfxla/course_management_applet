@@ -9,6 +9,7 @@ import com.haotongxue.service.ICourseService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.UUID;
@@ -29,6 +30,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     CourseMapper courseMapper;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public String addCourse(String courseName) {
         int existCourseCount = courseMapper.isExistCourse(courseName);
         if(existCourseCount == 1){

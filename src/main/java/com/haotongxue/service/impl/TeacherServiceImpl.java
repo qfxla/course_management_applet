@@ -9,6 +9,7 @@ import com.haotongxue.mapper.TeacherMapper;
 import com.haotongxue.service.ITeacherService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.UUID;
@@ -28,6 +29,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
     TeacherMapper teacherMapper;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Integer addTeacher(String teacherName) {
         if(teacherName == null){
             teacherName = "无";
