@@ -110,7 +110,7 @@ public class ReptileServiceImpl implements ReptileService {
 //                    fileWriter.flush();
                 }
                 String course = domElements[i][j].asText();
-                String temp[] = new String[10];
+                String[] temp;
 //                int num = 0;
 //                int index;
 
@@ -121,7 +121,7 @@ public class ReptileServiceImpl implements ReptileService {
 //                    course = course.substring(index+22);
 //                    num++;
 //                }
-                temp = course.split("---------------------|----------------------");
+                 temp = course.split("---------------------|----------------------");
                 //System.out.println(Arrays.toString(temp));
                 String[] courseInfo = new String[4];
                 for (int k = 0;k < temp.length;k++) {
