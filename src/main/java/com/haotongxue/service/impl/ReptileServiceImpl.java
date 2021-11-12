@@ -123,14 +123,46 @@ public class ReptileServiceImpl implements ReptileService {
                         sectionList = null;
                     }else{
                         int idx,cnum = 0;
+                        String didian = "";
                         for(int h = 0; temp[k].contains("\n") && cnum <= 3;h = h+idx){
                             idx = temp[k].indexOf("\n");
                             courseInfo[cnum] = temp[k].substring(0,idx);
+                            if(cnum == 3){
+                                didian = courseInfo[3];
+                            }
                             temp[k] = temp[k].substring(idx+1);
                             cnum++;
                         }
                         log.info("courseInfo...");
                         log.info(Arrays.toString(courseInfo));
+
+//                        if(i == 0 && j == 3 && k == 1){
+//                            courseInfo[0] = "";
+//                            courseInfo[1] = "电路与电子技术";
+//                            courseInfo[2] = "罗智杰,呼增讲师";
+//                            courseInfo[3] = "16-17(周)[06-07节]";
+//                        }
+                        for (int l = 0; l < courseInfo.length; l++) {
+                            if(courseInfo[l]!=null){
+                                if(courseInfo[l].equals("")){
+                                    System.out.println("数组成员存在空字符串");
+                                    for (int m = l; m+1 < courseInfo.length; m++) {
+                                        String tmp = "";
+                                        tmp = courseInfo[m+1];
+                                        courseInfo[m+1] = courseInfo[m];
+                                        courseInfo[m] = tmp;
+                                    }
+                                    courseInfo[3] = didian;
+                                    System.out.println("##############");
+                                    System.out.println(courseInfo[0]);
+                                    System.out.println(courseInfo[1]);
+                                    System.out.println(courseInfo[2]);
+                                    System.out.println(courseInfo[3]);
+                                    System.out.println("##############");
+                                }
+                            }
+                        }
+
                         weekList = getWeekCount(courseInfo[2]);
                         sectionList = getSectionCount(courseInfo[2]);
                     }
