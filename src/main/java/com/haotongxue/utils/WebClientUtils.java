@@ -1,11 +1,12 @@
 package com.haotongxue.utils;
 
+import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
 
 public class WebClientUtils {
     public static WebClient getWebClient(){
-        WebClient webClient = new WebClient();
+        WebClient webClient = new WebClient(BrowserVersion.FIREFOX);
         //配置webClient
         webClient.getOptions().setCssEnabled(false);
         webClient.getOptions().setJavaScriptEnabled(true);

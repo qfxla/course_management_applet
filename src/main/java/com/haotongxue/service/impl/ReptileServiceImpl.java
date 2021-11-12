@@ -11,8 +11,12 @@ import com.haotongxue.service.*;
 import com.haotongxue.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,13 +60,15 @@ public class ReptileServiceImpl implements ReptileService {
 
 
     @Override
-    public void pa(WebClient webClient,String currentOpenid) {
+    @Transactional(rollbackFor = Exception.class)
+    public void pa(WebClient webClient,String currentOpenid) throws IOException {
         HtmlPage page = null;
         try {
             page = webClient.getPage("http://edu-admin.zhku.edu.cn/jsxsd/xskb/xskb_list.do");
         } catch (IOException e) {
             e.printStackTrace();
         }
+        String enter = "\n";
         String[] sectionIds = new String[6];
         sectionIds[0] = "A0510B4234BA451499C8DDE3AD796254";  //1-2节
         sectionIds[1] = "CEEE5CA18F9546968B2478B34BECAF59";  //3-4节
@@ -84,6 +90,12 @@ public class ReptileServiceImpl implements ReptileService {
 
         String infoId;
         //String currentOpenid = "o2LPU5iId1G-iwcxH46GwuQzcuNw";
+
+
+
+//        File file = new File(System.getProperty("user.dir")+"/123.txt");
+//        FileWriter fileWriter = new FileWriter(file);
+
         for (int i = 0;i < 7;i++){     //星期一到星期日
             for (int j = 0;j <= 5;j++){     //sectionIds[0]到sectionIds[5]
                 if(j == 2){     //由于第5节为空，略过
@@ -94,43 +106,50 @@ public class ReptileServiceImpl implements ReptileService {
                     throw new NullPointerException("Key过期了！");
                 }else{
                     domElements[i][j] = page.getElementById(key);
+//                    fileWriter.append(page.asText());
+//                    fileWriter.flush();
                 }
                 String course = domElements[i][j].asText();
                 String temp[] = new String[10];
-                int num = 0;
-                int index;
-                for (int g = 0; course.contains("---------------------"); g = g + index) {
-                    index = course.indexOf("---------------------");
-                    temp[num] = course.substring(0,index);
-                    course = course.substring(index+21);
-                    num++;
-                }
-                temp[num] = course;
+//                int num = 0;
+//                int index;
+
+//                for (int g = 0; course.contains("----"); g = g + index) {
+//                    index = course.indexOf("---");
+//                    temp[num] = course.substring(0,index);
+//                    course = course.substring(index+21);
+//                    course = course.substring(index+22);
+//                    num++;
+//                }
+                temp = course.split("---------------------|----------------------");
+                //System.out.println(Arrays.toString(temp));
                 String[] courseInfo = new String[4];
                 for (int k = 0;k < temp.length;k++) {
                     if(temp[k] == null || temp[k].equals("") || temp[k].equals(" ")){
                         continue;
                     }
-                    if(temp[k].indexOf("\n") == 1){
+                    if (temp[k].charAt(0) == '\n'){
+                        temp[k] = temp[k].substring(1);
+                    }
+                    if(temp[k].indexOf(enter) == 1){
                         temp[k] = temp[k].substring(2);
                     }
                     ArrayList<Integer> weekList;
                     ArrayList<Integer> sectionList;
                     if(temp[k].contains("网络课")){
-                        temp[k] = temp[k].substring(0,temp[k].indexOf("\n"));
+                        temp[k] = temp[k].substring(0,temp[k].indexOf(enter));
                         courseInfo[0] = temp[k];
                         weekList = null;
                         sectionList = null;
                     }else{
                         int idx,cnum = 0;
-                        for(int h = 0; temp[k].contains("\n") && cnum <= 3;h = h+idx){
-                            idx = temp[k].indexOf("\n");
+                        for(int h = 0; temp[k].contains(enter) && cnum <= 3;h = h+idx){
+                            idx = temp[k].indexOf(enter);
                             courseInfo[cnum] = temp[k].substring(0,idx);
                             temp[k] = temp[k].substring(idx+1);
                             cnum++;
                         }
-                        log.info("courseInfo...");
-                        log.info(Arrays.toString(courseInfo));
+                        //System.out.println(Arrays.toString(courseInfo));
                         weekList = getWeekCount(courseInfo[2]);
                         sectionList = getSectionCount(courseInfo[2]);
                     }
@@ -178,16 +197,17 @@ public class ReptileServiceImpl implements ReptileService {
 //                    System.out.println("节次===" + sectionList);
 //                    System.out.println("地点===" + courseInfo[3]);
 //                    System.out.println("星期" + (i+1));
-                    log.info(String.valueOf(courseTotal));
+                    log.info(currentOpenid+":"+courseTotal);
                 }
             }
         }
-        System.out.println("总课程数===" + courseTotal);
+        System.out.println(currentOpenid+"总课程数===" + courseTotal);
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("openid",currentOpenid);
         User user = iUserService.getById(currentOpenid);
         user.setIsPa(1);
         iUserService.updateById(user);
+
     }
     public static ArrayList<Integer> getWeekCount(String weekAndSection){
         ArrayList<Integer> weekList = new ArrayList<>();
@@ -229,8 +249,10 @@ public class ReptileServiceImpl implements ReptileService {
         int begin = weekAndSection.indexOf("[") + 1;
         int end = weekAndSection.indexOf("节");
         if(end == -1){
-            log.info("要报错了。。。。");
-            log.info(weekAndSection);
+            System.out.println("可能要报错了。。");
+            System.out.println(weekAndSection);
+//            log.info("要报错了。。。。");
+//            log.info(weekAndSection);
         }
         String section = weekAndSection.substring(begin, end);
         int len = section.length();

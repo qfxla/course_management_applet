@@ -9,6 +9,7 @@ import com.haotongxue.service.ReptileService;
 import com.haotongxue.utils.GetBeanUtil;
 import com.haotongxue.utils.LoginUtils;
 import com.haotongxue.utils.WebClientUtils;
+import lombok.SneakyThrows;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationContext;
 
@@ -35,6 +36,7 @@ public class ReptileRunnable implements Runnable{
         this.currentOpenid = currentOpenid;
     }
 
+    @SneakyThrows
     @Override
     public void run() {
         if (webClient == null){
