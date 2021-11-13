@@ -36,19 +36,24 @@ import java.util.List;
 public class InfoController {
     @Autowired
     private IInfoService iInfoService;
-    @Autowired
-    private IUserService iUserService;
+
     @Autowired
     private InfoMapper infoMapper;
 
     @Resource(name = "courseCache")
     LoadingCache<String,Object> cache;
 
+    @Resource(name = "loginCache")
+    LoadingCache<String,Object> userCache;
+
     @ApiOperation(value = "判断是否爬完")
     @GetMapping("/successPa")
     public R successPa(){
         String openId = UserContext.getCurrentOpenid();
-        User user = iUserService.getById(openId);
+        User user = (User) userCache.get(openId);
+        if (user == null){
+            return R.error().message("没有用户");
+        }
         return user.getIsPa() == 1? R.ok().message("爬取成功") : R.error().message("尚未爬取成功");
     }
 
