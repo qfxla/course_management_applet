@@ -3,13 +3,16 @@ package com.haotongxue.config;
 import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.haotongxue.service.IInfoService;
-import com.haotongxue.service.IUserService;
+import com.haotongxue.entity.*;
+import com.haotongxue.service.*;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -21,6 +24,21 @@ public class CaffeineConfig {
 
     @Autowired
     IInfoService iInfoService;
+
+    @Resource
+    ITeacherService iTeacherService;
+
+    @Resource
+    ICourseService iCourseService;
+
+    @Resource
+    ISectionService iSectionService;
+
+    @Resource
+    IWeekService iWeekService;
+
+    @Resource
+    IClassroomService iClassroomService;
 
     /**
      * 用于做商品的本地缓存处理
@@ -75,6 +93,40 @@ public class CaffeineConfig {
                             return todayCourse;
                         }
                         return null;
+                    }
+                });
+    }
+
+    //所有教师、教室、周次、节次
+    @Bean("courseInfo")
+    public LoadingCache<String,Object> getCourseInfo(){
+        return Caffeine.newBuilder()
+                .expireAfterWrite(1,TimeUnit.DAYS)
+                .build(new CacheLoader<String,Object>() {
+                    @Override
+                    public @Nullable Object load(@NonNull String Key) throws Exception {
+                        int idx = Key.indexOf("-");
+                        String cacheType = Key.substring(0,idx);
+                        String realKey = Key.substring(idx+1);
+                        int realKeyInt = Integer.parseInt(realKey);
+                        switch (cacheType){
+                            case "teacher":
+                                Teacher teacher = iTeacherService.getById(realKeyInt);
+                                return teacher.getName();
+                            case "course":
+                                Course course = iCourseService.getById(realKey);
+                                return course.getName();
+                            case "classroom":
+                                Classroom classroom = iClassroomService.getById(realKey);
+                                return classroom.getLocation();
+                            case "week":
+                                Week week = iWeekService.getById(realKey);
+                                return week.getWeekId();
+                            case "section":
+                                Section section = iSectionService.getById(realKey);
+                                return section.getSectionId();
+                            default:return null;
+                        }
                     }
                 });
     }
