@@ -1,12 +1,13 @@
 package com.haotongxue.service.impl;
 
-import com.haotongxue.entity.Course;
-import com.haotongxue.entity.Info;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.haotongxue.entity.*;
 import com.haotongxue.entity.vo.CourseVo;
 import com.haotongxue.entity.vo.TodayCourseVo;
 import com.haotongxue.exceptionhandler.CourseException;
 import com.haotongxue.mapper.InfoMapper;
-import com.haotongxue.service.IInfoService;
+import com.haotongxue.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.C;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.*;
@@ -36,6 +38,14 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
 
     @Autowired
     private InfoMapper infoMapper;
+    @Resource(name = "courseInfo")
+    LoadingCache<String,Object> cache;
+    @Autowired
+    private IInfoCourseService iInfoCourseService;
+    @Autowired
+    private IInfoClassroomService iInfoClassroomService;
+    @Autowired
+    private IInfoTeacherService iInfoTeacherService;
 
 
     private static final int CORE_POOL_SIZE = 5;
@@ -93,17 +103,15 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
                                 //查该info对应的teacher，classroom，course
                                 String str1 = "";
                                 String str2 = "";
-                                String courseName = ((str1 = infoMapper.getCourseNameByInfoId(info.getInfoId())).equals("无")?"":str1);
-                                String classRoom = ((str2 = infoMapper.getClassRoomByInfoId(info.getInfoId())).equals("无")?"": "@" + str2.substring(5));
-                                List<String> teacherNameList = infoMapper.getTeacherListByInfoId(info.getInfoId());
-                                String teacherName = "";
-                                if (teacherNameList.size() != 0){
-                                    for (String s : teacherNameList) {
-                                        teacherName += s;
-                                    }
-                                }
+                                String str3 = "";
+                                String courseId = iInfoCourseService.list(new QueryWrapper<InfoCourse>().eq("info_id", info.getInfoId())).get(0).getCourseId();
+                                Integer classRoomId = iInfoClassroomService.list(new QueryWrapper<InfoClassroom>().eq("info_id", info.getInfoId())).get(0).getClassroomId();
+                                Integer teacherId = iInfoTeacherService.list(new QueryWrapper<InfoTeacher>().eq("info_id", info.getInfoId())).get(0).getTeacherId();
+                                String courseName = ((str1 = (String)cache.get("course-" + courseId)).equals("无")?"":str1);
+                                String classRoom = ((str2 = (String)cache.get("classroom-" + classRoomId))).equals("无")?"": "@" + str2.substring(5);
+                                String teacher = ((str3 = (String)cache.get("teacher-" + teacherId)).equals("无")?"":str3);
                                 CourseVo courseVo = new CourseVo();
-                                courseVo.setTeacher(teacherName);
+                                courseVo.setTeacher(teacher);
                                 courseVo.setClassRoom(classRoom);
                                 courseVo.setName(courseName);
 //                                String tableItem = courseName + "  " + classRoom + "  " + teacherName;
@@ -112,6 +120,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
                                     arr[section - 1] = courseVo;
                                 }
                             }
+
                             for (int j = 0;j < 12;j++){
                                 if (arr[j] == null){
                                     CourseVo courseVo = new CourseVo();
