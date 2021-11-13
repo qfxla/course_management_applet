@@ -118,7 +118,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
                 });
             }
 
-            logger.info("耗时：" + (System.currentTimeMillis() - start));
+//            logger.info("耗时：" + (System.currentTimeMillis() - start));
             countDownLatch.await();
         }catch (Exception e){
             e.printStackTrace();
