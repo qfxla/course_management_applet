@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.DomElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.haotongxue.entity.User;
 import com.haotongxue.exceptionhandler.CourseException;
 import com.haotongxue.service.*;
@@ -57,6 +58,9 @@ public class ReptileServiceImpl implements ReptileService {
 
     @Resource
     IUserService iUserService;
+
+    @Resource(name = "loginCache")
+    LoadingCache<String,Object> cache;
 
 
     @Override
@@ -206,8 +210,12 @@ public class ReptileServiceImpl implements ReptileService {
         queryWrapper.eq("openid",currentOpenid);
         User user = iUserService.getById(currentOpenid);
         user.setIsPa(1);
-        iUserService.updateById(user);
-
+        if (!iUserService.updateById(user)){
+            CourseException courseException = new CourseException();
+            courseException.setMsg("更新isPa失败");
+            throw courseException;
+        }
+        cache.invalidate(currentOpenid);
     }
     public static ArrayList<Integer> getWeekCount(String weekAndSection){
         ArrayList<Integer> weekList = new ArrayList<>();
