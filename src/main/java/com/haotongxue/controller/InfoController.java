@@ -64,7 +64,6 @@ public class InfoController {
         String openId = UserContext.getCurrentOpenid();
 
         List<List> timeTables = (List<List>)cache.get("cour" + openId + ":" + week);
-
         return timeTables != null?R.ok().data("timeTables",timeTables) : R.error();
     }
 
