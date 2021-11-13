@@ -31,8 +31,7 @@ public class GlobalExceptionHandler {
     @ResponseBody //为了返回数据
     public R error(CourseException e) {
         log.error(e.getMessage());
-        e.printStackTrace();
-
+        //e.printStackTrace();
         return R.error().code(e.getCode()).message(e.getMsg());
     }
 
