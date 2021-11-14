@@ -30,7 +30,7 @@ public class ClassroomServiceImpl extends ServiceImpl<ClassroomMapper, Classroom
             classroomName = "无";
         }
         int existClassroomCount = classroomMapper.isExistClassroom(classroomName);
-        if(existClassroomCount == 1){
+        if(existClassroomCount >= 1){
             QueryWrapper<Classroom> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("location",classroomName);
             Classroom existedClassroom = getOne(queryWrapper);

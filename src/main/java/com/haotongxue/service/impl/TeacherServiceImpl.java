@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -29,12 +31,20 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
     TeacherMapper teacherMapper;
 
     @Override
+    public List<Teacher> getTeachers() {
+        QueryWrapper<Teacher> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("is_deleted",0);
+        List<Teacher> teachers = teacherMapper.selectList(queryWrapper);
+        return teachers;
+    }
+
+    @Override
     public Integer addTeacher(String teacherName) {
         if(teacherName == null){
             teacherName = "无";
         }
         int existTeacherCount = teacherMapper.isExistTeacher(teacherName);
-        if(existTeacherCount == 1){
+        if(existTeacherCount >= 1){
             QueryWrapper<Teacher> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("name",teacherName);
             Teacher existedTeacher = getOne(queryWrapper);

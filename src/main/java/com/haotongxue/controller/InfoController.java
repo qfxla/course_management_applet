@@ -45,6 +45,9 @@ public class InfoController {
     @Resource(name = "loginCache")
     LoadingCache<String,Object> userCache;
 
+    @Resource(name = "weekCache")
+    LoadingCache<String,Object> weekCache;
+
     @ApiOperation(value = "判断是否爬完")
     @GetMapping("/successPa")
     public R successPa(){
@@ -63,7 +66,6 @@ public class InfoController {
         String openId = UserContext.getCurrentOpenid();
 
         List<List> timeTables = (List<List>)cache.get("cour" + openId + ":" + week);
-
         return timeTables != null?R.ok().data("timeTables",timeTables) : R.error();
     }
 
@@ -71,7 +73,7 @@ public class InfoController {
     @GetMapping("/getWhichWeek")
     public R getWhichWeek(){
         //查今天是第几周
-        Integer week = infoMapper.getWeekByToday();
+        int week = (int)weekCache.get("week");
         return R.ok().data("week",week);
     }
 }

@@ -32,7 +32,7 @@ public class CourseServiceImpl extends ServiceImpl<CourseMapper, Course> impleme
     @Override
     public String addCourse(String courseName) {
         int existCourseCount = courseMapper.isExistCourse(courseName);
-        if(existCourseCount == 1){
+        if(existCourseCount >= 1){
             QueryWrapper<Course> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("name",courseName);
             Course existedCourse = getOne(queryWrapper);

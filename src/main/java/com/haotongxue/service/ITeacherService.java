@@ -3,6 +3,9 @@ package com.haotongxue.service;
 import com.haotongxue.entity.Teacher;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * <p>
  *  服务类
@@ -13,4 +16,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface ITeacherService extends IService<Teacher> {
     Integer addTeacher(String teacherName);
+    List<Teacher> getTeachers();
 }

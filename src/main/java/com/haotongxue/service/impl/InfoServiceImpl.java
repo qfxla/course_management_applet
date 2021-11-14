@@ -1,18 +1,24 @@
 package com.haotongxue.service.impl;
 
-import com.haotongxue.entity.Info;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.haotongxue.entity.*;
+import com.haotongxue.entity.vo.CourseVo;
 import com.haotongxue.entity.vo.TodayCourseVo;
 import com.haotongxue.exceptionhandler.CourseException;
 import com.haotongxue.mapper.InfoMapper;
-import com.haotongxue.service.IInfoService;
+import com.haotongxue.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.C;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
@@ -32,6 +38,14 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
 
     @Autowired
     private InfoMapper infoMapper;
+    @Resource(name = "courseInfo")
+    LoadingCache<String,Object> cache;
+    @Autowired
+    private IInfoCourseService iInfoCourseService;
+    @Autowired
+    private IInfoClassroomService iInfoClassroomService;
+    @Autowired
+    private IInfoTeacherService iInfoTeacherService;
 
 
     private static final int CORE_POOL_SIZE = 5;
@@ -62,6 +76,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
         //把课程信息根据这周的星期几进行分类
         Map<Integer, List<Info>> xingqiMap = infos.stream().collect(Collectors.groupingBy(Info::getXingqi));
         ConcurrentHashMap<Integer, List> map = new ConcurrentHashMap<>();
+
         //假设是7条，那么这7天就形成一个数组
         try {
             for (int o = 1;o <= 7;o++){
@@ -69,18 +84,18 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
                 executor.execute(new Runnable() {
                     @Override
                     public void run() {
-                        logger.info("调用课表用的线程为：" + Thread.currentThread().getName());
                         //如果这周的该星期几没课，那就都置为空
                         if (!xingqiMap.containsKey(day)){
-                            List<String> oneDayVo = new ArrayList<>();
+                            List<CourseVo> oneDayVo = new ArrayList<>();
                             for (int j = 1;j <= 12;j++) {
-                                oneDayVo.add("");
+                                CourseVo courseVo = new CourseVo("","","");
+                                oneDayVo.add(courseVo);
                             }
                             map.put(day - 1,oneDayVo);
                         }else {
                             //如果该天有课，那就另外根据该天的info的id去关联其他课程学习
                             List<Info> infoDay = xingqiMap.get(day);
-                            String[] arr = new String[12];
+                            CourseVo[] arr = new CourseVo[12];
 
                             for (Info info : infoDay) {
                                 //看每个info对应的节次
@@ -88,28 +103,33 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
                                 //查该info对应的teacher，classroom，course
                                 String str1 = "";
                                 String str2 = "";
-                                String courseName = ((str1 = infoMapper.getCourseNameByInfoId(info.getInfoId())).equals("无")?"":str1);
-                                String classRoom = ((str2 = infoMapper.getClassRoomByInfoId(info.getInfoId())).equals("无")?"":str2.substring(5));
-//                                List<String> teacherNameList = infoMapper.getTeacherListByInfoId(info.getInfoId());
-//                                String teacherName = "";
-//                                if (teacherNameList.size() != 0){
-//                                    for (String s : teacherNameList) {
-//                                        teacherName += s + " ";
-//                                    }
-//                                }
+                                String str3 = "";
+                                String courseId = iInfoCourseService.list(new QueryWrapper<InfoCourse>().eq("info_id", info.getInfoId())).get(0).getCourseId();
+                                Integer classRoomId = iInfoClassroomService.list(new QueryWrapper<InfoClassroom>().eq("info_id", info.getInfoId())).get(0).getClassroomId();
+                                Integer teacherId = iInfoTeacherService.list(new QueryWrapper<InfoTeacher>().eq("info_id", info.getInfoId())).get(0).getTeacherId();
+                                String courseName = ((str1 = (String)cache.get("course-" + courseId)).equals("无")?"":str1);
+                                String classRoom = ((str2 = (String)cache.get("classroom-" + classRoomId))).equals("无")?"": "@" + str2.substring(5);
+                                String teacher = ((str3 = (String)cache.get("teacher-" + teacherId)).equals("无")?"":str3);
+                                CourseVo courseVo = new CourseVo();
+                                courseVo.setTeacher(teacher);
+                                courseVo.setClassRoom(classRoom);
+                                courseVo.setName(courseName);
 //                                String tableItem = courseName + "  " + classRoom + "  " + teacherName;
-                                String tableItem = courseName + "  @" + classRoom;
+//                                String tableItem = courseName + "  @" + classRoom;
                                 for (Integer section : sections) {
-                                    arr[section - 1] = tableItem;
-                                }
-                            }
-                            for (int j = 0;j < 12;j++){
-                                if (arr[j] == null || arr[j].equals("")){
-                                    arr[j] = "";
+                                    arr[section - 1] = courseVo;
                                 }
                             }
 
-                            List<String> oneDayVo = Arrays.asList(arr);
+                            for (int j = 0;j < 12;j++){
+                                if (arr[j] == null){
+                                    CourseVo courseVo = new CourseVo();
+                                    courseVo.setName("").setClassRoom("").setTeacher("");
+                                    arr[j] = courseVo;
+                                }
+                            }
+
+                            List<CourseVo> oneDayVo = Arrays.asList(arr);
                             map.put(day - 1,oneDayVo);
                         }
 
@@ -118,7 +138,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
                 });
             }
 
-            logger.info("耗时：" + (System.currentTimeMillis() - start));
+//            logger.info("耗时：" + (System.currentTimeMillis() - start));
             countDownLatch.await();
         }catch (Exception e){
             e.printStackTrace();
