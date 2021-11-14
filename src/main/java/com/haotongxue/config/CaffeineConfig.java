@@ -61,26 +61,26 @@ public class CaffeineConfig {
     }
 
     //每周的课表缓存
-    @Bean("courseCache")
-    public LoadingCache<String,Object> getCourseCache(){
-        return Caffeine.newBuilder()
-                .expireAfterWrite(166, TimeUnit.HOURS) //7 * 24 - 2 （-2是为了避免00点到2点访问的是昨天的课表）
-                .build(new CacheLoader<String, Object>() {
-                    @Override
-                    public @Nullable Object load(String key) throws Exception {
-                        String cacheType = key.substring(0, 4);
-                        String realKey = key.substring(4);
-                        String[] split = realKey.split(":");
-                        String openId = split[0];
-                        String week = split[1];
-                        if (cacheType.equals("cour")){
-                            List<List> timeTables = iInfoService.getInfo(openId,Integer.valueOf(week));
-                            return timeTables;
-                        }
-                        return null;
-                    }
-                });
-    }
+//    @Bean("courseCache")
+//    public LoadingCache<String,Object> getCourseCache(){
+//        return Caffeine.newBuilder()
+//                .expireAfterWrite(166, TimeUnit.HOURS) //7 * 24 - 2 （-2是为了避免00点到2点访问的是昨天的课表）
+//                .build(new CacheLoader<String, Object>() {
+//                    @Override
+//                    public @Nullable Object load(String key) throws Exception {
+//                        String cacheType = key.substring(0, 4);
+//                        String realKey = key.substring(4);
+//                        String[] split = realKey.split(":");
+//                        String openId = split[0];
+//                        String week = split[1];
+//                        if (cacheType.equals("cour")){
+//                            List<List> timeTables = iInfoService.getInfo(openId,Integer.valueOf(week));
+//                            return timeTables;
+//                        }
+//                        return null;
+//                    }
+//                });
+//    }
     //今天是哪周
     @Bean("weekCache")
     public LoadingCache<String,Object> whichWeek(){

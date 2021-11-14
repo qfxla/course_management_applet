@@ -46,17 +46,20 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
     private IInfoClassroomService iInfoClassroomService;
     @Autowired
     private IInfoTeacherService iInfoTeacherService;
+    @Resource(name = "weekCache")
+    LoadingCache<String,Object> weekCache;
 
 
-    private static final int CORE_POOL_SIZE = 5;
-    private static final int MAX_POOL_SIZE = 10;
+    private static final int CORE_POOL_SIZE = Runtime.getRuntime ().availableProcessors () + 1;
+    private static final int MAX_POOL_SIZE = (Runtime.getRuntime ().availableProcessors () + 1) * 2;
     private static final int QUEUE_CAPACITY = 100;
     private static final Long KEEP_ALIVE_TIME = 1L;
 
     @Override
     public List<List> getInfo(String openId,int week) {
         if (week == 0){
-            week = infoMapper.getWeekByToday();
+//            week = infoMapper.getWeekByToday();
+            week = (Integer)weekCache.get("week");
         }
         Long start = System.currentTimeMillis();
         ThreadPoolExecutor executor = new ThreadPoolExecutor(
@@ -71,12 +74,11 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
 
         List<List> timeTables = new ArrayList<>(7);
 
-        //获得用户的当前周的所有的info信息
+        //获得用户的当前周的所有的info信息并按星期一到星期七
         List<Info> infos = infoMapper.getInfoByOpenidAndWeek(openId,week);
         //把课程信息根据这周的星期几进行分类
         Map<Integer, List<Info>> xingqiMap = infos.stream().collect(Collectors.groupingBy(Info::getXingqi));
         ConcurrentHashMap<Integer, List> map = new ConcurrentHashMap<>();
-
         //假设是7条，那么这7天就形成一个数组
         try {
             for (int o = 1;o <= 7;o++){
@@ -84,6 +86,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
                 executor.execute(new Runnable() {
                     @Override
                     public void run() {
+
                         //如果这周的该星期几没课，那就都置为空
                         if (!xingqiMap.containsKey(day)){
                             List<CourseVo> oneDayVo = new ArrayList<>();
@@ -93,6 +96,11 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
                             }
                             map.put(day - 1,oneDayVo);
                         }else {
+
+
+                            Long mid = System.currentTimeMillis();
+
+
                             //如果该天有课，那就另外根据该天的info的id去关联其他课程学习
                             List<Info> infoDay = xingqiMap.get(day);
                             CourseVo[] arr = new CourseVo[12];
@@ -111,9 +119,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
                                 String classRoom = ((str2 = (String)cache.get("classroom-" + classRoomId))).equals("无")?"": "@" + str2.substring(5);
                                 String teacher = ((str3 = (String)cache.get("teacher-" + teacherId)).equals("无")?"":str3);
                                 CourseVo courseVo = new CourseVo();
-                                courseVo.setTeacher(teacher);
-                                courseVo.setClassRoom(classRoom);
-                                courseVo.setName(courseName);
+                                courseVo.setTeacher(teacher).setName(courseName).setClassRoom(classRoom);
 //                                String tableItem = courseName + "  " + classRoom + "  " + teacherName;
 //                                String tableItem = courseName + "  @" + classRoom;
                                 for (Integer section : sections) {
@@ -129,6 +135,10 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
                                 }
                             }
 
+
+//                            System.out.println("线程:" + day + ":" + (System.currentTimeMillis() - mid));
+
+
                             List<CourseVo> oneDayVo = Arrays.asList(arr);
                             map.put(day - 1,oneDayVo);
                         }
@@ -137,9 +147,8 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
                     }
                 });
             }
-
-//            logger.info("耗时：" + (System.currentTimeMillis() - start));
             countDownLatch.await();
+            logger.info("耗时：" + (System.currentTimeMillis() - start));
         }catch (Exception e){
             e.printStackTrace();
         }finally {

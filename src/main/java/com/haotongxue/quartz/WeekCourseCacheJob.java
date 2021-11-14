@@ -33,14 +33,14 @@ public class WeekCourseCacheJob implements Job {
     //缓存每周课表
     @Override
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-        //遍历所有的user表数据
-        QueryWrapper<User> wrapper = new QueryWrapper<>();
-        wrapper.eq("is_pa",1);
-        List<User> users = iUserService.list(wrapper);  //所有爬完数据的人
-        for (User user : users) {
-            Integer week = infoMapper.getWeekByToday();
-            List<List> info = iInfoService.getInfo(user.getOpenid(), week);
-            cache.put("cour",user.getOpenid() + ":" + week);
-        }
+//        //遍历所有的user表数据
+//        QueryWrapper<User> wrapper = new QueryWrapper<>();
+//        wrapper.eq("is_pa",1);
+//        List<User> users = iUserService.list(wrapper);  //所有爬完数据的人
+//        for (User user : users) {
+//            Integer week = infoMapper.getWeekByToday();
+//            List<List> info = iInfoService.getInfo(user.getOpenid(), week);
+//            cache.put("cour",user.getOpenid() + ":" + week);
+//        }
     }
 }
