@@ -28,8 +28,7 @@ import java.util.List;
  * @author DJT
  * @since 2021-11-06
  */
-@RestController
-@CrossOrigin
+@RestController@CrossOrigin
 @Slf4j
 @Api(tags = "课程表信息")
 @RequestMapping("/authority/info")
@@ -76,4 +75,3 @@ public class InfoController {
         return R.ok().data("week",week);
     }
 }
-
