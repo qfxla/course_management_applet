@@ -38,6 +38,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
 
     @Autowired
     private InfoMapper infoMapper;
+
     @Resource(name = "courseInfo")
     LoadingCache<String,Object> cache;
     @Autowired
