@@ -68,12 +68,4 @@ public class InfoController {
         List<List> timeTables = (List<List>)cache.get("cour" + openId + ":" + week);
         return timeTables != null?R.ok().data("timeTables",timeTables) : R.error();
     }
-
-    @ApiOperation(value = "获得当前是哪周")
-    @GetMapping("/getWhichWeek")
-    public R getWhichWeek(){
-        //查今天是第几周
-        int week = (int)weekCache.get("week");
-        return R.ok().data("week",week);
-    }
 }
