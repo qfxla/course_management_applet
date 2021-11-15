@@ -66,7 +66,6 @@ public class MiniAndOfficialHandler {
                 }
                 UpdateWrapper<User> userUpdateWrapper = new UpdateWrapper<>();
                 userUpdateWrapper.set("union_id",uuid)
-                        .set("subscribe",1)
                         .eq("openid",userOpenid);
                 if (!userService.update(userUpdateWrapper)){
                     CourseException courseException = new CourseException();
