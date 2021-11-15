@@ -39,14 +39,15 @@ public class InfoController {
     @Autowired
     private InfoMapper infoMapper;
 
-    @Resource(name = "courseCache")
-    LoadingCache<String,Object> cache;
-
     @Resource(name = "loginCache")
     LoadingCache<String,Object> userCache;
 
     @Resource(name = "weekCache")
     LoadingCache<String,Object> weekCache;
+
+    @Resource(name = "courseCache")
+    LoadingCache<String,Object> courseCache;
+
 
     @ApiOperation(value = "判断是否爬完")
     @GetMapping("/successPa")
@@ -62,10 +63,9 @@ public class InfoController {
     @ApiOperation(value = "获得课程表信息")
     @GetMapping("/getInfo")
     public R getInfo(@RequestParam(value = "week",required = false,defaultValue = "0")int week) throws InterruptedException {
-
         String openId = UserContext.getCurrentOpenid();
-
-        List<List> timeTables = (List<List>)cache.get("cour" + openId + ":" + week);
+        List<List> timeTables = (List<List>)courseCache.get("cour" + openId + ":" + week);
+//        List<List> timeTables = iInfoService.getInfo(openId, week);
         return timeTables != null?R.ok().data("timeTables",timeTables) : R.error();
     }
 }
