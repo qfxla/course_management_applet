@@ -261,11 +261,23 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
 
 
     @Override
-    public String addCourseInfo(int week) {
+    public int insertInfo(Info info) {
+        int res = infoMapper.insert(info);
+        if(res == 1){
+            return 1;
+        }else{
+            throw new CourseException(555,"插入t_info失败。");
+        }
+    }
+
+    @Override
+    public String addCourseInfo(int week,String weekStr,String sectionStr) {
         UUID infoUUID = UUID.randomUUID();
         String infoId = infoUUID.toString();
         Info info = new Info();
         info.setInfoId(infoId);
+        info.setWeekStr(weekStr);
+        info.setSectionStr(sectionStr);
         if(week >= 1 && week <= 7){
             info.setXingqi(week);
         }else {

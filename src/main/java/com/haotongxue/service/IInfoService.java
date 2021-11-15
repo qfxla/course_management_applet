@@ -24,5 +24,8 @@ public interface IInfoService extends IService<Info> {
     List getTodayCourse(String openId);   //map的key为一次课的第一小节，value为课程详细信息
 
     //插入课程信息
-    String addCourseInfo(int week);
+    String addCourseInfo(int week,String weekStr,String sectionStr);
+
+    //插入周次和节次的字符串
+    int insertInfo(Info info);
 }

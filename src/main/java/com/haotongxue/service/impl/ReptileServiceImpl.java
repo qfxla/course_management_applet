@@ -6,28 +6,24 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.DomElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.haotongxue.entity.Info;
 import com.haotongxue.entity.User;
 import com.haotongxue.exceptionhandler.CourseException;
 import com.haotongxue.service.*;
-import com.haotongxue.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 @Service
 @Slf4j
 public class ReptileServiceImpl implements ReptileService {
 
     @Resource
-    IInfoService infoService;
+    IInfoService iinfoService;
 
     @Resource
     ICourseService iCourseService;
@@ -153,14 +149,17 @@ public class ReptileServiceImpl implements ReptileService {
                             temp[k] = temp[k].substring(idx+1);
                             cnum++;
                         }
-                        //System.out.println(Arrays.toString(courseInfo));
                         weekList = getWeekCount(courseInfo[2]);
                         sectionList = getSectionCount(courseInfo[2]);
                     }
                     int xingqiId = i+1;     //星期几
 
                     if(weekList == null || weekList.size() == 0){
-                        infoId = infoService.addCourseInfo(xingqiId);
+                        String weekAndSectionStr = courseInfo[2];
+                        String weekStr = getWeekStr(weekAndSectionStr);
+                        String sectionStr = getSectionStr(weekAndSectionStr);
+
+                        infoId = iinfoService.addCourseInfo(xingqiId,weekStr,sectionStr);
                         iUserInfoService.insertUserInfo(currentOpenid,infoId);
                         continue;
                     }
@@ -168,8 +167,11 @@ public class ReptileServiceImpl implements ReptileService {
                     for (Integer weekId : weekList) {
                         for (Integer sectionId : sectionList) {
                             courseTotal++;
-                            infoId = infoService.addCourseInfo(xingqiId);
+                            String weekAndSectionStr = courseInfo[2];
+                            String weekStr = getWeekStr(weekAndSectionStr);
+                            String sectionStr = getSectionStr(weekAndSectionStr);
 
+                            infoId = iinfoService.addCourseInfo(xingqiId,weekStr,sectionStr);
                             iUserInfoService.insertUserInfo(currentOpenid, infoId);
 
                             String courseName = courseInfo[0];      //课程名
@@ -178,6 +180,8 @@ public class ReptileServiceImpl implements ReptileService {
                             Integer teacherId = iTeacherService.addTeacher(teacherName);  //添加教师t_teacher
                             String classroomName = courseInfo[3];   //教室名
                             Integer classroomId = iClassroomService.addClassroom(classroomName);    //添加教室t_classroom
+
+
 
                             //插入课程表与t_info的关联表
                             iInfoCourseService.insertInfoCourse(infoId, courseId);
@@ -217,6 +221,41 @@ public class ReptileServiceImpl implements ReptileService {
         }
         cache.invalidate(currentOpenid);
     }
+
+    public static String getWeekStr(String ws){
+        String zSub = "";
+        if(ws.contains("周") && !ws.contains("节")){  //只有周次
+            return ws;  //直接返回周次
+        }
+
+        if(ws.contains("周")){
+            int zhouIdx = ws.indexOf("周");
+            zSub = ws.substring(0, zhouIdx + 2);
+            return ws;  //返回周次
+        }
+
+        return "无";     //只有节次 或者 都没有
+
+    }
+
+    public static String getSectionStr(String ws){
+        String zSub = "";
+        if(ws.contains("周")){   //拿到zSub
+            int zhouIdx = ws.indexOf("周");
+            zSub = ws.substring(0, zhouIdx + 2);
+        }
+
+        if(ws.contains("周") && ws.contains("节")){   //有周次和节次，只要节次
+            int jieIdx = ws.indexOf("节");
+            String jSub = ws.substring(zSub.length(),jieIdx+2);
+            return jSub;
+        }else if(!ws.contains("周") && ws.contains("节")){    //只有节次
+            return ws;  //直接返回节次
+        }
+        return "无";     //只有周次  或者  都没有
+    }
+
+
     public static ArrayList<Integer> getWeekCount(String weekAndSection){
         ArrayList<Integer> weekList = new ArrayList<>();
         int index = weekAndSection.indexOf("(周)");
