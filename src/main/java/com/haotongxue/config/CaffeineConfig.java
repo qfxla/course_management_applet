@@ -6,6 +6,7 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.haotongxue.entity.*;
 import com.haotongxue.mapper.InfoMapper;
 import com.haotongxue.service.*;
+import com.haotongxue.utils.DateConvert;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,8 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -61,31 +64,33 @@ public class CaffeineConfig {
     }
 
     //每周的课表缓存
-//    @Bean("courseCache")
-//    public LoadingCache<String,Object> getCourseCache(){
-//        return Caffeine.newBuilder()
-//                .expireAfterWrite(166, TimeUnit.HOURS) //7 * 24 - 2 （-2是为了避免00点到2点访问的是昨天的课表）
-//                .build(new CacheLoader<String, Object>() {
-//                    @Override
-//                    public @Nullable Object load(String key) throws Exception {
-//                        String cacheType = key.substring(0, 4);
-//                        String realKey = key.substring(4);
-//                        String[] split = realKey.split(":");
-//                        String openId = split[0];
-//                        String week = split[1];
-//                        if (cacheType.equals("cour")){
-//                            List<List> timeTables = iInfoService.getInfo(openId,Integer.valueOf(week));
-//                            return timeTables;
-//                        }
-//                        return null;
-//                    }
-//                });
-//    }
+    @Bean("courseCache")
+    public LoadingCache<String,Object> getCourseCache(){
+        int min = DateConvert.cacheMin();
+        return Caffeine.newBuilder()
+                .expireAfterWrite(min, TimeUnit.MINUTES)
+                .build(new CacheLoader<String, Object>() { //到下周一0点的分钟数
+                    @Override
+                    public @Nullable Object load(String key) throws Exception {
+                        String cacheType = key.substring(0, 4);
+                        String realKey = key.substring(4);
+                        String[] split = realKey.split(":");
+                        String openId = split[0];
+                        String week = split[1];
+                        if (cacheType.equals("cour")){
+                            List<List> timeTables = iInfoService.getInfo(openId,Integer.valueOf(week));
+                            return timeTables;
+                        }
+                        return null;
+                    }
+                });
+    }
     //今天是哪周
     @Bean("weekCache")
     public LoadingCache<String,Object> whichWeek(){
+        int min = DateConvert.cacheMin();
         return Caffeine.newBuilder()
-                .expireAfterWrite(7, TimeUnit.DAYS)    //7 * 24 - 2 （-2是为了避免00点到2点访问的是昨天的课表）
+                .expireAfterWrite(min, TimeUnit.MINUTES) //缓存时间为当前时间到下周一的0点
                 .build(new CacheLoader<String, Object>() {
                     @Override
                     public @Nullable Object load(String key) throws Exception {
