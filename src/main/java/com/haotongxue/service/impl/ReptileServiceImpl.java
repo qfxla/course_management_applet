@@ -229,6 +229,9 @@ public class ReptileServiceImpl implements ReptileService {
     }
 
     public static String getWeekStr(String ws){
+        if(ws == null){
+            return "无";
+        }
         String zSub = "";
         if(ws.contains("周") && !ws.contains("节")){  //只有周次
             return ws;  //直接返回周次
@@ -237,7 +240,7 @@ public class ReptileServiceImpl implements ReptileService {
         if(ws.contains("周")){
             int zhouIdx = ws.indexOf("周");
             zSub = ws.substring(0, zhouIdx + 2);
-            return ws;  //返回周次
+            return zSub;  //返回周次
         }
 
         return "无";     //只有节次 或者 都没有
@@ -245,6 +248,9 @@ public class ReptileServiceImpl implements ReptileService {
     }
 
     public static String getSectionStr(String ws){
+        if(ws == null){
+            return "无";
+        }
         String zSub = "";
         if(ws.contains("周")){   //拿到zSub
             int zhouIdx = ws.indexOf("周");
