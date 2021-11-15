@@ -39,6 +39,12 @@ public class Info implements Serializable {
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
 
+    @ApiModelProperty("周次字符串")
+    private String weekStr;
+
+    @ApiModelProperty("节次字符串")
+    private String sectionStr;
+
     @Version
     private Integer version;
 
