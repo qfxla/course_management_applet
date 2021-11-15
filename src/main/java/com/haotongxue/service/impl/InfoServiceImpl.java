@@ -97,11 +97,6 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
                             }
                             map.put(day - 1,oneDayVo);
                         }else {
-
-
-                            Long mid = System.currentTimeMillis();
-
-
                             //如果该天有课，那就另外根据该天的info的id去关联其他课程学习
                             List<Info> infoDay = xingqiMap.get(day);
                             CourseVo[] arr = new CourseVo[12];
@@ -135,11 +130,6 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
                                     arr[j] = courseVo;
                                 }
                             }
-
-
-//                            System.out.println("线程:" + day + ":" + (System.currentTimeMillis() - mid));
-
-
                             List<CourseVo> oneDayVo = Arrays.asList(arr);
                             map.put(day - 1,oneDayVo);
                         }
