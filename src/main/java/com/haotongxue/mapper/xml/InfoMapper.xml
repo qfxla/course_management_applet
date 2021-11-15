@@ -3,7 +3,7 @@
 <mapper namespace="com.haotongxue.mapper.InfoMapper">
 
     <select id="getInfoByOpenidAndWeek" resultType="com.haotongxue.entity.Info">
-        SELECT i.info_id,i.xingqi
+        SELECT i.info_id,i.xingqi,i.week_str,i.section_str
         FROM t_info i LEFT JOIN t_user_info uf
         ON i.info_id = uf.info_id
         LEFT JOIN t_info_week wf

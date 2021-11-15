@@ -167,10 +167,16 @@ public class ReptileServiceImpl implements ReptileService {
                     for (Integer weekId : weekList) {
                         for (Integer sectionId : sectionList) {
                             courseTotal++;
+                            String weekStr = "";
+                            String sectionStr = "";
                             String weekAndSectionStr = courseInfo[2];
-                            String weekStr = getWeekStr(weekAndSectionStr);
-                            String sectionStr = getSectionStr(weekAndSectionStr);
-
+                            if(weekAndSectionStr != null && !weekAndSectionStr.equals("") && !weekAndSectionStr.equals(" ")){
+                                weekStr  = getWeekStr(weekAndSectionStr);
+                                sectionStr = getSectionStr(weekAndSectionStr);
+                            }else {
+                                weekStr = "无";
+                                sectionStr = "无";
+                            }
                             infoId = iinfoService.addCourseInfo(xingqiId,weekStr,sectionStr);
                             iUserInfoService.insertUserInfo(currentOpenid, infoId);
 

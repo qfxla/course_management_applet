@@ -15,14 +15,18 @@ public class CourseVo {
     String name;
     String classRoom;
     String teacher;
+    String weekStr;
+    String sectionStr;
 
     public CourseVo() {
     }
 
-    public CourseVo(String name, String classRoom, String teacher) {
+    public CourseVo(String name, String classRoom, String teacher, String weekStr, String sectionStr) {
         this.name = name;
         this.classRoom = classRoom;
         this.teacher = teacher;
+        this.weekStr = weekStr;
+        this.sectionStr = sectionStr;
     }
 
     @Override
@@ -31,6 +35,8 @@ public class CourseVo {
                 "name='" + name + '\'' +
                 ", classRoom='" + classRoom + '\'' +
                 ", teacher='" + teacher + '\'' +
+                ", weekStr='" + weekStr + '\'' +
+                ", sectionStr='" + sectionStr + '\'' +
                 '}';
     }
 }
