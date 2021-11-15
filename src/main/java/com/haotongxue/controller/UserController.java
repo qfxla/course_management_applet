@@ -140,6 +140,18 @@ public class UserController {
         return R.ok().data("isSubscribe",user.getSubscribe());
     }
 
+
+    @ApiOperation("确认该用户是否有关注公众号")
+    @GetMapping("/authority/confirmOfficial")
+    public R confirmConcern(){
+        String currentOpenid = UserContext.getCurrentOpenid();
+        User user = (User) cache.get(currentOpenid);
+        if (user.getUnionId() == null){
+            return R.error();
+        }
+        return R.ok();
+    }
+
     @ApiOperation("重新设置信息推送规则")
     @PostMapping("/authority/setting")
     public R pushSetting(@RequestBody PushSettingDTO pushSettingDTO){
@@ -151,6 +163,5 @@ public class UserController {
         userService.update(userUpdateWrapper);
         return R.ok();
     }
-
 }
 

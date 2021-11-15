@@ -39,18 +39,26 @@ public class MiniAndOfficialHandler {
     @Transactional(rollbackFor = Exception.class)
     public void confirmSubscribe(){
         QueryWrapper<OfficialUser> officialWrapper = new QueryWrapper<>();
-        officialWrapper.select("openid");
+        officialWrapper.select("openid","nickname","sex").eq("unionid","");
         List<OfficialUser> officialUserList = officialUserService.list(officialWrapper);
         for (OfficialUser officialUser : officialUserList){
-            String openid = officialUser.getOpenid();
-            User user = (User) cache.get(openid);
-            if (user == null){
+            String officialOpenid = officialUser.getOpenid();
+            String nickname = officialUser.getNickname();
+            String sex = officialUser.getSex();
+            QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+            userQueryWrapper.select("openid")
+                    .eq("nick_name",nickname)
+                    .eq("gender",sex);
+            List<User> userList = userService.list(userQueryWrapper);
+            if (userList == null){
                 continue;
             }
+            User user = userList.get(0);
+            String userOpenid = user.getOpenid();
             if (user.getUnionId() == null){
                 String uuid = UUID.randomUUID().toString();
                 UpdateWrapper<OfficialUser> officialWrapperTwo = new UpdateWrapper<>();
-                officialWrapperTwo.set("unionid",uuid).eq("openid",openid);
+                officialWrapperTwo.set("unionid",uuid).eq("openid",officialOpenid);
                 if (!officialUserService.update(officialWrapperTwo)){
                     CourseException courseException = new CourseException();
                     courseException.setMsg("设置official_uuid失败");
@@ -59,7 +67,7 @@ public class MiniAndOfficialHandler {
                 UpdateWrapper<User> userUpdateWrapper = new UpdateWrapper<>();
                 userUpdateWrapper.set("union_id",uuid)
                         .set("subscribe",1)
-                        .eq("openid",openid);
+                        .eq("openid",userOpenid);
                 if (!userService.update(userUpdateWrapper)){
                     CourseException courseException = new CourseException();
                     courseException.setMsg("设置user_uuid失败");
