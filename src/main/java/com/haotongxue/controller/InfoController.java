@@ -4,9 +4,6 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.haotongxue.entity.User;
 import com.haotongxue.mapper.InfoMapper;
 import com.haotongxue.service.IInfoService;
-import com.haotongxue.service.IUserService;
-import com.haotongxue.utils.R;
-import com.haotongxue.utils.ResultCode;
 import com.haotongxue.utils.UserContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
@@ -15,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
-
+import com.haotongxue.utils.*;
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;

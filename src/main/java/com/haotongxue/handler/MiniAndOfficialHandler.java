@@ -50,7 +50,7 @@ public class MiniAndOfficialHandler {
                     .eq("nick_name",nickname)
                     .eq("gender",sex);
             List<User> userList = userService.list(userQueryWrapper);
-            if (userList == null){
+            if (userList == null || userList.size() == 0){
                 continue;
             }
             User user = userList.get(0);
@@ -72,6 +72,7 @@ public class MiniAndOfficialHandler {
                     courseException.setMsg("设置user_uuid失败");
                     throw courseException;
                 }
+                cache.invalidate(userOpenid);
             }
         }
     }
