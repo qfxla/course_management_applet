@@ -1,6 +1,10 @@
 package com.haotongxue.service.impl;
 
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.DomElement;
@@ -11,8 +15,12 @@ import com.haotongxue.entity.User;
 import com.haotongxue.exceptionhandler.CourseException;
 import com.haotongxue.service.*;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.io.FileOutputStream;
 
 import javax.annotation.Resource;
 import java.io.IOException;
@@ -70,14 +78,55 @@ public class ReptileServiceImpl implements ReptileService {
         }
         String enter = "\n";
         String[] sectionIds = new String[6];
-        sectionIds[0] = "A0510B4234BA451499C8DDE3AD796254";  //1-2节
-        sectionIds[1] = "CEEE5CA18F9546968B2478B34BECAF59";  //3-4节
-        sectionIds[2] = "13CC5FA094F34E519AFA1A151EC9676E";  //5节
-        sectionIds[3] = "FE4BF6D361F648CF902A89C879DF0A81";  //6-7节
-        sectionIds[4] = "DAB50D67E3684EE7AE7781D2DCA83158";  //8-9节
-        sectionIds[5] = "273908B0CB2248D2BF96D0CF529EB31F";  //10-12节
-        DomElement[][] domElements = new DomElement[7][6];
 
+
+        DomElement timetable = page.getElementById("timetable");
+        String timeTableXml = timetable.asXml();
+        Document doc = Jsoup.parse(timeTableXml);
+        Elements trs = doc.select("table").select("td");
+        int count = 0;
+        for (Element oneClass :trs.toggleClass("kbcontent")){
+            if(count >= 42){
+                break;
+            }
+            Element child = oneClass.child(0);
+            String val = child.val();
+            String sub = val.substring(0, 32);
+
+            switch (count){
+                case 6:
+                    sectionIds[0] = sub;
+                    break;
+                case 13:
+                    sectionIds[1] = sub;
+                    break;
+                case 20:
+                    sectionIds[2] = sub;
+                    break;
+                case 27:
+                    sectionIds[3] = sub;
+                    break;
+                case 34:
+                    sectionIds[4] = sub;
+                    break;
+                case 41:
+                    sectionIds[5] = sub;
+                    break;
+            }
+            count++;
+        }
+
+
+//        sectionIds[0] = "A0510B4234BA451499C8DDE3AD796254";  //1-2节
+//        sectionIds[1] = "CEEE5CA18F9546968B2478B34BECAF59";  //3-4节
+//        sectionIds[2] = "13CC5FA094F34E519AFA1A151EC9676E";  //5节
+//        sectionIds[3] = "FE4BF6D361F648CF902A89C879DF0A81";  //6-7节
+//        sectionIds[4] = "DAB50D67E3684EE7AE7781D2DCA83158";  //8-9节
+//        sectionIds[5] = "273908B0CB2248D2BF96D0CF529EB31F";  //10-12节
+
+
+
+        DomElement[][] domElements = new DomElement[7][6];
         String key = "";
         int courseTotal = 0;
         //星期一~星期日：1-2~7-2
