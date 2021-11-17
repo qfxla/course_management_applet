@@ -90,6 +90,8 @@ public class UserController {
             user.setIsPa(0);
             user.setIsPaing(0);
             userService.save(user);
+            user.setSubscribe(1);
+            user.setUnionId("");
             cache.put(openid,user);
         }else {
             //如果为0，则爬虫还没执行成功
