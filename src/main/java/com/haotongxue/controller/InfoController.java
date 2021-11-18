@@ -2,7 +2,9 @@ package com.haotongxue.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.haotongxue.entity.User;
+import com.haotongxue.entity.vo.AddCourseVo;
 import com.haotongxue.mapper.InfoMapper;
+import com.haotongxue.service.AddCourseService;
 import com.haotongxue.service.IInfoService;
 import com.haotongxue.utils.UserContext;
 import io.swagger.annotations.Api;
@@ -45,6 +47,9 @@ public class InfoController {
     @Resource(name = "courseCache")
     LoadingCache<String,Object> courseCache;
 
+    @Autowired
+    AddCourseService addCourseService;
+
 
     @ApiOperation(value = "判断是否爬完")
     @GetMapping("/successPa")
@@ -64,6 +69,14 @@ public class InfoController {
         List<List> timeTables = (List<List>)courseCache.get("cour" + openId + ":" + week);
 //        List<List> timeTables = iInfoService.getInfo(openId, week);
         return timeTables != null?R.ok().data("timeTables",timeTables) : R.error();
+    }
+
+    @ApiOperation("自定义添加课程")
+    @PostMapping("/addCourse")
+    public R addCourse(@RequestParam("openid") String openId,
+                       @RequestBody AddCourseVo addCourseVo){
+        boolean flag = addCourseService.addCourse(openId, addCourseVo);
+        return flag?R.ok():R.error();
     }
 
     @ApiOperation(value = "重新爬取课程表数据")
