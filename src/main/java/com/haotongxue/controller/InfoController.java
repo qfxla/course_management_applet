@@ -2,8 +2,9 @@ package com.haotongxue.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.haotongxue.entity.User;
+import com.haotongxue.entity.vo.AddCourseVo;
 import com.haotongxue.mapper.InfoMapper;
-import com.haotongxue.service.IInfoService;
+import com.haotongxue.service.*;
 import com.haotongxue.utils.UserContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
@@ -25,16 +26,14 @@ import java.util.List;
  * @author DJT
  * @since 2021-11-06
  */
-@RestController@CrossOrigin
+@RestController
+@CrossOrigin
 @Slf4j
 @Api(tags = "课程表信息")
 @RequestMapping("/authority/info")
 public class InfoController {
     @Autowired
     private IInfoService iInfoService;
-
-    @Autowired
-    private InfoMapper infoMapper;
 
     @Resource(name = "loginCache")
     LoadingCache<String,Object> userCache;
@@ -44,6 +43,9 @@ public class InfoController {
 
     @Resource(name = "courseCache")
     LoadingCache<String,Object> courseCache;
+
+    @Autowired
+    AddCourseService addCourseService;
 
 
     @ApiOperation(value = "判断是否爬完")
@@ -64,5 +66,13 @@ public class InfoController {
         List<List> timeTables = (List<List>)courseCache.get("cour" + openId + ":" + week);
 //        List<List> timeTables = iInfoService.getInfo(openId, week);
         return timeTables != null?R.ok().data("timeTables",timeTables) : R.error();
+    }
+
+    @ApiOperation("自定义添加课程")
+    @PostMapping("/addCourse")
+    public R addCourse(@RequestParam("openid") String openId,
+                       @RequestBody AddCourseVo addCourseVo){
+        boolean flag = addCourseService.addCourse(openId, addCourseVo);
+        return flag?R.ok():R.error();
     }
 }

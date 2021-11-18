@@ -237,7 +237,6 @@ public class ReptileServiceImpl implements ReptileService {
                             Integer classroomId = iClassroomService.addClassroom(classroomName);    //添加教室t_classroom
 
 
-
                             //插入课程表与t_info的关联表
                             iInfoCourseService.insertInfoCourse(infoId, courseId);
 
