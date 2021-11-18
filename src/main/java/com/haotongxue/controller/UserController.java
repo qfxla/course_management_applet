@@ -101,9 +101,16 @@ public class UserController {
         }
         String token = JwtUtils.generate(openid);
         if (isRefreshInfo){
-            return R.ok().code(ResultCode.NEED_REFRESH_INFO).data("Authority",token);
+            return R.ok().code(ResultCode.NEED_REFRESH_INFO)
+                    .data("Authority",token)
+                    .data("subscribe",user.getSubscribe() == 1)
+                    .data("isConcern",!user.getUnionId().equals(""));
         }
-        return R.ok().data("Authority",token).data("openid",openid);
+        return R.ok()
+                .data("Authority",token)
+                .data("openid",openid)
+                .data("subscribe",user.getSubscribe() == 1)
+                .data("isConcern",!user.getUnionId().equals(""));
     }
 
     @ApiOperation("修改用户密码")
@@ -140,6 +147,14 @@ public class UserController {
         return R.ok().data("isSubscribe",user.getSubscribe());
     }
 
+    @ApiOperation("查看用户是否关注了公众号")
+    @GetMapping("/authority/confirmOfficial")
+    public R confirmConcern(){
+        String currentOpenid = UserContext.getCurrentOpenid();
+        User user = (User) cache.get(currentOpenid);
+        return user.getUnionId().equals("") ? R.error() : R.ok();
+    }
+
     @ApiOperation("重新设置信息推送规则")
     @PostMapping("/authority/setting")
     public R pushSetting(@RequestBody PushSettingDTO pushSettingDTO){
@@ -151,6 +166,5 @@ public class UserController {
         userService.update(userUpdateWrapper);
         return R.ok();
     }
-
 }
 
