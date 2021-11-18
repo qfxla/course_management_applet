@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Calendar;
+import java.util.Date;
+
 /**
  * @author zcj
  * @creat 2021-11-07-14:52
@@ -17,6 +20,9 @@ public class testCode {
     private InfoServiceImpl infoServiceImpl;
     @Test
     public void test() throws InterruptedException {
-        infoServiceImpl.getTodayCourse("1");
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        int xingqi = calendar.get(Calendar.DAY_OF_WEEK) - 1;
+        System.out.println(xingqi);
     }
 }
