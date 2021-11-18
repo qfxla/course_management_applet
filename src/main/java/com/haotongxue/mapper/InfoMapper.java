@@ -2,6 +2,7 @@ package com.haotongxue.mapper;
 
 import com.haotongxue.entity.Info;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -35,4 +36,7 @@ public interface InfoMapper extends BaseMapper<Info> {
 
     //查今天是第几周
     Integer getWeekByToday();
+
+    @Delete("delete from t_info where info_id = #{infoId}")
+    int deleteByInfoId(@Param("infoId") String infoId);
 }

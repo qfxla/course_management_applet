@@ -4,6 +4,7 @@ import com.haotongxue.entity.Info;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.haotongxue.entity.vo.InfoVo;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -30,5 +31,5 @@ public interface IInfoService extends IService<Info> {
     int insertInfo(Info info);
 
     //重新获取课程表数据
-    boolean updateCourseData();
+    boolean updateCourseData() throws IOException;
 }

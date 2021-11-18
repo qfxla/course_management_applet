@@ -2,15 +2,19 @@ package com.haotongxue.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.gargoylesoftware.htmlunit.WebClient;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.haotongxue.entity.*;
 import com.haotongxue.entity.vo.CourseVo;
 import com.haotongxue.entity.vo.TodayCourseVo;
 import com.haotongxue.exceptionhandler.CourseException;
+import com.haotongxue.handler.ReptileHandler;
 import com.haotongxue.mapper.*;
 import com.haotongxue.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.haotongxue.utils.UserContext;
+import com.haotongxue.utils.WebClientUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.C;
 import org.slf4j.Logger;
@@ -20,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.*;
@@ -63,6 +68,14 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
     private IInfoService iInfoService;
     @Autowired
     private IUserInfoService iUserInfoService;
+    @Autowired
+    private ReptileService reptileService;
+    @Autowired
+    private ReptileHandler reptileHandler;
+    @Resource(name = "loginCache")
+    LoadingCache<String,Object> loginCache;
+    @Autowired
+    private IUserService iUserService;
 
 
     private static final int CORE_POOL_SIZE = Runtime.getRuntime ().availableProcessors () + 1;
@@ -219,23 +232,40 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
     }
 
     @Override
-    public boolean updateCourseData() {
+    @Transactional(rollbackFor = Exception.class)
+    public boolean updateCourseData() throws IOException {
         String openId = UserContext.getCurrentOpenid();
+        UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("openid",openId).set("is_pa",0);
         //查找当前用户的所有info
         QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
         wrapper.eq("openid",openId);
         List<String> infoList = iUserInfoService.list(wrapper).stream().map(UserInfo::getInfoId).collect(Collectors.toList());
+
+        logger.info("查找用户的所有info数量"+ infoList.size());
+
+        int i1 = 0,i2 =0,i3 = 0,i4 = 0,i5 = 0;
         for (String infoId : infoList) {
             //删除当前用户的数据
-            int i1 = infoSectionMapper.deleteByInfoId(infoId);
-            int i2 = infoWeekMapper.deleteByInfoId(infoId);
-            int i3 = infoCourseMapper.deleteByInfoId(infoId);
-            int i4 = infoClassroomMapper.deleteByInfoId(infoId);
+            i1 = infoSectionMapper.deleteByInfoId(infoId);
+            i2 = infoWeekMapper.deleteByInfoId(infoId);
+            i3 = infoCourseMapper.deleteByInfoId(infoId);
+            i4 = infoClassroomMapper.deleteByInfoId(infoId);
+            i5 = infoMapper.deleteByInfoId(infoId);
         }
-
-return true;
-
+        //删除成功，开始爬
+        if (i1 > 0 && i2 > 0 && i3 > 0 && i4 > 0 && i5 >0){
+            logger.info("删除成功，开始爬");
+            WebClient webClient = WebClientUtils.getWebClient();
+            reptileService.pa(webClient,openId);
+            User user = (User)loginCache.get(openId);
+            logger.info("删除成功，开始爬");
+            reptileHandler.pa(webClient,user.getNo(),user.getPassword());
+            return true;
+        }
+        return false;
     }
+
 
     @Override
     public String addCourseInfo(int week,String weekStr,String sectionStr) {
