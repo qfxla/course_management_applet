@@ -35,11 +35,11 @@ public class MiniAndOfficialHandler {
     /**
      * 确认用户是否有订阅课程推送
      */
-    @Scheduled(fixedDelay = 40*60*1000)
+    @Scheduled(fixedDelay = 20*60*1000)
     @Transactional(rollbackFor = Exception.class)
     public void confirmSubscribe(){
         QueryWrapper<OfficialUser> officialWrapper = new QueryWrapper<>();
-        officialWrapper.select("openid","nickname","sex").eq("unionid","");
+        officialWrapper.select("openid","nickname","sex","unionid");
         List<OfficialUser> officialUserList = officialUserService.list(officialWrapper);
         for (OfficialUser officialUser : officialUserList){
             String officialOpenid = officialUser.getOpenid();
@@ -55,8 +55,13 @@ public class MiniAndOfficialHandler {
             }
             User user = userList.get(0);
             String userOpenid = user.getOpenid();
-            if (user.getUnionId() == null){
-                String uuid = UUID.randomUUID().toString();
+            if (user.getUnionId() == null || user.getUnionId().equals("")){
+                String uuid;
+                if (!officialUser.getUnionid().equals("")){
+                    uuid = officialUser.getUnionid();
+                }else {
+                    uuid = UUID.randomUUID().toString();
+                }
                 UpdateWrapper<OfficialUser> officialWrapperTwo = new UpdateWrapper<>();
                 officialWrapperTwo.set("unionid",uuid).eq("openid",officialOpenid);
                 if (!officialUserService.update(officialWrapperTwo)){
