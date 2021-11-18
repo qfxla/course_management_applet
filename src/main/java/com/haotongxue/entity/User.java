@@ -61,6 +61,9 @@ public class User implements Serializable {
     @ApiModelProperty("是否订阅推送")
     private Integer subscribe;
 
+    @ApiModelProperty("用户自定义推送时间")
+    private Integer minutes;
+
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
