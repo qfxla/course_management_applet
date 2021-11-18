@@ -28,4 +28,7 @@ public interface IInfoService extends IService<Info> {
 
     //插入周次和节次的字符串
     int insertInfo(Info info);
+
+    //重新获取课程表数据
+    boolean updateCourseData();
 }

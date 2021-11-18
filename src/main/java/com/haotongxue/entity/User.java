@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.Version;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -59,6 +60,9 @@ public class User implements Serializable {
 
     @ApiModelProperty("是否订阅推送")
     private Integer subscribe;
+
+    @ApiModelProperty("用户自定义推送时间")
+    private Integer minutes;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;

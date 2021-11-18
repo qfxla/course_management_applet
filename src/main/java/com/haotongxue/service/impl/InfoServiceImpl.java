@@ -1,14 +1,16 @@
 package com.haotongxue.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.haotongxue.entity.*;
 import com.haotongxue.entity.vo.CourseVo;
 import com.haotongxue.entity.vo.TodayCourseVo;
 import com.haotongxue.exceptionhandler.CourseException;
-import com.haotongxue.mapper.InfoMapper;
+import com.haotongxue.mapper.*;
 import com.haotongxue.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.haotongxue.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.C;
 import org.slf4j.Logger;
@@ -49,6 +51,18 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
     private IInfoTeacherService iInfoTeacherService;
     @Resource(name = "weekCache")
     LoadingCache<String,Object> weekCache;
+    @Autowired
+    private InfoSectionMapper infoSectionMapper;
+    @Autowired
+    private InfoWeekMapper infoWeekMapper;
+    @Autowired
+    private InfoCourseMapper infoCourseMapper;
+    @Autowired
+    private InfoClassroomMapper infoClassroomMapper;
+    @Autowired
+    private IInfoService iInfoService;
+    @Autowired
+    private IUserInfoService iUserInfoService;
 
 
     private static final int CORE_POOL_SIZE = Runtime.getRuntime ().availableProcessors () + 1;
@@ -160,7 +174,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
         Integer week = infoMapper.getWeekByToday();
         //获取这周所有的infos
         List<Info> infos = infoMapper.getInfoByOpenidAndWeek(openId, week);
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT+:08:00"));
+        Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
         int xingqi = calendar.get(Calendar.DAY_OF_WEEK) - 1;
         //过滤出今天的infos
@@ -194,73 +208,6 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
         return list;
     }
 
-
-    //没优化之前的
-
-//    @Override
-//    public List<List> getInfo(int week) throws InterruptedException {
-//        Long start = System.currentTimeMillis();
-//
-//        List<List> timeTables = new ArrayList<>();
-//
-//        //获取登录用户
-////        String openId = UserContext.getCurrentOpenid();
-//        String openId = "1";
-//        //获得用户的当前周的所有的info信息
-//        List<Info> infos = infoMapper.getInfoByOpenidAndWeek(openId,week);
-//        //把课程信息根据这周的星期几进行分类
-//        Map<Integer, List<Info>> xingqiMap = infos.stream().collect(Collectors.groupingBy(Info::getXingqi));
-//        //假设是7条，那么这7天就形成一个数组
-//        for (i = 1;i <= 7;i++){
-//            //如果这周的该星期几没课，那就都置为空
-//            if (!xingqiMap.containsKey(i)){
-//                List<String> oneDayVo = new ArrayList<>();
-//                for (int j = 1;j <= 12;j++) {
-//                    oneDayVo.add("");
-//                }
-//                timeTables.add(oneDayVo);
-//            }else {
-//                //如果该天有课，那就另外根据该天的info的id去关联其他课程学习
-//                List<Info> infoDay = xingqiMap.get(i);
-//                String[] arr = new String[12];
-//
-//                for (Info info : infoDay) {
-//                    //看每个info对应的节次
-//                    List<Integer> sections = infoMapper.getSectionByInfoId(info.getInfoId());
-//                    //查该info对应的teacher，classroom，course
-//                    String courseName = infoMapper.getCourseNameByInfoId(info.getInfoId());
-//                    String classRoom = infoMapper.getClassRoomByInfoId(info.getInfoId());
-//                    List<String> teacherNameList = infoMapper.getTeacherListByInfoId(info.getInfoId());
-//                    String teacherName = "";
-//                    for (String s : teacherNameList) {
-//                        teacherName += s + " ";
-//                    }
-//                    String tableItem = courseName + "--" + classRoom + "--" + teacherName;
-//                    for (Integer section : sections) {
-//                        arr[section - 1] = tableItem;
-//                    }
-//                }
-//                for (int j = 0;j < 12;j++){
-//                    if (arr[j] == null || arr[j].equals("")){
-//                        arr[j] = "";
-//                    }
-//                }
-//
-//                List<String> oneDayVo = Arrays.asList(arr);
-//                timeTables.add(oneDayVo);
-//            }
-//        }
-//
-//        logger.info("耗时：" + (System.currentTimeMillis() - start));
-//        for (int j = 0;j < 7;j++){
-//            System.out.println(timeTables.get(j));
-//        }
-////        cache.put("cour" + week,timeTables);  //循环更新缓存
-//        return timeTables;
-//        return null;
-//    }
-
-
     @Override
     public int insertInfo(Info info) {
         int res = infoMapper.insert(info);
@@ -269,6 +216,25 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
         }else{
             throw new CourseException(555,"插入t_info失败。");
         }
+    }
+
+    @Override
+    public boolean updateCourseData() {
+        String openId = UserContext.getCurrentOpenid();
+        //查找当前用户的所有info
+        QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
+        wrapper.eq("openid",openId);
+        List<String> infoList = iUserInfoService.list(wrapper).stream().map(UserInfo::getInfoId).collect(Collectors.toList());
+        for (String infoId : infoList) {
+            //删除当前用户的数据
+            int i1 = infoSectionMapper.deleteByInfoId(infoId);
+            int i2 = infoWeekMapper.deleteByInfoId(infoId);
+            int i3 = infoCourseMapper.deleteByInfoId(infoId);
+            int i4 = infoClassroomMapper.deleteByInfoId(infoId);
+        }
+
+return true;
+
     }
 
     @Override
