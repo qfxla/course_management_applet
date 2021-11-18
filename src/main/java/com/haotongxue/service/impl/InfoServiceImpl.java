@@ -102,7 +102,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
                             CourseVo[] arr = new CourseVo[12];
 
                             for (Info info : infoDay) {
-                                System.out.println("info为" + info.getXingqi() + ":" + info.getSectionStr());
+//                                System.out.println("info为" + info.getXingqi() + ":" + info.getSectionStr());
                                 //看每个info对应的节次
                                 List<Integer> sections = infoMapper.getSectionByInfoId(info.getInfoId());
                                 //查该info对应的teacher，classroom，course
@@ -140,7 +140,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
                 });
             }
             countDownLatch.await();
-            logger.info("耗时：" + (System.currentTimeMillis() - start));
+//            logger.info("耗时：" + (System.currentTimeMillis() - start));
         }catch (Exception e){
             e.printStackTrace();
         }finally {
