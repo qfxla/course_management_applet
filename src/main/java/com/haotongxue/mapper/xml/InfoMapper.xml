@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.haotongxue.mapper.InfoMapper">
+    <delete id="deleteByInfoId" parameterType="java.util.List">
+        delete from t_info
+        where info_id in
+        <foreach item="infoId" collection="infoList" open="(" separator="," close=")">
+            #{infoId,jdbcType=VARCHAR}
+        </foreach>
+    </delete>
 
     <select id="getInfoByOpenidAndWeek" resultType="com.haotongxue.entity.Info">
         SELECT i.info_id,i.xingqi,i.week_str,i.section_str

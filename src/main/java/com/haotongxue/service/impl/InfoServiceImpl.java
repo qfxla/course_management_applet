@@ -65,6 +65,10 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
     @Autowired
     private InfoClassroomMapper infoClassroomMapper;
     @Autowired
+    private InfoTeacherMapper infoTeacherMapper;
+    @Autowired
+    private UserInfoMapper userInfoMapper;
+    @Autowired
     private IInfoService iInfoService;
     @Autowired
     private IUserInfoService iUserInfoService;
@@ -244,25 +248,30 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
 
         logger.info("查找用户的所有info数量"+ infoList.size());
 
-        int i1 = 0,i2 =0,i3 = 0,i4 = 0,i5 = 0;
-        for (String infoId : infoList) {
-            //删除当前用户的数据
-            i1 = infoSectionMapper.deleteByInfoId(infoId);
-            i2 = infoWeekMapper.deleteByInfoId(infoId);
-            i3 = infoCourseMapper.deleteByInfoId(infoId);
-            i4 = infoClassroomMapper.deleteByInfoId(infoId);
-            i5 = infoMapper.deleteByInfoId(infoId);
-        }
+        int i1 = 0,i2 =0,i3 = 0,i4 = 0,i5 = 0,i6 = 0,i7 = 0;
+        i1 = infoSectionMapper.deleteByInfoId(infoList);
+        i2 = infoWeekMapper.deleteByInfoId(infoList);
+        i3 = infoCourseMapper.deleteByInfoId(infoList);
+        i4 = infoClassroomMapper.deleteByInfoId(infoList);
+        i5 = infoTeacherMapper.deleteByInfoId(infoList);
+        i6 = infoMapper.deleteByInfoId(infoList);
+        i7 = userInfoMapper.deleteByInfoId(infoList);
+
         //删除成功，开始爬
-        if (i1 > 0 && i2 > 0 && i3 > 0 && i4 > 0 && i5 >0){
+        if (i1 > 0 && i2 > 0 && i3 > 0 && i4 > 0 && i5 > 0 && i6 > 0 && i7 > 0){
             logger.info("删除成功，开始爬");
             WebClient webClient = WebClientUtils.getWebClient();
-            reptileService.pa(webClient,openId);
             User user = (User)loginCache.get(openId);
-            logger.info("删除成功，开始爬");
             reptileHandler.pa(webClient,user.getNo(),user.getPassword());
+
+            //删除缓存
+            logger.info("我将删除缓存");
+            for (int i = 1;i <= 20;i++){
+                cache.invalidate("cour" + openId + ":" + i);
+            }
             return true;
         }
+        logger.info("删除失败！");
         return false;
     }
 

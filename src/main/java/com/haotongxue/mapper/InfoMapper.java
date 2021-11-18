@@ -37,6 +37,6 @@ public interface InfoMapper extends BaseMapper<Info> {
     //查今天是第几周
     Integer getWeekByToday();
 
-    @Delete("delete from t_info where info_id = #{infoId}")
-    int deleteByInfoId(@Param("infoId") String infoId);
+//    @Delete("delete from t_info where info_id = #{infoId}")
+    int deleteByInfoId(@Param("infoList")List<String> infoList);
 }
