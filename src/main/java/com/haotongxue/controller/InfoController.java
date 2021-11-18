@@ -65,4 +65,10 @@ public class InfoController {
 //        List<List> timeTables = iInfoService.getInfo(openId, week);
         return timeTables != null?R.ok().data("timeTables",timeTables) : R.error();
     }
+
+    @ApiOperation(value = "重新爬取课程表数据")
+    @GetMapping("/updateCourseData")
+    public R updateCourseData(){
+return null;
+    }
 }
