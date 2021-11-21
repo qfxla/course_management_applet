@@ -63,7 +63,7 @@ public class CaffeineConfig {
                 });
     }
 
-    //每周的课表缓存
+//    //每周的课表缓存
     @Bean("courseCache")
     public LoadingCache<String,Object> getCourseCache(){
         int min = DateConvert.cacheMin();
