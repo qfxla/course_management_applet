@@ -6,6 +6,7 @@ import com.haotongxue.entity.vo.AddCourseVo;
 import com.haotongxue.mapper.InfoMapper;
 import com.haotongxue.service.AddCourseService;
 import com.haotongxue.service.IInfoService;
+import com.haotongxue.service.impl.CaffeineServiceImpl;
 import com.haotongxue.service.impl.InfoSectionServiceImpl;
 import com.haotongxue.utils.UserContext;
 import io.swagger.annotations.Api;
@@ -51,6 +52,8 @@ public class InfoController {
 
     @Autowired
     AddCourseService addCourseService;
+    @Autowired
+    CaffeineServiceImpl caffeineService;
 
 
     @ApiOperation(value = "判断是否爬完")
@@ -84,7 +87,7 @@ public class InfoController {
     @ApiOperation(value = "重新爬取课程表数据")
     @GetMapping("/updateCourseData")
     public R updateCourseData() throws IOException {
-        boolean b = iInfoService.updateCourseData();
+        boolean b = caffeineService.updateCourseData();
         if (b){
             return R.ok();
         }
