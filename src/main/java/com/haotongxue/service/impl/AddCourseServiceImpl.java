@@ -64,6 +64,10 @@ public class AddCourseServiceImpl implements AddCourseService {
         String classroomName = addCourseVo.getClassRoom();   //教室名
         int xingqiId = addCourseVo.getXingqi();
         List<Integer> weekList = addCourseVo.getWeekList();
+        System.out.println("qqqq");
+        System.out.println(courseName);
+        System.out.println(weekList);
+        System.out.println(xingqiId);
         String weekStr = getWeekStr(weekList);
         int section = addCourseVo.getSection();
         String sectionStr = getSectionStr(section);
@@ -84,7 +88,7 @@ public class AddCourseServiceImpl implements AddCourseService {
             loopBegin = section;
             loopEnd = loopBegin + 1;
         }else if( section == 5 ){
-            loopBegin = 1;
+            loopBegin = 5;
             loopEnd = loopBegin;
         }else if(section == 14){
             loopBegin = 1;
@@ -133,6 +137,8 @@ public class AddCourseServiceImpl implements AddCourseService {
     }
 
     public static String getWeekStr(List<Integer> weekList){
+        System.out.println("周次集合。。。。");
+        System.out.println(weekList);
         List<String> weekStrList = new ArrayList<>();
         int[] weekArr = new int[21];
         for (Integer week : weekList) {
