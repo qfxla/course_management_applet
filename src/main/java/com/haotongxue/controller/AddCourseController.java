@@ -22,11 +22,10 @@ import javax.annotation.Resource;
 @CrossOrigin
 @Slf4j
 @Api(tags = "添加课接口")
-@RequestMapping("/addCourse")
+@RequestMapping("/authority/addCourse")
 public class AddCourseController {
     @Resource
     AddCourseService addCourseService;
-
 
     @PostMapping("/addCourses")
     public R addCourse(AddCourseVo addCourseVo){
