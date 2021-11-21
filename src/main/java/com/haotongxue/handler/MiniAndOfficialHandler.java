@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentMap;
  * 用来处理小程序和公众号之间的一些关联
  */
 @Component
+@Deprecated
 public class MiniAndOfficialHandler {
 
     @Autowired
@@ -35,8 +36,8 @@ public class MiniAndOfficialHandler {
     /**
      * 确认用户是否有订阅课程推送
      */
-    @Scheduled(fixedDelay = 20*60*1000)
-    @Transactional(rollbackFor = Exception.class)
+    //@Scheduled(fixedDelay = 20*60*1000)
+    //@Transactional(rollbackFor = Exception.class)
     public void confirmSubscribe(){
         QueryWrapper<OfficialUser> officialWrapper = new QueryWrapper<>();
         officialWrapper.select("openid","nickname","sex","unionid");
