@@ -51,8 +51,8 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
     @Resource(name = "courseInfo")
     LoadingCache<String,Object> cache;
 
-    @Resource(name = "courseCache")
-    LoadingCache<String,Object> courseCache;
+//    @Resource(name = "courseCache")
+//    LoadingCache<String,Object> courseCache;
 
     @Autowired
     private IInfoCourseService iInfoCourseService;
@@ -278,10 +278,10 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
             HtmlPage afterLogin = LoginUtils.login(webClient, user.getNo(), user.getPassword());
             reptileHandler.pa(webClient,user.getNo(),user.getPassword());
 
-            //删除缓存
-            for (int i = 1;i <= 20;i++){
-                courseCache.invalidate("cour" + openId + ":" + i);
-            }
+//            //删除缓存
+//            for (int i = 1;i <= 20;i++){
+//                courseCache.invalidate("cour" + openId + ":" + i);
+//            }
             return true;
         }
         return false;
