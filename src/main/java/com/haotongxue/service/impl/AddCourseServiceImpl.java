@@ -2,6 +2,7 @@ package com.haotongxue.service.impl;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.haotongxue.entity.vo.AddCourseVo;
+import com.haotongxue.mapper.AddCourseMapper;
 import com.haotongxue.service.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,6 +51,9 @@ public class AddCourseServiceImpl implements AddCourseService {
     @Resource(name = "courseCache")
     LoadingCache<String,Object> cache;
 
+    @Resource
+    AddCourseMapper addCourseMapper;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public boolean addCourse(String openId,AddCourseVo addCourseVo) {
@@ -58,13 +62,20 @@ public class AddCourseServiceImpl implements AddCourseService {
         String teacherName = addCourseVo.getTeacherName();     //教师名
         String classroomName = addCourseVo.getClassRoom();   //教室名
         int xingqiId = addCourseVo.getXingqi();
-        String weekStr = getWeekStr(addCourseVo.getWeekList());
-        String sectionStr = getSectionStr(addCourseVo.getSection());
+        List<Integer> weekList = addCourseVo.getWeekList();
+        String weekStr = getWeekStr(weekList);
+        int section = addCourseVo.getSection();
+        String sectionStr = getSectionStr(section);
+
+        boolean insertFlag = isConflict(openId, weekList, xingqiId, section);
+        if(!insertFlag){
+            return false;
+        }
+
 
         String courseId = iCourseService.addCourse(courseName); //添加课程t_course
         Integer teacherId = iTeacherService.addTeacher(teacherName);  //添加教师t_teacher
         Integer classroomId = iClassroomService.addClassroom(classroomName);    //添加教室t_classroom
-
 
         //插入周次表与t_info的关联表
         for (Integer week : addCourseVo.getWeekList()) {
@@ -135,6 +146,19 @@ public class AddCourseServiceImpl implements AddCourseService {
         String sub3 = sub2.replace(" ","") + "(周)";
         System.out.println(sub3);
         return sub3;
+    }
+
+    @Override
+    public boolean isConflict(String openId,List<Integer> weekList, int xingqi, int section) {
+        for (Integer week : weekList) {
+            int num = addCourseMapper.isConflict(openId, week, xingqi, section);
+            if(num != 0){   //只要一个有冲突，直接阻止插入
+                System.out.println("只要一个有冲突，直接阻止插入");
+                return false;
+            }
+        }
+        System.out.println("没有一个是冲突的，允许插入");
+        return true;    //没有一个是冲突的，允许插入
     }
 
     public static String getSectionStr(int section){
