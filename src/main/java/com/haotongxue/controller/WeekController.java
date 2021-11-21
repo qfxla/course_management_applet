@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
+
 /**
  * <p>
  *  前端控制器
@@ -22,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/week")
 public class WeekController {
 
-    @Autowired
+    @Resource(name = "weekCache")
     LoadingCache<String,Object> weekCache;
 
     @ApiOperation(value = "获得当前是哪周")
