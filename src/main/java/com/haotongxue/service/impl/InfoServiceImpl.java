@@ -50,6 +50,8 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
 
     @Resource(name = "courseInfo")
     LoadingCache<String,Object> cache;
+    @Resource(name = "courseCache")
+    LoadingCache<String,Object> courseCache;
     @Autowired
     private IInfoCourseService iInfoCourseService;
     @Autowired
@@ -276,7 +278,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
 
             //删除缓存
             for (int i = 1;i <= 20;i++){
-                cache.invalidate("cour" + openId + ":" + i);
+                courseCache.invalidate("cour" + openId + ":" + i);
             }
             return true;
         }
