@@ -26,7 +26,7 @@ public class ClassroomServiceImpl extends ServiceImpl<ClassroomMapper, Classroom
 
     @Override
     public Integer addClassroom(String classroomName) {
-        if(classroomName == null){
+        if(classroomName == null || classroomName.equals("")){
             classroomName = "无";
         }
         int existClassroomCount = classroomMapper.isExistClassroom(classroomName);

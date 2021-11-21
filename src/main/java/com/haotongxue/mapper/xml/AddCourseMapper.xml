@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haotongxue.mapper.AddCourseMapper">
+
+    <select id="isConflict" resultType="java.lang.Integer">
+        SELECT count(*)
+        FROM t_user,t_user_info,t_info,
+             t_info_week,
+             t_info_section
+        WHERE
+            t_user.openid=#{openid}
+          AND t_user.openid = t_user_info.openid
+          AND t_info.info_id = t_user_info.info_id
+          AND t_info.info_id = t_info_week.info_id
+          AND t_info_week.week_id=#{week}
+          AND t_info.info_id = t_info_section.info_id
+          AND t_info_section.section_id=#{section}
+          AND t_info.xingqi=#{xingqi};
+    </select>
+</mapper>
