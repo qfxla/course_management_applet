@@ -117,7 +117,7 @@ public class AddCourseServiceImpl implements AddCourseService {
                 iInfoWeekService.insertInfoWeek(infoId, week);
 
                 //插入节次表与t_info的关联表
-                infoSectionService.insertInfoSection(infoId,section);
+                infoSectionService.insertInfoSection(infoId,i);
 
                 //出入用户表与t_info的关联表
                 iUserInfoService.insertUserInfo(openId,infoId);
@@ -126,7 +126,7 @@ public class AddCourseServiceImpl implements AddCourseService {
 
         //使缓存失效
         for (int i = 1; i <= 20; i++) {
-            cache.invalidate("week" + openId + ":" + i);
+            cache.invalidate("cour" + openId + ":" + i);
         }
         flag = true;
         return flag;

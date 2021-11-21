@@ -2,15 +2,21 @@ package com.haotongxue.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.haotongxue.entity.*;
 import com.haotongxue.entity.vo.CourseVo;
 import com.haotongxue.entity.vo.TodayCourseVo;
 import com.haotongxue.exceptionhandler.CourseException;
+import com.haotongxue.handler.ReptileHandler;
 import com.haotongxue.mapper.*;
 import com.haotongxue.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.haotongxue.utils.LoginUtils;
 import com.haotongxue.utils.UserContext;
+import com.haotongxue.utils.WebClientUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.C;
 import org.slf4j.Logger;
@@ -20,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.*;
@@ -60,9 +67,21 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
     @Autowired
     private InfoClassroomMapper infoClassroomMapper;
     @Autowired
+    private InfoTeacherMapper infoTeacherMapper;
+    @Autowired
+    private UserInfoMapper userInfoMapper;
+    @Autowired
     private IInfoService iInfoService;
     @Autowired
     private IUserInfoService iUserInfoService;
+    @Autowired
+    private ReptileService reptileService;
+    @Autowired
+    private ReptileHandler reptileHandler;
+    @Resource(name = "loginCache")
+    LoadingCache<String,Object> loginCache;
+    @Autowired
+    private IUserService iUserService;
 
 
     private static final int CORE_POOL_SIZE = Runtime.getRuntime ().availableProcessors () + 1;
@@ -127,7 +146,13 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
                                 Integer classRoomId = iInfoClassroomService.list(new QueryWrapper<InfoClassroom>().eq("info_id", info.getInfoId())).get(0).getClassroomId();
                                 Integer teacherId = iInfoTeacherService.list(new QueryWrapper<InfoTeacher>().eq("info_id", info.getInfoId())).get(0).getTeacherId();
                                 String courseName = ((str1 = (String)cache.get("course-" + courseId)).equals("无")?"":str1);
-                                String classRoom = ((str2 = (String)cache.get("classroom-" + classRoomId))).equals("无")?"": "@" + str2.substring(5);
+                                String s = (String)cache.get("classroom-" + classRoomId);
+                                String classRoom = "";
+                                if (s.equals("无") || s.contains("【")){
+                                    classRoom = ((str2 = (String)cache.get("classroom-" + classRoomId))).equals("无")?"": "@" + str2.substring(5);
+                                }else {
+                                    classRoom = s;
+                                }
                                 String teacher = ((str3 = (String)cache.get("teacher-" + teacherId)).equals("无")?"":str3);
                                 CourseVo courseVo = new CourseVo();
                                 courseVo.setTeacher(teacher).setName(courseName).setClassRoom(classRoom).setWeekStr(info.getWeekStr()).setSectionStr(info.getSectionStr());
@@ -219,23 +244,45 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
     }
 
     @Override
-    public boolean updateCourseData() {
+    @Transactional(rollbackFor = Exception.class)
+    public boolean updateCourseData() throws IOException {
         String openId = UserContext.getCurrentOpenid();
+        UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("openid",openId).set("is_pa",0);
+        iUserService.update(updateWrapper);
         //查找当前用户的所有info
         QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
         wrapper.eq("openid",openId);
         List<String> infoList = iUserInfoService.list(wrapper).stream().map(UserInfo::getInfoId).collect(Collectors.toList());
-        for (String infoId : infoList) {
-            //删除当前用户的数据
-            int i1 = infoSectionMapper.deleteByInfoId(infoId);
-            int i2 = infoWeekMapper.deleteByInfoId(infoId);
-            int i3 = infoCourseMapper.deleteByInfoId(infoId);
-            int i4 = infoClassroomMapper.deleteByInfoId(infoId);
+
+        logger.info("查找用户的所有info数量"+ infoList.size());
+
+        int i1 = 0,i2 =0,i3 = 0,i4 = 0,i5 = 0,i6 = 0,i7 = 0;
+        i1 = infoSectionMapper.deleteByInfoId(infoList);
+        i2 = infoWeekMapper.deleteByInfoId(infoList);
+        i3 = infoCourseMapper.deleteByInfoId(infoList);
+        i4 = infoClassroomMapper.deleteByInfoId(infoList);
+        i5 = infoTeacherMapper.deleteByInfoId(infoList);
+        i6 = infoMapper.deleteByInfoId(infoList);
+        i7 = userInfoMapper.deleteByInfoId(infoList);
+
+        //删除成功，开始爬
+        if (i1 > 0 && i2 > 0 && i3 > 0 && i4 > 0 && i5 > 0 && i6 > 0 && i7 > 0){
+            logger.info("删除成功，开始爬");
+            WebClient webClient = WebClientUtils.getWebClient();
+            User user = (User)loginCache.get(openId);
+            HtmlPage afterLogin = LoginUtils.login(webClient, user.getNo(), user.getPassword());
+            reptileHandler.pa(webClient,user.getNo(),user.getPassword());
+
+            //删除缓存
+            for (int i = 1;i <= 20;i++){
+                cache.invalidate("cour" + openId + ":" + i);
+            }
+            return true;
         }
-
-return true;
-
+        return false;
     }
+
 
     @Override
     public String addCourseInfo(int week,String weekStr,String sectionStr) {

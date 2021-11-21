@@ -6,6 +6,7 @@ import com.haotongxue.entity.vo.AddCourseVo;
 import com.haotongxue.mapper.InfoMapper;
 import com.haotongxue.service.AddCourseService;
 import com.haotongxue.service.IInfoService;
+import com.haotongxue.service.impl.InfoSectionServiceImpl;
 import com.haotongxue.utils.UserContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import com.haotongxue.utils.*;
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -73,15 +75,19 @@ public class InfoController {
 
     @ApiOperation("自定义添加课程")
     @PostMapping("/addCourse")
-    public R addCourse(@RequestParam("openid") String openId,
-                       @RequestBody AddCourseVo addCourseVo){
+    public R addCourse(@RequestBody AddCourseVo addCourseVo){
+        String openId = UserContext.getCurrentOpenid();
         boolean flag = addCourseService.addCourse(openId, addCourseVo);
         return flag?R.ok():R.error();
     }
 
     @ApiOperation(value = "重新爬取课程表数据")
     @GetMapping("/updateCourseData")
-    public R updateCourseData(){
-return null;
+    public R updateCourseData() throws IOException {
+        boolean b = iInfoService.updateCourseData();
+        if (b){
+            return R.ok();
+        }
+        return R.error();
     }
 }

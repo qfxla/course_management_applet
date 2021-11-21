@@ -6,6 +6,8 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * <p>
  *  Mapper 接口
@@ -16,6 +18,6 @@ import org.apache.ibatis.annotations.Param;
  */
 @Mapper
 public interface InfoWeekMapper extends BaseMapper<InfoWeek> {
-    @Delete("delete from t_info_week where info_id = #{infoId}")
-    int deleteByInfoId(@Param("infoId") String infoId);
+//    @Delete("delete from t_info_week where info_id = #{infoId}")
+    int deleteByInfoId(@Param("infoList") List<String> infoList);
 }
