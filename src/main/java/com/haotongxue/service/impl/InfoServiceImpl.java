@@ -146,7 +146,13 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
                                 Integer classRoomId = iInfoClassroomService.list(new QueryWrapper<InfoClassroom>().eq("info_id", info.getInfoId())).get(0).getClassroomId();
                                 Integer teacherId = iInfoTeacherService.list(new QueryWrapper<InfoTeacher>().eq("info_id", info.getInfoId())).get(0).getTeacherId();
                                 String courseName = ((str1 = (String)cache.get("course-" + courseId)).equals("无")?"":str1);
-                                String classRoom = ((str2 = (String)cache.get("classroom-" + classRoomId))).equals("无")?"": "@" + str2.substring(5);
+                                String s = (String)cache.get("classroom-" + classRoomId);
+                                String classRoom = "";
+                                if (s.equals("无") || s.contains("【")){
+                                    classRoom = ((str2 = (String)cache.get("classroom-" + classRoomId))).equals("无")?"": "@" + str2.substring(5);
+                                }else {
+                                    classRoom = s;
+                                }
                                 String teacher = ((str3 = (String)cache.get("teacher-" + teacherId)).equals("无")?"":str3);
                                 CourseVo courseVo = new CourseVo();
                                 courseVo.setTeacher(teacher).setName(courseName).setClassRoom(classRoom).setWeekStr(info.getWeekStr()).setSectionStr(info.getSectionStr());
