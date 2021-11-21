@@ -14,7 +14,7 @@
     <name>course_service</name>
     <description>Demo project for Spring Boot</description>
     <properties>
-        <java.version>11</java.version>
+        <java.version>8</java.version>
         <mybatis-plus.version>3.4.3.1</mybatis-plus.version>
         <velocity.version>2.0</velocity.version>
         <lombok.version>1.18.18</lombok.version>
