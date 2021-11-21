@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.haotongxue.entity.*;
 import com.haotongxue.entity.vo.CourseVo;
@@ -13,6 +14,7 @@ import com.haotongxue.handler.ReptileHandler;
 import com.haotongxue.mapper.*;
 import com.haotongxue.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.haotongxue.utils.LoginUtils;
 import com.haotongxue.utils.UserContext;
 import com.haotongxue.utils.WebClientUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -259,9 +261,11 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
 
         //删除成功，开始爬
         if (i1 > 0 && i2 > 0 && i3 > 0 && i4 > 0 && i5 > 0 && i6 > 0 && i7 > 0){
+//        if (true){
             logger.info("删除成功，开始爬");
             WebClient webClient = WebClientUtils.getWebClient();
             User user = (User)loginCache.get(openId);
+            HtmlPage afterLogin = LoginUtils.login(webClient, user.getNo(), user.getPassword());
             reptileHandler.pa(webClient,user.getNo(),user.getPassword());
 
             //删除缓存

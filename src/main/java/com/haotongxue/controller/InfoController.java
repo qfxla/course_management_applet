@@ -75,8 +75,8 @@ public class InfoController {
 
     @ApiOperation("自定义添加课程")
     @PostMapping("/addCourse")
-    public R addCourse(@RequestParam("openid") String openId,
-                       @RequestBody AddCourseVo addCourseVo){
+    public R addCourse(@RequestBody AddCourseVo addCourseVo){
+        String openId = UserContext.getCurrentOpenid();
         boolean flag = addCourseService.addCourse(openId, addCourseVo);
         return flag?R.ok():R.error();
     }
