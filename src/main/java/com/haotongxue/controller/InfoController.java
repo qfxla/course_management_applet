@@ -1,25 +1,19 @@
 package com.haotongxue.controller;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.haotongxue.entity.User;
 import com.haotongxue.entity.vo.AddCourseVo;
 import com.haotongxue.mapper.InfoMapper;
 import com.haotongxue.service.AddCourseService;
 import com.haotongxue.service.IInfoService;
-import com.haotongxue.service.impl.CaffeineServiceImpl;
-import com.haotongxue.service.impl.InfoSectionServiceImpl;
 import com.haotongxue.utils.UserContext;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import com.haotongxue.utils.*;
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -52,8 +46,7 @@ public class InfoController {
 
     @Autowired
     AddCourseService addCourseService;
-    @Autowired
-    CaffeineServiceImpl caffeineService;
+
 
 
     @ApiOperation(value = "判断是否爬完")
@@ -87,8 +80,13 @@ public class InfoController {
     @ApiOperation(value = "重新爬取课程表数据")
     @GetMapping("/updateCourseData")
     public R updateCourseData() throws IOException {
-        boolean b = caffeineService.updateCourseData();
+        UserContext openId = new UserContext();
+        boolean b = iInfoService.updateCourseData();
+        //删除缓存
         if (b){
+            for (int i = 1;i <= 20;i++){
+                courseCache.invalidate("cour" + openId + ":" + i);
+            }
             return R.ok();
         }
         return R.error();
