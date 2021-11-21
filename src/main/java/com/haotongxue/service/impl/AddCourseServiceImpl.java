@@ -2,6 +2,7 @@ package com.haotongxue.service.impl;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.haotongxue.entity.vo.AddCourseVo;
+import com.haotongxue.exceptionhandler.CourseException;
 import com.haotongxue.mapper.AddCourseMapper;
 import com.haotongxue.service.*;
 import org.springframework.stereotype.Service;
@@ -67,6 +68,7 @@ public class AddCourseServiceImpl implements AddCourseService {
         int section = addCourseVo.getSection();
         String sectionStr = getSectionStr(section);
 
+        //判断与原有课程是否有冲突
         boolean insertFlag = isConflict(openId, weekList, xingqiId, section);
         if(!insertFlag){
             return false;
@@ -77,27 +79,49 @@ public class AddCourseServiceImpl implements AddCourseService {
         Integer teacherId = iTeacherService.addTeacher(teacherName);  //添加教师t_teacher
         Integer classroomId = iClassroomService.addClassroom(classroomName);    //添加教室t_classroom
 
+        int loopBegin,loopEnd;
+        if(section == 1 || section == 3 || section == 6 || section == 8){
+            loopBegin = section;
+            loopEnd = loopBegin + 1;
+        }else if( section == 5 ){
+            loopBegin = 1;
+            loopEnd = loopBegin;
+        }else if(section == 14){
+            loopBegin = 1;
+            loopEnd = 4;
+        }else if(section == 69){
+            loopBegin = 6;
+            loopEnd = 9;
+        }else if(section == 10){
+            loopBegin = 10;
+            loopEnd = 12;
+        }else{
+            throw new CourseException(555,"未知节次！！");
+        }
+
         //插入周次表与t_info的关联表
         for (Integer week : addCourseVo.getWeekList()) {
-            String infoId;
-            infoId = iinfoService.addCourseInfo(xingqiId,weekStr,sectionStr);
-            //插入课程表与t_info的关联表
-            iInfoCourseService.insertInfoCourse(infoId, courseId);
+            for (int i = loopBegin; i <= loopEnd; i++) {
+                String infoId;
+                infoId = iinfoService.addCourseInfo(xingqiId,weekStr,sectionStr);
+                //插入课程表与t_info的关联表
+                iInfoCourseService.insertInfoCourse(infoId, courseId);
 
-            //插入教师表与t_info的关联表
-            iInfoTeacherService.insertInfoTeacher(infoId, teacherId);
+                //插入教师表与t_info的关联表
+                iInfoTeacherService.insertInfoTeacher(infoId, teacherId);
 
-            //插入教室表与t_info的关联表
-            iInfoClassroomService.insertInfoClassroom(infoId, classroomId);
+                //插入教室表与t_info的关联表
+                iInfoClassroomService.insertInfoClassroom(infoId, classroomId);
 
-            //插入周次表与t_info的关联表
-            iInfoWeekService.insertInfoWeek(infoId, week);
+                //插入周次表与t_info的关联表
+                iInfoWeekService.insertInfoWeek(infoId, week);
 
-            //插入节次表与t_info的关联表
-            infoSectionService.insertInfoSection(infoId,addCourseVo.getSection());
+                //插入节次表与t_info的关联表
+                infoSectionService.insertInfoSection(infoId,section);
 
-            //出入用户表与t_info的关联表
-            iUserInfoService.insertUserInfo(openId,infoId);
+                //出入用户表与t_info的关联表
+                iUserInfoService.insertUserInfo(openId,infoId);
+            }
         }
 
         //使缓存失效
@@ -169,7 +193,7 @@ public class AddCourseServiceImpl implements AddCourseService {
             case 5:return "[05节]";
             case 6:return "[06-07节]";
             case 8:return "[08-09节]";
-            case 68:return "[06-07-08-09节]";
+            case 69:return "[06-07-08-09节]";
             case 10:return "[10-11-12节]";
             default:return "未知节次";
         }
