@@ -40,7 +40,7 @@ public class TeacherServiceImpl extends ServiceImpl<TeacherMapper, Teacher> impl
 
     @Override
     public Integer addTeacher(String teacherName) {
-        if(teacherName == null){
+        if(teacherName == null || teacherName.equals("")){
             teacherName = "无";
         }
         int existTeacherCount = teacherMapper.isExistTeacher(teacherName);
