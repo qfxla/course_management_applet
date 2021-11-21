@@ -117,7 +117,7 @@ public class AddCourseServiceImpl implements AddCourseService {
                 iInfoWeekService.insertInfoWeek(infoId, week);
 
                 //插入节次表与t_info的关联表
-                infoSectionService.insertInfoSection(infoId,section);
+                infoSectionService.insertInfoSection(infoId,i);
 
                 //出入用户表与t_info的关联表
                 iUserInfoService.insertUserInfo(openId,infoId);

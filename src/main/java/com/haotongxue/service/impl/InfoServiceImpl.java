@@ -249,6 +249,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
         String openId = UserContext.getCurrentOpenid();
         UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("openid",openId).set("is_pa",0);
+        iUserService.update(updateWrapper);
         //查找当前用户的所有info
         QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
         wrapper.eq("openid",openId);
@@ -267,7 +268,6 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
 
         //删除成功，开始爬
         if (i1 > 0 && i2 > 0 && i3 > 0 && i4 > 0 && i5 > 0 && i6 > 0 && i7 > 0){
-//        if (true){
             logger.info("删除成功，开始爬");
             WebClient webClient = WebClientUtils.getWebClient();
             User user = (User)loginCache.get(openId);
@@ -275,13 +275,11 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
             reptileHandler.pa(webClient,user.getNo(),user.getPassword());
 
             //删除缓存
-            logger.info("我将删除缓存");
             for (int i = 1;i <= 20;i++){
                 cache.invalidate("cour" + openId + ":" + i);
             }
             return true;
         }
-        logger.info("删除失败！");
         return false;
     }
 
