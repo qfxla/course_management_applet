@@ -80,13 +80,13 @@ public class InfoController {
     @ApiOperation(value = "重新爬取课程表数据")
     @GetMapping("/updateCourseData")
     public R updateCourseData() throws IOException {
-        UserContext openId = new UserContext();
+        String openId = UserContext.getCurrentOpenid();
         boolean b = iInfoService.updateCourseData();
+        for (int i = 1;i <= 20;i++){
+            courseCache.invalidate("cour" + openId + ":" + i);
+        }
         //删除缓存
         if (b){
-            for (int i = 1;i <= 20;i++){
-                courseCache.invalidate("cour" + openId + ":" + i);
-            }
             return R.ok();
         }
         return R.error();
