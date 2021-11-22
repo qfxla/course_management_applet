@@ -152,8 +152,9 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
                                 String courseName = ((str1 = (String)cache.get("course-" + courseId)).equals("无")?"":str1);
                                 String s = (String)cache.get("classroom-" + classRoomId);
                                 String classRoom = "";
-                                if (s.equals("无") || s.contains("【")){
-                                    classRoom = ((str2 = (String)cache.get("classroom-" + classRoomId))).equals("无")?"": "@" + str2.substring(5);
+                                if (s.equals("无") || s.contains("】")){
+                                    int end = s.indexOf("】");
+                                    classRoom = ((str2 = s)).equals("无")?"": "@" + str2.substring(end + 1);
                                 }else {
                                     classRoom = s;
                                 }
