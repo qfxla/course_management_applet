@@ -318,7 +318,14 @@ public class ReptileServiceImpl implements ReptileService {
 
     public static ArrayList<Integer> getWeekCount(String weekAndSection){
         ArrayList<Integer> weekList = new ArrayList<>();
-        int index = weekAndSection.indexOf("(周)");
+        int index;
+        if(weekAndSection.contains("(双周)")){
+            index = weekAndSection.indexOf("(双周)");
+        }else if(weekAndSection.contains("(周)")){
+            index = weekAndSection.indexOf("(周)");
+        }else{
+            throw new CourseException(555,"周次这里要改Bug咯！");
+        }
         if(index == -1){
             return new ArrayList<>();
         }
