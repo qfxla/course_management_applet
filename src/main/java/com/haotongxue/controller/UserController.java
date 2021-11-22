@@ -1,6 +1,7 @@
 package com.haotongxue.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.gargoylesoftware.htmlunit.*;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
@@ -16,6 +17,7 @@ import com.haotongxue.service.IUserService;
 import com.haotongxue.utils.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -167,6 +169,15 @@ public class UserController {
         userUpdateWrapper.eq("openid",currentOpenid);
         userService.update(userUpdateWrapper);
         return R.ok();
+    }
+
+    @ApiOperation("获取用户的学号")
+    @GetMapping("/authority/no")
+    public R getNo(@RequestHeader("Authority") @ApiParam("放在请求头的token") String authority){
+        String currentOpenid = UserContext.getCurrentOpenid();
+        User user = (User) cache.get(currentOpenid);
+        String no = user.getNo();
+        return R.ok().data("no",no);
     }
 }
 
