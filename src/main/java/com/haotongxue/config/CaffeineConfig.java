@@ -26,14 +26,6 @@ public class CaffeineConfig {
     @Autowired
     IUserService userService;
 
-    @Autowired
-    IInfoService iInfoService;
-
-
-
-    @Autowired
-    InfoMapper infoMapper;
-
     /**
      * 用于做商品的本地缓存处理
      * @return
