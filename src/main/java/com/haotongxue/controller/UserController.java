@@ -179,5 +179,12 @@ public class UserController {
         String no = user.getNo();
         return R.ok().data("no",no);
     }
+
+    @ApiOperation("删除某个人的登录缓存")
+    @GetMapping("/deleteLoginCache")
+    public R deleteLoginCache(@RequestParam("openid")String openid){
+        cache.invalidate(openid);
+        return R.ok();
+    }
 }
 
