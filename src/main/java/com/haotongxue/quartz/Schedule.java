@@ -20,8 +20,7 @@ public class Schedule {
                 .withIdentity("getWeekCourseCache","group2").build();
         CronTrigger cronTrigger = TriggerBuilder.newTrigger().withIdentity("trigger2", "trigger2")
                 .startNow()
-                .withSchedule(CronScheduleBuilder.cronSchedule("0 0 1 ? * M
-ON"))
+                .withSchedule(CronScheduleBuilder.cronSchedule("0 0 1 ? * MON"))
                 .build();
 
         scheduler.scheduleJob(jobDetail, cronTrigger);
