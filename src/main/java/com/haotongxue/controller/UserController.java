@@ -102,6 +102,9 @@ public class UserController {
         }else {
             //如果为0，则爬虫还没执行成功
             isDoPa = user.getIsPa() == 0;
+            if (user.getUnionId() == ""){
+                isRefreshInfo = true;
+            }
         }
         if (isDoPa && user.getIsPaing() == 0){
             log.info(openid+"开始爬虫");
@@ -195,5 +198,6 @@ public class UserController {
         cache.invalidate(openid);
         return R.ok();
     }
+
 }
 
