@@ -25,20 +25,28 @@ public class ReptileRunnable implements Runnable{
 
     private String currentOpenid;
 
+    public boolean paFlag = true;
+
+    private ReReptileRunnable reptileRunnable;
+
     private ReptileService reptileService = GetBeanUtil.getBean(ReptileService.class);
 
     private IUserService userService = GetBeanUtil.getBean(IUserService.class);
 
-    public ReptileRunnable(WebClient webClient, String no, String password,String currentOpenid) {
+    public ReptileRunnable(WebClient webClient, String no, String password,String currentOpenid,ReReptileRunnable reptileRunnable) {
         this.webClient = webClient;
         this.no = no;
         this.password = password;
         this.currentOpenid = currentOpenid;
+        this.reptileRunnable = reptileRunnable;
     }
 
     @SneakyThrows
     @Override
     public void run() {
+//        if(!Thread.currentThread().isInterrupted()){
+        Thread.currentThread().setName("正常爬的线程");
+        reptileRunnable.noticeRePa(Thread.currentThread());
         if (webClient == null){
             webClient = WebClientUtils.getWebClient();
             try {
@@ -47,10 +55,13 @@ public class ReptileRunnable implements Runnable{
                 e.printStackTrace();
             }
         }
-
         reptileService.pa(webClient,currentOpenid);
         UpdateWrapper<User> userUpdateWrapperTwo = new UpdateWrapper<>();
         userUpdateWrapperTwo.set("is_paing",0).eq("openid",currentOpenid);
         userService.update(userUpdateWrapperTwo);
+//        }else {
+//            //save
+//            return;
+//        }
     }
 }

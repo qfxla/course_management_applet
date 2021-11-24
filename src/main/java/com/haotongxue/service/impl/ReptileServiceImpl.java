@@ -1,6 +1,11 @@
 package com.haotongxue.service.impl;
 
 
+import com.gargoylesoftware.htmlunit.ScriptException;
+import com.gargoylesoftware.htmlunit.javascript.JavaScriptErrorListener;
+import com.haotongxue.entity.UserInfo;
+import com.haotongxue.mapper.*;
+import com.haotongxue.utils.UserContext;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -24,11 +29,15 @@ import java.io.FileOutputStream;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class ReptileServiceImpl implements ReptileService {
+public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListener {
 
     @Resource
     IInfoService iinfoService;
@@ -65,6 +74,27 @@ public class ReptileServiceImpl implements ReptileService {
 
     @Resource(name = "loginCache")
     LoadingCache<String,Object> cache;
+
+    @Resource
+    InfoSectionMapper infoSectionMapper;
+
+    @Resource
+    InfoClassroomMapper infoClassroomMapper;
+
+    @Resource
+    InfoTeacherMapper infoTeacherMapper;
+
+    @Resource
+    InfoWeekMapper infoWeekMapper;
+
+    @Resource
+    InfoMapper infoMapper;
+
+    @Resource
+    InfoCourseMapper infoCourseMapper;
+
+    @Resource
+    UserInfoMapper userInfoMapper;
 
 
     @Override
@@ -147,6 +177,10 @@ public class ReptileServiceImpl implements ReptileService {
 
         for (int i = 0;i < 7;i++){     //星期一到星期日
             for (int j = 0;j <= 5;j++){     //sectionIds[0]到sectionIds[5]
+                if(Thread.currentThread().isInterrupted()){
+                    log.info("正常爬的线程不再执行。。。");
+                    throw new CourseException(555,"正常爬的线程不再执行，回滚数据");
+                }
                 if(j == 2){     //由于第5节为空，略过
                     continue;
                 }
@@ -323,6 +357,8 @@ public class ReptileServiceImpl implements ReptileService {
             index = weekAndSection.indexOf("(双周)");
         }else if(weekAndSection.contains("(周)")){
             index = weekAndSection.indexOf("(周)");
+        }else if(weekAndSection.contains("(单周)")){
+            index = weekAndSection.indexOf("(单周)");
         }else{
             throw new CourseException(555,"周次这里要改Bug咯！");
         }
@@ -382,4 +418,28 @@ public class ReptileServiceImpl implements ReptileService {
     }
 
 
+    @Override
+    public void scriptException(HtmlPage page, ScriptException scriptException) {
+
+    }
+
+    @Override
+    public void timeoutError(HtmlPage page, long allowedTime, long executionTime) {
+
+    }
+
+    @Override
+    public void malformedScriptURL(HtmlPage page, String url, MalformedURLException malformedURLException) {
+
+    }
+
+    @Override
+    public void loadScriptError(HtmlPage page, URL scriptUrl, Exception exception) {
+
+    }
+
+    @Override
+    public void warn(String message, String sourceName, int line, String lineSource, int lineOffset) {
+
+    }
 }
