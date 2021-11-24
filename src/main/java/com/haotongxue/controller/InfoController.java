@@ -116,14 +116,15 @@ public class InfoController {
     @ApiOperation(value = "删除某个课程")
     @GetMapping("/deleteCourse")
     public R deleteCourse(@RequestParam(value = "infoIdList") String list){
-        JSONArray obj = JSON.parseArray(list);
-        List<String> infoIdList = new ArrayList<>();
-        if (obj.size() > 0) {
-
-            for (int i = 0; i < obj.size(); i++) {
-                infoIdList.add((String) obj.get(i));
-            }
-        }
+//        JSONArray obj = JSON.parseArray(list);
+//        List<String> infoIdList = new ArrayList<>();
+//        if (obj.size() > 0) {
+//
+//            for (int i = 0; i < obj.size(); i++) {
+//                infoIdList.add((String) obj.get(i));
+//            }
+//        }
+        String[] infoIdList = list.split(",");
         for (String infoId : infoIdList) {
             UserInfo userInfo = iUserInfoService.list(new QueryWrapper<UserInfo>().eq("info_id", infoId)).get(0);
             iUserInfoService.remove(new QueryWrapper<UserInfo>().eq("info_id",infoId));
