@@ -7,6 +7,6 @@
     from
     t_course
     where
-    name = #{courseName};
+    name = #{courseName}
 </select>
 </mapper>

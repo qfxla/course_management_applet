@@ -7,6 +7,6 @@
     from
     t_classroom
     where
-    location = #{classroomName};
+    location = #{classroomName}
 </select>
 </mapper>

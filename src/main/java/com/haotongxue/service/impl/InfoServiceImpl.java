@@ -127,7 +127,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
                         if (!xingqiMap.containsKey(day)){
                             List<CourseVo> oneDayVo = new ArrayList<>();
                             for (int j = 1;j <= 12;j++) {
-                                CourseVo courseVo = new CourseVo("","","","","");
+                                CourseVo courseVo = new CourseVo("","","","","","");
                                 oneDayVo.add(courseVo);
                             }
                             map.put(day - 1,oneDayVo);
@@ -159,10 +159,9 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
                                 }
 
 
-
                                 String teacher = ((str3 = (String)cache.get("teacher-" + teacherId)).equals("无")?"":str3);
                                 CourseVo courseVo = new CourseVo();
-                                courseVo.setTeacher(teacher).setName(courseName).setClassRoom(classRoom).setWeekStr(info.getWeekStr()).setSectionStr(info.getSectionStr());
+                                courseVo.setInfoId(info.getInfoId()).setTeacher(teacher).setName(courseName).setClassRoom(classRoom).setWeekStr(info.getWeekStr()).setSectionStr(info.getSectionStr());
 //                                String tableItem = courseName + "  " + classRoom + "  " + teacherName;
 //                                String tableItem = courseName + "  @" + classRoom;
                                 for (Integer section : sections) {
@@ -173,7 +172,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
                             for (int j = 0;j < 12;j++){
                                 if (arr[j] == null){
                                     CourseVo courseVo = new CourseVo();
-                                    courseVo.setName("").setClassRoom("").setTeacher("").setSectionStr("").setWeekStr("");
+                                    courseVo.setInfoId("").setName("").setClassRoom("").setTeacher("").setSectionStr("").setWeekStr("");
                                     arr[j] = courseVo;
                                 }
                             }

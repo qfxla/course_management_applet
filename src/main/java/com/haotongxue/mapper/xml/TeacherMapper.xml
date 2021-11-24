@@ -7,6 +7,6 @@
     from
     t_teacher
     where
-    name = #{teacherName};
+    name = #{teacherName}
 </select>
 </mapper>
