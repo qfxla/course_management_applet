@@ -321,6 +321,8 @@ public class ReptileServiceImpl implements ReptileService {
         int index;
         if(weekAndSection.contains("(双周)")){
             index = weekAndSection.indexOf("(双周)");
+        }else if(weekAndSection.contains("(单周)")){
+            index = weekAndSection.indexOf("(单周)");
         }else if(weekAndSection.contains("(周)")){
             index = weekAndSection.indexOf("(周)");
         }else{
