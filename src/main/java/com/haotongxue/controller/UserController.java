@@ -1,7 +1,6 @@
 package com.haotongxue.controller;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.gargoylesoftware.htmlunit.*;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
@@ -58,6 +57,7 @@ public class UserController {
     public R login(@RequestBody WeChatLoginDTO loginDTO) throws IOException {
         WeChatLoginResponse loginResponse = userService.getLoginResponse(loginDTO.getCode());
         String openid = loginResponse.getOpenid();
+        String unionid = loginResponse.getUnionid();
         UserContext.add(openid);
         //用来标记是否是快捷登录
         boolean isQuickLogin = false;
@@ -91,6 +91,10 @@ public class UserController {
             //记得在爬虫完以后要设置这条数据失效
             user.setIsPa(0);
             user.setIsPaing(0);
+
+            //设置unionId
+            user.setUnionId(unionid);
+
             userService.save(user);
             user.setSubscribe(1);
             user.setUnionId("");
@@ -105,6 +109,11 @@ public class UserController {
         }
         String token = JwtUtils.generate(openid);
         if (isRefreshInfo){
+
+            //设置unionId
+            user.setUnionId(unionid);
+            userService.updateById(user);
+
             return R.ok().code(ResultCode.NEED_REFRESH_INFO)
                     .data("Authority",token)
                     .data("subscribe",user.getSubscribe() == 1)
