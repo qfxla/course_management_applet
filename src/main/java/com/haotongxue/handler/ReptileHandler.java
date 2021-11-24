@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.haotongxue.entity.User;
+import com.haotongxue.runnable.ReReptileRunnable;
 import com.haotongxue.runnable.ReptileRunnable;
 import com.haotongxue.service.IUserService;
 import com.haotongxue.service.ReptileService;
@@ -29,13 +30,13 @@ public class ReptileHandler {
 
     private ExecutorService executorService = Executors.newCachedThreadPool();
 
-    public void pa(WebClient webClient,String no,String password){
+    public void pa(ReptileRunnable reptileRunnable){
         String currentOpenid = UserContext.getCurrentOpenid();
         UpdateWrapper<User> userUpdateWrapper = new UpdateWrapper<>();
         userUpdateWrapper.set("is_paing",1).eq("openid",currentOpenid);
         if (userService.update(userUpdateWrapper)){
             cache.invalidate(currentOpenid);
-            executorService.execute(new ReptileRunnable(webClient,no,password,currentOpenid));
+            executorService.execute(reptileRunnable);
         }
     }
 }

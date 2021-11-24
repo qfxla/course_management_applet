@@ -11,7 +11,10 @@ import com.haotongxue.entity.vo.CourseVo;
 import com.haotongxue.entity.vo.TodayCourseVo;
 import com.haotongxue.exceptionhandler.CourseException;
 import com.haotongxue.handler.ReptileHandler;
+import com.haotongxue.handler.WatchIsPaingHandler;
 import com.haotongxue.mapper.*;
+import com.haotongxue.runnable.ReReptileRunnable;
+import com.haotongxue.runnable.ReptileRunnable;
 import com.haotongxue.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.haotongxue.utils.LoginUtils;
@@ -80,6 +83,8 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
     private ReptileService reptileService;
     @Autowired
     private ReptileHandler reptileHandler;
+    @Autowired
+    private WatchIsPaingHandler WatchIsPaingHandler;
     @Resource(name = "loginCache")
     LoadingCache<String,Object> loginCache;
     @Autowired
@@ -278,12 +283,16 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
             WebClient webClient = WebClientUtils.getWebClient();
             User user = (User)loginCache.get(openId);
             HtmlPage afterLogin = LoginUtils.login(webClient, user.getNo(), user.getPassword());
-            reptileHandler.pa(webClient,user.getNo(),user.getPassword());
+            ReReptileRunnable reReptileRunnable = new ReReptileRunnable(webClient,user.getNo(),user.getPassword(),UserContext.getCurrentOpenid());
+            WatchIsPaingHandler.watchIsPa(reReptileRunnable);   //监视正常爬是否超过2分钟
+            reptileHandler.pa(new ReptileRunnable(webClient,user.getNo(),user.getPassword(),UserContext.getCurrentOpenid(),reReptileRunnable));
 
-//            //删除缓存
-//            for (int i = 1;i <= 20;i++){
-//                courseCache.invalidate("cour" + openId + ":" + i);
-//            }
+/*
+            //删除缓存
+            for (int i = 1;i <= 20;i++){
+                courseCache.invalidate("cour" + openId + ":" + i);
+            }
+*/
             return true;
         }
         return false;
