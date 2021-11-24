@@ -137,7 +137,10 @@ public class UserController {
                 .data("Authority",token)
                 .data("openid",openid)
                 .data("subscribe",user.getSubscribe() == 1)
-                .data("isConcern",!user.getUnionId().equals(""));
+                .data("isConcern",!user.getUnionId().equals(""))
+                .data("avatarUrl",user.getAvatarUrl())
+                .data("nickName",user.getNickName())
+                .data("gender",user.getGender());
     }
 
     @ApiOperation("修改用户密码")
