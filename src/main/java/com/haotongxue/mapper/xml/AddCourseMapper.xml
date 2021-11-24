@@ -15,6 +15,7 @@
           AND t_info_week.week_id=#{week}
           AND t_info.info_id = t_info_section.info_id
           AND t_info_section.section_id=#{section}
-          AND t_info.xingqi=#{xingqi};
+          AND t_info.xingqi=#{xingqi}
+          AND t_info.is_deleted = 0;
     </select>
 </mapper>
