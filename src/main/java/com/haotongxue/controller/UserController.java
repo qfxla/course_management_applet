@@ -12,6 +12,9 @@ import com.haotongxue.entity.WeChatLoginResponse;
 import com.haotongxue.entity.dto.PushSettingDTO;
 import com.haotongxue.entity.dto.WeChatLoginDTO;
 import com.haotongxue.handler.ReptileHandler;
+import com.haotongxue.handler.WatchIsPaingHandler;
+import com.haotongxue.runnable.ReReptileRunnable;
+import com.haotongxue.runnable.ReptileRunnable;
 import com.haotongxue.service.EduLoginService;
 import com.haotongxue.service.IUserService;
 import com.haotongxue.utils.*;
@@ -52,6 +55,9 @@ public class UserController {
 
     @Autowired
     ReptileHandler reptileHandler;
+
+    @Autowired
+    WatchIsPaingHandler watchIsPaingHandler;
 
     @ApiOperation(value = "微信登录")
     @PostMapping("/login")
@@ -100,8 +106,13 @@ public class UserController {
             isDoPa = user.getIsPa() == 0;
         }
         if (isDoPa && user.getIsPaing() == 0){
-            log.info(openid+"开始爬虫");
-            reptileHandler.pa(webClient,user.getNo(),user.getPassword());
+            log.info(openid + "开始爬虫");
+            ReReptileRunnable reReptileRunnable = new ReReptileRunnable(webClient,user.getNo(),user.getPassword(),UserContext.getCurrentOpenid());
+            watchIsPaingHandler.watchIsPa(reReptileRunnable);
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            log.info(openid + "正常爬虫");
+            ReptileRunnable reptileRunnable = new ReptileRunnable(webClient,user.getNo(),user.getPassword(),UserContext.getCurrentOpenid(),reReptileRunnable);
+            reptileHandler.pa(reptileRunnable);
         }
         String token = JwtUtils.generate(openid);
         if (isRefreshInfo){
