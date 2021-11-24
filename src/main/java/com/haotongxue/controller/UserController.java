@@ -102,7 +102,7 @@ public class UserController {
         }else {
             //如果为0，则爬虫还没执行成功
             isDoPa = user.getIsPa() == 0;
-            if (user.getUnionId() == ""){
+            if (!user.getUnionId().equals(unionid)){
                 isRefreshInfo = true;
             }
         }
