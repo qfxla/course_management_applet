@@ -102,10 +102,10 @@ public class InfoController {
     public R updateCourseData() throws IOException {
         String openId = UserContext.getCurrentOpenid();
         boolean b = iInfoService.updateCourseData();
-        for (int i = 1;i <= 20;i++){
+        //删除缓存
+        for (int i = 1;i <= 20;i++) {
             courseCache.invalidate("cour" + openId + ":" + i);
         }
-        //删除缓存
         if (b){
             return R.ok();
         }

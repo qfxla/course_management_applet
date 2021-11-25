@@ -1,21 +1,20 @@
 package com.haotongxue.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.gargoylesoftware.htmlunit.*;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.haotongxue.entity.PasswordEditEntity;
-import com.haotongxue.entity.User;
-import com.haotongxue.entity.WeChatLoginResponse;
+import com.haotongxue.entity.*;
 import com.haotongxue.entity.dto.PushSettingDTO;
 import com.haotongxue.entity.dto.WeChatLoginDTO;
 import com.haotongxue.handler.ReptileHandler;
 import com.haotongxue.handler.WatchIsPaingHandler;
+import com.haotongxue.mapper.*;
 import com.haotongxue.runnable.ReReptileRunnable;
 import com.haotongxue.runnable.ReptileRunnable;
-import com.haotongxue.service.EduLoginService;
-import com.haotongxue.service.IUserService;
+import com.haotongxue.service.*;
 import com.haotongxue.utils.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,6 +27,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -48,6 +49,8 @@ public class UserController {
 
     @Resource(name = "loginCache")
     LoadingCache<String,Object> cache;
+    @Resource(name = "courseCache")
+    LoadingCache<String,Object> courseCache;
 
     @Autowired
     EduLoginService eduLoginService;
@@ -57,6 +60,25 @@ public class UserController {
 
     @Autowired
     WatchIsPaingHandler watchIsPaingHandler;
+
+    @Autowired
+    private InfoSectionMapper infoSectionMapper;
+    @Autowired
+    private InfoWeekMapper infoWeekMapper;
+    @Autowired
+    private InfoCourseMapper infoCourseMapper;
+    @Autowired
+    private InfoClassroomMapper infoClassroomMapper;
+    @Autowired
+    private InfoTeacherMapper infoTeacherMapper;
+    @Autowired
+    private UserInfoMapper userInfoMapper;
+    @Autowired
+    private InfoMapper infoMapper;
+    @Autowired
+    private IUserInfoService iUserInfoService;
+    @Autowired
+    private UserMapper userMapper;
 
     @ApiOperation(value = "微信登录")
     @PostMapping("/login")
@@ -203,11 +225,34 @@ public class UserController {
         return R.ok().data("no",no);
     }
 
-    @ApiOperation("删除某个人的登录缓存")
+    @ApiOperation("删除某个人的数据及缓存")
     @GetMapping("/deleteLoginCache")
     public R deleteLoginCache(@RequestParam("openid")String openid){
+        User user = userService.getById(openid);
+        if (user == null){
+            return R.error().data("msg","无该openid");
+        }
+
+        String openId = user.getOpenid();
+        QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
+        wrapper.eq("openid",openId);
+        List<String> infoList = iUserInfoService.list(wrapper).stream().map(UserInfo::getInfoId).collect(Collectors.toList());
+        userMapper.deleteByInfoId(openid);
         cache.invalidate(openid);
-        return R.ok();
+        for (int i = 1;i <= 20;i++){
+            courseCache.invalidate("cour" + openId + ":" + i);
+        }
+        log.info("查找用户的所有info数量"+ infoList.size());
+        if(infoList.size() != 0){
+            infoSectionMapper.deleteByInfoId(infoList);
+            infoWeekMapper.deleteByInfoId(infoList);
+            infoCourseMapper.deleteByInfoId(infoList);
+            infoClassroomMapper.deleteByInfoId(infoList);
+            infoTeacherMapper.deleteByInfoId(infoList);
+            infoMapper.deleteByInfoId(infoList);
+            userInfoMapper.deleteByInfoId(infoList);
+        }
+        return R.ok().data("msg","清除成功");
     }
 
 }

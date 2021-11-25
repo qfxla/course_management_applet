@@ -268,34 +268,25 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
 
         logger.info("查找用户的所有info数量"+ infoList.size());
 
-        int i1 = 0,i2 =0,i3 = 0,i4 = 0,i5 = 0,i6 = 0,i7 = 0;
-        i1 = infoSectionMapper.deleteByInfoId(infoList);
-        i2 = infoWeekMapper.deleteByInfoId(infoList);
-        i3 = infoCourseMapper.deleteByInfoId(infoList);
-        i4 = infoClassroomMapper.deleteByInfoId(infoList);
-        i5 = infoTeacherMapper.deleteByInfoId(infoList);
-        i6 = infoMapper.deleteByInfoId(infoList);
-        i7 = userInfoMapper.deleteByInfoId(infoList);
-
-        //删除成功，开始爬
-        if (i1 > 0 && i2 > 0 && i3 > 0 && i4 > 0 && i5 > 0 && i6 > 0 && i7 > 0){
-            logger.info("删除成功，开始爬");
-            WebClient webClient = WebClientUtils.getWebClient();
-            User user = (User)loginCache.get(openId);
-            HtmlPage afterLogin = LoginUtils.login(webClient, user.getNo(), user.getPassword());
-            ReReptileRunnable reReptileRunnable = new ReReptileRunnable(webClient,user.getNo(),user.getPassword(),UserContext.getCurrentOpenid());
-            WatchIsPaingHandler.watchIsPa(reReptileRunnable);   //监视正常爬是否超过2分钟
-            reptileHandler.pa(new ReptileRunnable(webClient,user.getNo(),user.getPassword(),UserContext.getCurrentOpenid(),reReptileRunnable));
-
-/*
-            //删除缓存
-            for (int i = 1;i <= 20;i++){
-                courseCache.invalidate("cour" + openId + ":" + i);
-            }
-*/
-            return true;
+        if (infoList.size() != 0){
+            int i1 = 0,i2 =0,i3 = 0,i4 = 0,i5 = 0,i6 = 0,i7 = 0;
+            i1 = infoSectionMapper.deleteByInfoId(infoList);
+            i2 = infoWeekMapper.deleteByInfoId(infoList);
+            i3 = infoCourseMapper.deleteByInfoId(infoList);
+            i4 = infoClassroomMapper.deleteByInfoId(infoList);
+            i5 = infoTeacherMapper.deleteByInfoId(infoList);
+            i6 = infoMapper.deleteByInfoId(infoList);
+            i7 = userInfoMapper.deleteByInfoId(infoList);
         }
-        return false;
+        logger.info("删除成功，开始爬");
+        WebClient webClient = WebClientUtils.getWebClient();
+        User user = (User)loginCache.get(openId);
+        HtmlPage afterLogin = LoginUtils.login(webClient, user.getNo(), user.getPassword());
+        ReReptileRunnable reReptileRunnable = new ReReptileRunnable(webClient,user.getNo(),user.getPassword(),UserContext.getCurrentOpenid());
+        WatchIsPaingHandler.watchIsPa(reReptileRunnable);   //监视正常爬是否超过2分钟
+        reptileHandler.pa(new ReptileRunnable(webClient,user.getNo(),user.getPassword(),UserContext.getCurrentOpenid(),reReptileRunnable));
+
+        return true;
     }
 
 
