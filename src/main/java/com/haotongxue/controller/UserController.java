@@ -144,6 +144,7 @@ public class UserController {
             reptileHandler.pa(reptileRunnable);
         }
         String token = JwtUtils.generate(openid);
+        boolean isHaiZhu = StuNumUtils.isHaiZhu(user.getNo());
         if (isRefreshInfo){
 
             //设置unionId
@@ -153,7 +154,8 @@ public class UserController {
             return R.ok().code(ResultCode.NEED_REFRESH_INFO)
                     .data("Authority",token)
                     .data("subscribe",user.getSubscribe() == 1)
-                    .data("isConcern",!user.getUnionId().equals(""));
+                    .data("isConcern",!user.getUnionId().equals(""))
+                    .data("isHaiZhu",isHaiZhu);
         }
         return R.ok()
                 .data("Authority",token)
@@ -162,7 +164,8 @@ public class UserController {
                 .data("isConcern",!user.getUnionId().equals(""))
                 .data("avatarUrl",user.getAvatarUrl())
                 .data("nickName",user.getNickName())
-                .data("gender",user.getGender());
+                .data("gender",user.getGender())
+                .data("isHaiZhu",isHaiZhu);
     }
 
     @ApiOperation("修改用户密码")
