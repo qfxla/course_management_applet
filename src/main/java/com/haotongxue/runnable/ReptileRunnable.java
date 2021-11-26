@@ -45,7 +45,7 @@ public class ReptileRunnable implements Runnable{
     @Override
     public void run() {
 //        if(!Thread.currentThread().isInterrupted()){
-        Thread.currentThread().setName("正常爬的线程");
+        Thread.currentThread().setName(currentOpenid + "===正常爬的线程");
         reptileRunnable.noticeRePa(Thread.currentThread());
         if (webClient == null){
             webClient = WebClientUtils.getWebClient();
