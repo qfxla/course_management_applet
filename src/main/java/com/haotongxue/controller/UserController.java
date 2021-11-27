@@ -21,6 +21,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 /**
@@ -144,7 +146,7 @@ public class UserController {
             reptileHandler.pa(reptileRunnable);
         }
         String token = JwtUtils.generate(openid);
-        boolean isHaiZhu = StuNumUtils.isHaiZhu(user.getNo());
+        boolean isHaiZhu = user.getIsHaizhu().equals(1);
         if (isRefreshInfo){
 
             //设置unionId

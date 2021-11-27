@@ -58,6 +58,8 @@ public class User implements Serializable {
     @ApiModelProperty("是否正在爬")
     private Integer isPaing;
 
+    private Integer isHaizhu;
+
     @ApiModelProperty("是否订阅推送")
     private Integer subscribe;
 
