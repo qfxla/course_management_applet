@@ -21,6 +21,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +29,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 /**
@@ -260,6 +264,19 @@ public class UserController {
         }
         return R.ok().data("msg","清除成功");
     }
+
+    @ApiOperation("删除所有人的登录缓存")
+    @GetMapping("/deleteAllLoginCache")
+    public R deleteAllLoginCache(){
+        ConcurrentMap<@NonNull String, @NonNull Object> map = cache.asMap();
+        Set<Map.Entry<@NonNull String, @NonNull Object>> set = map.entrySet();
+        for (Map.Entry<String, Object> entry : set) {
+            cache.invalidate(entry.getKey());
+        }
+
+        return R.ok();
+    }
+
 
 }
 

@@ -8,4 +8,5 @@ import java.io.IOException;
  */
 public interface getFreeRoomService {
     void paFreeRoom() throws IOException;
+    void paFreeRoom2() throws IOException;
 }

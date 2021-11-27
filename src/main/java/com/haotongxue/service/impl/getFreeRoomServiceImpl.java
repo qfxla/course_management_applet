@@ -34,8 +34,10 @@ public class getFreeRoomServiceImpl implements getFreeRoomService {
     @Autowired
     IFreeRoomService iFreeRoomService;
 
+
+    //海珠校区
 //    @Transactional(rollbackFor = Exception.class)
-//    @Scheduled(initialDelay = 5000,fixedDelay = 300000)
+    @Scheduled(initialDelay = 5000,fixedDelay = 300000)
     @Override
     public void paFreeRoom() throws IOException {
         WebClient webClient = WebClientUtils.getWebClient();
@@ -54,6 +56,73 @@ public class getFreeRoomServiceImpl implements getFreeRoomService {
 
         Map<Integer, List<Integer>> map = getSectionMap();
 
+        for (int i = 18;i < 23;i++){
+            System.out.println(i);
+            HtmlSelect startWeek = page.getHtmlElementById("zc1");
+            startWeek.setDefaultValue(String.valueOf(i));
+            HtmlSelect endWeek = page.getHtmlElementById("zc2");
+            endWeek.setDefaultValue(String.valueOf(i));
+            HtmlElement query = page.getHtmlElementById("btn_query");
+            HtmlPage afterQuery = query.click();
+            webClient.waitForBackgroundJavaScript(1000);
+
+            //*******
+            DomNodeList<DomElement> tbodyList = afterQuery.getElementsByTagName("tbody");
+
+            if(tbodyList.size() != 0){
+                List<FreeRoom> list = new ArrayList<>();
+                DomElement tbody = tbodyList.get(0);
+                DomNodeList<HtmlElement> tr = tbody.getElementsByTagName("tr");
+                for (HtmlElement htmlElement : tr) {   //每一个教师每一周的课
+                    DomNodeList<HtmlElement> td = htmlElement.getElementsByTagName("td");
+                    String name = td.get(0).asText();
+                    int xingqi = 0;
+                    int start = 0;
+                    for (int j = 1;j < td.size();j++){
+                        start++;
+                        if (j % 6 == 1){
+                            xingqi ++;
+                            start = 1;
+                        }
+                        if (td.get(j).asText().trim().equals("")){
+                            List<Integer> sections = map.get(start);
+                            for (Integer section : sections) {
+                                FreeRoom freeRoom = new FreeRoom(UUID.randomUUID().toString(),i,section,xingqi,name,"海珠校区","教学楼");
+                                list.add(freeRoom);
+                            }
+                        }
+                    }
+                }
+                iFreeRoomService.saveBatch(list);
+            }else {
+                System.out.println("这学期没了，return");
+                break;
+            }
+
+        }
+        System.out.println("我爬完了");
+    }
+
+//    //白云校区
+//    @Scheduled(initialDelay = 5000,fixedDelay = 3000000)
+    @Override
+    public void paFreeRoom2() throws IOException {
+        WebClient webClient = WebClientUtils.getWebClient();
+        HtmlPage afterLogin = LoginUtils.login(webClient,"202010244130","Zhku106133");
+        log.info("ohpVk5VjCMQ9IZsZzfmwruWvhXeA" + "开始爬虫");
+        HtmlPage page = null;
+        try {
+            page = webClient.getPage("http://edu-admin.zhku.edu.cn/jsxsd/kbcx/kbxx_classroom");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        HtmlSelect campus = page.getHtmlElementById("xqid");
+        campus.setDefaultValue("3"); //白云校区
+        HtmlSelect building = page.getHtmlElementById("jzwid");
+        building.setDefaultValue("301");
+        //301 杨钊杨勋楼
+        Map<Integer, List<Integer>> map = getSectionMap();
+
         for (int i = 1;i < 23;i++){
             System.out.println(i);
             HtmlSelect startWeek = page.getHtmlElementById("zc1");
@@ -63,28 +132,34 @@ public class getFreeRoomServiceImpl implements getFreeRoomService {
             HtmlElement query = page.getHtmlElementById("btn_query");
             HtmlPage afterQuery = query.click();
             webClient.waitForBackgroundJavaScript(1000);
-            DomElement tbody = afterQuery.getElementsByTagName("tbody").get(0);
-            DomNodeList<HtmlElement> tr = tbody.getElementsByTagName("tr");
-            for (HtmlElement htmlElement : tr) {   //每一个教师每一周的课
-                DomNodeList<HtmlElement> td = htmlElement.getElementsByTagName("td");
-                String name = td.get(0).asText();
-                int xingqi = 0;
-                int start = 0;
-                for (int j = 1;j < td.size();j++){
-                    start++;
-                    if (j % 6 == 1){
-                        xingqi ++;
-                        start = 1;
-                    }
-                    if (td.get(j).asText().trim().equals("")){
-                        List<Integer> sections = map.get(start);
-                        for (Integer section : sections) {
-                            FreeRoom freeRoom = new FreeRoom(UUID.randomUUID().toString(),i,section,xingqi,name,"海珠校区","教学楼");
+            DomNodeList<DomElement> tbodyList = afterQuery.getElementsByTagName("tbody");
+            if(tbodyList.size() != 0){
+                DomElement tbody = tbodyList.get(0);
+                DomNodeList<HtmlElement> tr = tbody.getElementsByTagName("tr");
+                for (HtmlElement htmlElement : tr) {   //每一个教室每一周的课
+                    DomNodeList<HtmlElement> td = htmlElement.getElementsByTagName("td");
+                    String name = td.get(0).asText();
+                    int xingqi = 0;
+                    int start = 0;
+                    for (int j = 1; j < td.size(); j++) {
+                        start++;
+                        if (j % 6 == 1) {
+                            xingqi++;
+                            start = 1;
+                        }
+                        if (td.get(j).asText().trim().equals("")) {
+                            List<Integer> sections = map.get(start);
+                            for (Integer section : sections) {
+                                FreeRoom freeRoom = new FreeRoom(UUID.randomUUID().toString(), i, section, xingqi, name, "白云校区", "杨钊杨勋楼");
 //                            System.out.println(freeRoom);
-                            iFreeRoomService.save(freeRoom);
+                                iFreeRoomService.save(freeRoom);
+                            }
                         }
                     }
                 }
+            }else {
+                System.out.println("这学期没了，return");
+                break;
             }
         }
         System.out.println("我爬完了");
