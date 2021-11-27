@@ -37,7 +37,7 @@ public class getFreeRoomServiceImpl implements getFreeRoomService {
 
     //海珠校区
 //    @Transactional(rollbackFor = Exception.class)
-    @Scheduled(initialDelay = 5000,fixedDelay = 300000)
+//    @Scheduled(initialDelay = 5000,fixedDelay = 300000)
     @Override
     public void paFreeRoom() throws IOException {
         WebClient webClient = WebClientUtils.getWebClient();

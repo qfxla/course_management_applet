@@ -1,9 +1,16 @@
 package com.haotongxue.controller;
 
 
+import com.haotongxue.entity.vo.FreeRoomVo;
+import com.haotongxue.service.FreeRoomVoService;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * <p>
@@ -16,6 +23,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/freeRoom")
 public class FreeRoomController {
+
+    @Resource
+    FreeRoomVoService freeRoomVoService;
+
+    @GetMapping("/getFreeByFour")
+    public List<FreeRoomVo> getFreeByFour(@RequestParam("campus") String campus,
+                                          @RequestParam("building") String building,
+                                          @RequestParam("week") int week,
+                                          @RequestParam("xingqi") int xingqi){
+        return freeRoomVoService.queryFreeRoom(campus,building,week,xingqi);
+    }
 
 }
 
