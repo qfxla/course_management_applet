@@ -2,8 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.haotongxue.mapper.FreeRoomVoMapper">
 
-    <select id="queryFreeRooms" resultType="com.haotongxue.entity.vo.FreeRoomVo">
-        SELECT name,section
+    <select id="queryFreeRooms" resultType="java.lang.String">
+        SELECT DISTINCT name
         FROM
             t_free_room
         WHERE
@@ -11,6 +11,20 @@
         AND xingqi=#{xingqi}
         AND building=#{building}
         AND campus=#{campus}
-        order by name;
+        ORDER BY name;
+    </select>
+
+
+    <select id="queryFreeSections" resultType="java.lang.Integer">
+        SELECT section
+        FROM
+            t_free_room
+        WHERE
+        week=#{week}
+        and name=#{roomName}
+        AND xingqi=#{xingqi}
+        AND building=#{building}
+        AND campus=#{campus}
+        ORDER BY section;
     </select>
 </mapper>

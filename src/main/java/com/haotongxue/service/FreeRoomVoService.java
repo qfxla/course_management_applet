@@ -1,9 +1,9 @@
 package com.haotongxue.service;
 
 import com.haotongxue.entity.vo.FreeRoomVo;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description TODO
@@ -11,5 +11,5 @@ import java.util.List;
  */
 
 public interface FreeRoomVoService {
-    public List<FreeRoomVo> queryFreeRoom(String campus,String building,int week,int xingqi);
+    public List<FreeRoomVo>  queryFreeRoom(String campus, String building, int week, int xingqi);
 }

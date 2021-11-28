@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+import java.util.List;
+
 /**
  * @Description TODO
  * @date 2021/11/27 16:02
@@ -17,5 +19,5 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class FreeRoomVo {
     private String name;
-    private int section;
+    private List<Integer> section;
 }

@@ -1,7 +1,6 @@
 package com.haotongxue.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.haotongxue.entity.FreeRoom;
 import com.haotongxue.entity.vo.FreeRoomVo;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -18,5 +17,6 @@ import java.util.List;
 
 @Mapper
 public interface FreeRoomVoMapper extends BaseMapper<FreeRoomVo> {
-    public List<FreeRoomVo> queryFreeRooms(String campus,String building,int week,int xingqi);
+    public List<String> queryFreeRooms(String campus, String building, int week, int xingqi);
+    public List<Integer> queryFreeSections(String roomName,String campus, String building, int week, int xingqi);
 }
