@@ -277,7 +277,19 @@ public class UserController {
         for (Map.Entry<String, Object> entry : set) {
             cache.invalidate(entry.getKey());
         }
+
         return R.ok();
+    }
+
+    @ApiOperation("只删某个人的登录缓存")
+    @GetMapping("/justDeleteCache")
+    public R justDeleteCache(@RequestParam("openid")String openid){
+        User user = userService.getById(openid);
+        if (user == null){
+            return R.error().data("msg","无该openid");
+        }
+        cache.invalidate(openid);
+        return R.ok().data("msg","删除成功");
     }
 }
 
