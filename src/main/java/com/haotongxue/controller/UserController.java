@@ -29,6 +29,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
@@ -121,7 +123,11 @@ public class UserController {
             //记得在爬虫完以后要设置这条数据失效
             user.setIsPa(0);
             user.setIsPaing(0);
-
+            if (StuNumUtils.isHaiZhu(user.getNo())){
+                user.setIsHaizhu(1);
+            }else {
+                user.setIsHaizhu(2);
+            }
             //设置unionId
             user.setUnionId(unionid);
 
@@ -263,5 +269,15 @@ public class UserController {
         return R.ok().data("msg","清除成功");
     }
 
+    @ApiOperation("删除所有人的登录缓存")
+    @GetMapping("/deleteAllLoginCache")
+    public R deleteAllLoginCache(){
+        ConcurrentMap<@NonNull String, @NonNull Object> map = cache.asMap();
+        Set<Map.Entry<@NonNull String, @NonNull Object>> set = map.entrySet();
+        for (Map.Entry<String, Object> entry : set) {
+            cache.invalidate(entry.getKey());
+        }
+        return R.ok();
+    }
 }
 

@@ -54,7 +54,7 @@ public class ReReptileRunnable implements Runnable{
         }
         if(rePa){
             log.info("正常爬超过2分钟，得重爬了。。。。。。");
-            Thread.currentThread().setName("重爬的线程");
+            Thread.currentThread().setName(currentOpenid + "===重爬的线程");
             try {
                 Thread.sleep(2000);
                 paThread.interrupt();
