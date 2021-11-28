@@ -53,10 +53,10 @@ public class getFreeRoomServiceImpl implements getFreeRoomService {
         campus.setDefaultValue("1");
         HtmlSelect building = page.getHtmlElementById("jzwid");
         building.setDefaultValue("A01");
-
+        //A01 教学楼
         Map<Integer, List<Integer>> map = getSectionMap();
 
-        for (int i = 18;i < 23;i++){
+        for (int i = 1;i < 23;i++){
             System.out.println(i);
             HtmlSelect startWeek = page.getHtmlElementById("zc1");
             startWeek.setDefaultValue(String.valueOf(i));
@@ -117,13 +117,13 @@ public class getFreeRoomServiceImpl implements getFreeRoomService {
             e.printStackTrace();
         }
         HtmlSelect campus = page.getHtmlElementById("xqid");
-        campus.setDefaultValue("3"); //白云校区
+        campus.setDefaultValue("3"); //1 海珠校区  3 白云校区
         HtmlSelect building = page.getHtmlElementById("jzwid");
-        building.setDefaultValue("301");
-        //301 杨钊杨勋楼
+        building.setDefaultValue("307");
+        //301 杨钊杨勋楼  307 D栋综合教学楼  //302 曾宪梓楼
         Map<Integer, List<Integer>> map = getSectionMap();
 
-        for (int i = 1;i < 23;i++){
+        for (int i = 3;i < 23;i++){
             System.out.println(i);
             HtmlSelect startWeek = page.getHtmlElementById("zc1");
             startWeek.setDefaultValue(String.valueOf(i));
@@ -150,7 +150,7 @@ public class getFreeRoomServiceImpl implements getFreeRoomService {
                         if (td.get(j).asText().trim().equals("")) {
                             List<Integer> sections = map.get(start);
                             for (Integer section : sections) {
-                                FreeRoom freeRoom = new FreeRoom(UUID.randomUUID().toString(), i, section, xingqi, name, "白云校区", "杨钊杨勋楼");
+                                FreeRoom freeRoom = new FreeRoom(UUID.randomUUID().toString(), i, section, xingqi, name, "白云校区", "D栋综合教学楼");
 //                            System.out.println(freeRoom);
                                 iFreeRoomService.save(freeRoom);
                             }
