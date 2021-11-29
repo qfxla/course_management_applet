@@ -94,13 +94,13 @@ public class UserController {
         //用来标记是否是快捷登录
         boolean isQuickLogin = false;
         //是否让用户重新刷新他的个人信息
-        boolean isRefreshInfo = false;
+        //boolean isRefreshInfo = false;
         if (loginDTO.getPassword() == null && loginDTO.getNo() == null){
             isQuickLogin = true;
-            if (!cache.asMap().containsKey(openid)){
-                //每三天用户信息就要更新一次，起码确保头像是最新的
-                isRefreshInfo = true;
-            }
+//            if (!cache.asMap().containsKey(openid)){
+//                //每三天用户信息就要更新一次，起码确保头像是最新的
+//                isRefreshInfo = true;
+//            }
         }
         User user = (User) cache.get(openid);
         boolean isDoPa = true; //是否执行学校系统登录验证
@@ -138,9 +138,9 @@ public class UserController {
         }else {
             //如果为0，则爬虫还没执行成功
             isDoPa = user.getIsPa() == 0;
-            if (!user.getUnionId().equals(unionid)){
-                isRefreshInfo = true;
-            }
+//            if (!user.getUnionId().equals(unionid)){
+//                isRefreshInfo = true;
+//            }
         }
         if (isDoPa && user.getIsPaing() == 0){
             log.info(openid + "开始爬虫");
@@ -153,18 +153,18 @@ public class UserController {
         }
         String token = JwtUtils.generate(openid);
         boolean isHaiZhu = user.getIsHaizhu().equals(1);
-        if (isRefreshInfo){
-
-            //设置unionId
-            user.setUnionId(unionid);
-            userService.updateById(user);
-
-            return R.ok().code(ResultCode.NEED_REFRESH_INFO)
-                    .data("Authority",token)
-                    .data("subscribe",user.getSubscribe() == 1)
-                    .data("isConcern",!user.getUnionId().equals(""))
-                    .data("isHaiZhu",isHaiZhu);
-        }
+//        if (isRefreshInfo){
+//
+//            //设置unionId
+//            user.setUnionId(unionid);
+//            userService.updateById(user);
+//
+//            return R.ok().code(ResultCode.NEED_REFRESH_INFO)
+//                    .data("Authority",token)
+//                    .data("subscribe",user.getSubscribe() == 1)
+//                    .data("isConcern",!user.getUnionId().equals(""))
+//                    .data("isHaiZhu",isHaiZhu);
+//        }
         return R.ok()
                 .data("Authority",token)
                 .data("openid",openid)
