@@ -45,4 +45,3 @@ public class FreeRoomController {
         return (List<FreeRoomVo>)freeRoomCache.get(key);
     }
 }
-
