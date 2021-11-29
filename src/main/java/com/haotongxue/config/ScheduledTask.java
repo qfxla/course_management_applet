@@ -21,12 +21,12 @@ public class ScheduledTask {
     @Autowired
     InfoMapper infoMapper;
 
-//    @Resource(name = "weekCache")
-//    LoadingCache<String,Object> weekCache;
-//
-//    @Scheduled(cron = "0 0 0 ? * MON")
-//    public void updateCurrentWeek(){
-//        Integer week = infoMapper.getWeekByToday();
-//        weekCache.put("week",week);
-//    }
+    @Resource(name = "weekCache")
+    LoadingCache<String,Object> weekCache;
+
+    @Scheduled(cron = "1 0 0 ? * MON")  //星期一0点1秒
+    public void updateCurrentWeek(){
+        Integer week = infoMapper.getWeekByToday();
+        weekCache.put("week",week);
+    }
 }
