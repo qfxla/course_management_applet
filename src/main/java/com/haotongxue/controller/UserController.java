@@ -138,15 +138,15 @@ public class UserController {
         }else {
             //如果为0，则爬虫还没执行成功
             isDoPa = user.getIsPa() == 0;
-//            if (!user.getUnionId().equals(unionid)){
-//                isRefreshInfo = true;
-//            }
+            if (!user.getUnionId().equals(unionid)){
+                user.setUnionId(unionid);
+                userService.updateById(user);
+            }
         }
         if (isDoPa && user.getIsPaing() == 0){
             log.info(openid + "开始爬虫");
             ReReptileRunnable reReptileRunnable = new ReReptileRunnable(webClient,user.getNo(),user.getPassword(),UserContext.getCurrentOpenid());
             watchIsPaingHandler.watchIsPa(reReptileRunnable);
-            //////////////////////////////////////////////////////////////////////////////////////////////////////////////
             log.info(openid + "正常爬虫");
             ReptileRunnable reptileRunnable = new ReptileRunnable(webClient,user.getNo(),user.getPassword(),UserContext.getCurrentOpenid(),reReptileRunnable);
             reptileHandler.pa(reptileRunnable);
