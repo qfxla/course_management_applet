@@ -123,7 +123,11 @@ public class UserController {
             //记得在爬虫完以后要设置这条数据失效
             user.setIsPa(0);
             user.setIsPaing(0);
-
+            if (StuNumUtils.isHaiZhu(user.getNo())){
+                user.setIsHaizhu(1);
+            }else {
+                user.setIsHaizhu(2);
+            }
             //设置unionId
             user.setUnionId(unionid);
 
@@ -148,7 +152,7 @@ public class UserController {
             reptileHandler.pa(reptileRunnable);
         }
         String token = JwtUtils.generate(openid);
-        boolean isHaiZhu = StuNumUtils.isHaiZhu(user.getNo());
+        boolean isHaiZhu = user.getIsHaizhu().equals(1);
         if (isRefreshInfo){
 
             //设置unionId
