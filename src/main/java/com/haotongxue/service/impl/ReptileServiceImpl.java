@@ -3,9 +3,7 @@ package com.haotongxue.service.impl;
 
 import com.gargoylesoftware.htmlunit.ScriptException;
 import com.gargoylesoftware.htmlunit.javascript.JavaScriptErrorListener;
-import com.haotongxue.entity.UserInfo;
 import com.haotongxue.mapper.*;
-import com.haotongxue.utils.UserContext;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
