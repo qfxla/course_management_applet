@@ -282,8 +282,9 @@ public class UserController {
     }
 
     @ApiOperation("只删某个人的登录缓存")
-    @GetMapping("/justDeleteCache")
-    public R justDeleteCache(@RequestParam("openid")String openid){
+    @GetMapping("/authority/justDeleteCache")
+    public R justDeleteCache(){
+        String openid = UserContext.getCurrentOpenid();
         User user = userService.getById(openid);
         if (user == null){
             return R.error().data("msg","无该openid");
