@@ -24,13 +24,16 @@ import lombok.Setter;
 @Getter
 @Setter
 @TableName("t_count_down")
-@ApiModel(value = "CountDown对象", description = "倒计时表")
+@ApiModel(value = "CountDown对象", description = "")
 public class CountDown implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @ApiModelProperty("id")
+      @TableId(value = "id", type = IdType.ASSIGN_ID)
+    private String id;
+
     @ApiModelProperty("openid")
-      @TableId(value = "openid", type = IdType.ASSIGN_ID)
     private String openid;
 
     @ApiModelProperty("名称")
