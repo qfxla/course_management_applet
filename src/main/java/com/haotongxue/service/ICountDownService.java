@@ -3,6 +3,8 @@ package com.haotongxue.service;
 import com.haotongxue.entity.CountDown;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.io.IOException;
+
 /**
  * <p>
  *  服务类
@@ -12,5 +14,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2021-12-01
  */
 public interface ICountDownService extends IService<CountDown> {
-
+    void refreshCountDown() throws IOException;
 }
