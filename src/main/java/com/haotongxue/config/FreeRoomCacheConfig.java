@@ -34,11 +34,17 @@ public class FreeRoomCacheConfig {
                         //freeRoom-海珠校区-教学楼-13-5
                         //freeRoom-白云校区-（白）曾宪梓楼-1-4
                         String cacheType = key.substring(0,key.indexOf("-"));
+                        System.out.println(cacheType);
                         String campus = key.substring(cacheType.length() + 1, key.indexOf("校区")) + "校区";
+                        System.out.println(campus);
                         String building = key.substring(cacheType.length() + campus.length() + 2,key.indexOf("楼")) + "楼";
+                        System.out.println(building);
                         String weekStr = key.substring(key.indexOf("楼") + 2,key.lastIndexOf("-"));
+                        System.out.println(weekStr);
                         int week = Integer.parseInt(weekStr);
+                        System.out.println(week);
                         String xingqiStr = key.substring(key.lastIndexOf("-") + 1);
+                        System.out.println(xingqiStr);
                         int xingqi = Integer.parseInt(xingqiStr);
                         return freeRoomVoService.queryFreeRoom(campus,building,week,xingqi);
                     }
