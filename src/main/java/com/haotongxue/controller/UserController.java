@@ -241,12 +241,14 @@ public class UserController {
 
     @ApiOperation("删除某个人的数据及缓存")
     @GetMapping("/deleteLoginCache")
-    public R deleteLoginCache(@RequestParam("openid")String openid){
+    public R deleteLoginCache(@RequestParam(value = "openid",defaultValue = "",required = false)String openid){
+        if (openid.equals("")){
+            openid = UserContext.getCurrentOpenid();
+        }
         User user = userService.getById(openid);
         if (user == null){
             return R.error().data("msg","无该openid");
         }
-
         String openId = user.getOpenid();
         QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
         wrapper.eq("openid",openId);
