@@ -50,59 +50,61 @@ public class CountDownServiceImpl extends ServiceImpl<CountDownMapper, CountDown
     @Scheduled(cron = "0 0 3 * * ?")
     public void refreshCountDown(){
         log.info("开始查询考试信息--->");
-        ExecutorService executorService = Executors.newFixedThreadPool(8);
+        ExecutorService executorService = Executors.newFixedThreadPool(2);
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
         userQueryWrapper.select("openid","no","password");
         List<User> list = userService.list(userQueryWrapper);
         for (User user : list){
             executorService.execute(() -> {
-                String userOpenid = user.getOpenid();
-                String no = user.getNo();
-                String password = user.getPassword();
-                WebClient webClient = WebClientUtils.getWebClient();
-                HtmlPage loginPage = null;
-                DomNodeList<DomElement> trList = null;
-                try {
-                    loginPage = LoginUtils.login(webClient, no, password);
-                    HtmlElement testSchedule = loginPage.getHtmlElementById("NEW_XSD_KSBM_WDKS_KSAPCX");
-                    HtmlPage testPage = testSchedule.click();
-                    HtmlElement queryBtn = testPage.getHtmlElementById("btn_query");
-                    HtmlPage testQueryMsg = queryBtn.click();
-                    trList = testQueryMsg.getElementsByTagName("tr");
-                } catch (IOException e) {
-                    //e.printStackTrace();
-                }
-                boolean loop = true;
-                for (int i=1;i<trList.size() && loop;i++){
-                    CountDown countDown = new CountDown();
-                    countDown.setOpenid(userOpenid);
-                    DomElement domElement = trList.get(i);
-                    DomNodeList<HtmlElement> tdList = domElement.getElementsByTagName("td");
-                    if (tdList.get(0).getTextContent().contains("未")){
-                        loop = false;
-                        continue;
-                    }
-                    countDown.setName(tdList.get(4).asText());
-                    QueryWrapper<CountDown> wrapperTwo = new QueryWrapper<>();
-                    wrapperTwo.eq("openid",userOpenid).eq("name",countDown.getName());
-                    if (count(wrapperTwo) != 0){
-                        continue;
-                    }
-                    countDown.setLocation(tdList.get(7).asText());
-                    String startAndEndTime = tdList.get(6).asText();
-                    String[] split = startAndEndTime.split(" ");
-                    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                    LocalDate localDate = LocalDate.parse(split[0], dateFormatter);
-                    DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-                    String[] timeSplit = split[1].split("~");
-                    LocalTime startTime = LocalTime.parse(timeSplit[0], timeFormatter);
-                    LocalTime endTime = LocalTime.parse(timeSplit[1], timeFormatter);
-                    countDown.setStartTime(LocalDateTime.of(localDate,startTime));
-                    countDown.setEndTime(LocalDateTime.of(localDate,endTime));
-                    saveOrUpdate(countDown);
-                }
+                searchCountDown(user.getOpenid(),user.getNo(),user.getPassword());
             });
         }
         executorService.shutdown();
+    }
+
+    @Override
+    public void searchCountDown(String userOpenid,String no,String password){
+        WebClient webClient = WebClientUtils.getWebClient();
+        HtmlPage loginPage = null;
+        DomNodeList<DomElement> trList = null;
+        try {
+            loginPage = LoginUtils.login(webClient, no, password);
+            HtmlElement testSchedule = loginPage.getHtmlElementById("NEW_XSD_KSBM_WDKS_KSAPCX");
+            HtmlPage testPage = testSchedule.click();
+            HtmlElement queryBtn = testPage.getHtmlElementById("btn_query");
+            HtmlPage testQueryMsg = queryBtn.click();
+            trList = testQueryMsg.getElementsByTagName("tr");
+        } catch (IOException e) {
+            //e.printStackTrace();
+        }
+        boolean loop = true;
+        for (int i=1;i<trList.size() && loop;i++){
+            CountDown countDown = new CountDown();
+            countDown.setOpenid(userOpenid);
+            DomElement domElement = trList.get(i);
+            DomNodeList<HtmlElement> tdList = domElement.getElementsByTagName("td");
+            if (tdList.get(0).getTextContent().contains("未")){
+                loop = false;
+                continue;
+            }
+            countDown.setName(tdList.get(4).asText());
+            QueryWrapper<CountDown> wrapperTwo = new QueryWrapper<>();
+            wrapperTwo.eq("openid",userOpenid).eq("name",countDown.getName());
+            if (count(wrapperTwo) != 0){
+                continue;
+            }
+            countDown.setLocation(tdList.get(7).asText());
+            String startAndEndTime = tdList.get(6).asText();
+            String[] split = startAndEndTime.split(" ");
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDate localDate = LocalDate.parse(split[0], dateFormatter);
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+            String[] timeSplit = split[1].split("~");
+            LocalTime startTime = LocalTime.parse(timeSplit[0], timeFormatter);
+            LocalTime endTime = LocalTime.parse(timeSplit[1], timeFormatter);
+            countDown.setStartTime(LocalDateTime.of(localDate,startTime));
+            countDown.setEndTime(LocalDateTime.of(localDate,endTime));
+            saveOrUpdate(countDown);
+        }
     }
 }

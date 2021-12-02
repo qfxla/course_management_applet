@@ -15,4 +15,5 @@ import java.io.IOException;
  */
 public interface ICountDownService extends IService<CountDown> {
     void refreshCountDown() throws IOException;
+    void searchCountDown(String userOpenid,String no,String password);
 }
