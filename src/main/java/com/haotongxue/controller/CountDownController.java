@@ -28,6 +28,7 @@ import javax.management.Query;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -62,7 +63,7 @@ public class CountDownController {
     public R getCountDownMes(){
         String openid = UserContext.getCurrentOpenid();
         QueryWrapper<CountDown> wrapper = new QueryWrapper<>();
-        wrapper.eq("openid",openid).eq("is_deleted",0);
+        wrapper.eq("openid",openid).eq("is_deleted",0).gt("start_time",new Date());
         List<CountDown> list = iCountDownService.list(wrapper);
         List<CountDownVo> listVo1 = ConvertUtil.convert(list, CountDownVo.class);
         for (CountDownVo countDownVo : listVo1) {

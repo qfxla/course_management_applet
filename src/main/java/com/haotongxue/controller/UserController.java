@@ -250,14 +250,15 @@ public class UserController {
             return R.error().data("msg","无该openid");
         }
         String openId = user.getOpenid();
-        QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
-        wrapper.eq("openid",openId);
-        List<String> infoList = iUserInfoService.list(wrapper).stream().map(UserInfo::getInfoId).collect(Collectors.toList());
         userMapper.deleteByInfoId(openid);
         cache.invalidate(openid);
         for (int i = 1;i <= 20;i++){
             courseCache.invalidate("cour" + openId + ":" + i);
         }
+        QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
+        wrapper.eq("openid",openId);
+        List<String> infoList = iUserInfoService.list(wrapper).stream().map(UserInfo::getInfoId).collect(Collectors.toList());
+
         log.info("查找用户的所有info数量"+ infoList.size());
         if(infoList.size() != 0){
             infoSectionMapper.deleteByInfoId(infoList);
