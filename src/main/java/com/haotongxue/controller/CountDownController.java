@@ -57,42 +57,22 @@ public class CountDownController {
 
     ExecutorService executorService = Executors.newCachedThreadPool();
 
-//    @ApiOperation("获得登录用户的倒计时信息")
-//    @GetMapping("/authority/getCountDownMes")
-//    public R getCountDownMes(){
-//        String openid = UserContext.getCurrentOpenid();
-//        QueryWrapper<CountDown> wrapper = new QueryWrapper<>();
-//        wrapper.eq("openid",openid).eq("is_deleted",0);
-//        List<CountDown> list = iCountDownService.list(wrapper);
-//        List<CountDownVo> listVo1 = ConvertUtil.convert(list, CountDownVo.class);
-//        for (CountDownVo countDownVo : listVo1) {
-//            LocalDateTime startTime = countDownVo.getStartTime();
-//            long now = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
-//            long start = startTime.toInstant(ZoneOffset.of("+8")).toEpochMilli();
-//            int countDownHour = (int) ((start - now) / (1000 * 60 * 60) - 8);
-//            countDownVo.setCountDownHour(countDownHour);
-//        }
-//        List<CountDownVo> listVo = listVo1.stream().sorted(Comparator.comparing(CountDownVo::getCountDownHour).reversed()).collect(Collectors.toList());
-//        return R.ok().data("data",listVo);
-//    }
-
     @ApiOperation("获得登录用户的倒计时信息")
-    @GetMapping("/getCountDownMes")
+    @GetMapping("/authority/getCountDownMes")
     public R getCountDownMes(){
-//        String openid = UserContext.getCurrentOpenid();
-        String openid = "ohpVk5VjCMQ9IZsZzfmwruWvhXeA";
+        String openid = UserContext.getCurrentOpenid();
         QueryWrapper<CountDown> wrapper = new QueryWrapper<>();
         wrapper.eq("openid",openid).eq("is_deleted",0);
         List<CountDown> list = iCountDownService.list(wrapper);
         List<CountDownVo> listVo1 = ConvertUtil.convert(list, CountDownVo.class);
         for (CountDownVo countDownVo : listVo1) {
             LocalDateTime startTime = countDownVo.getStartTime();
-        long now = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
-        long start = startTime.toInstant(ZoneOffset.of("+8")).toEpochMilli();
-        int countDownHour = (int) ((start - now) / (1000 * 60 * 60) - 8);
-        countDownVo.setCountDownHour(countDownHour);
-    }
-        List<CountDownVo> listVo = listVo1.stream().sorted(Comparator.comparing(CountDownVo::getCountDownHour)).collect(Collectors.toList());
+            long now = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
+            long start = startTime.toInstant(ZoneOffset.of("+8")).toEpochMilli();
+            int countDownHour = (int) ((start - now) / (1000 * 60 * 60) - 8);
+            countDownVo.setCountDownHour(countDownHour);
+        }
+        List<CountDownVo> listVo = listVo1.stream().sorted(Comparator.comparing(CountDownVo::getCountDownHour).reversed()).collect(Collectors.toList());
         return R.ok().data("data",listVo);
     }
 
