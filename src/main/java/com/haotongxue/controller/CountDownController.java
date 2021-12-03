@@ -72,7 +72,7 @@ public class CountDownController {
             int countDownHour = (int) ((start - now) / (1000 * 60 * 60) - 8);
             countDownVo.setCountDownHour(countDownHour);
         }
-        List<CountDownVo> listVo = listVo1.stream().sorted(Comparator.comparing(CountDownVo::getCountDownHour).reversed()).collect(Collectors.toList());
+        List<CountDownVo> listVo = listVo1.stream().sorted(Comparator.comparing(CountDownVo::getCountDownHour)).collect(Collectors.toList());
         return R.ok().data("data",listVo);
     }
 
