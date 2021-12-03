@@ -3,6 +3,7 @@ package com.haotongxue.controller;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.github.benmanes.caffeine.cache.Cache;
 import com.haotongxue.entity.CountDown;
 import com.haotongxue.entity.User;
 import com.haotongxue.entity.vo.CountDownVo;
@@ -15,12 +16,14 @@ import com.haotongxue.utils.UserContext;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.Resource;
 import javax.management.Query;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -48,6 +51,9 @@ public class CountDownController {
 
     @Autowired
     IUserService userService;
+
+    @Resource(name = "countDownCache")
+    Cache<String,String> cache;
 
     ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -95,10 +101,7 @@ public class CountDownController {
     @PostMapping("/authority/triCountDown")
     public R triggerSearchCountDown(){
         String currentOpenid = UserContext.getCurrentOpenid();
-        QueryWrapper<CountDown> countDownQueryWrapper = new QueryWrapper<>();
-        countDownQueryWrapper.eq("openid",currentOpenid);
-        int count = iCountDownService.count(countDownQueryWrapper);
-        if (count > 0){
+        if (cache.asMap().containsKey(currentOpenid)){
             return R.ok();
         }
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
@@ -106,7 +109,7 @@ public class CountDownController {
         User user = userService.getOne(userQueryWrapper);
         log.info("----->"+currentOpenid+"触发了查考试倒计时");
         executorService.execute(() -> iCountDownService.searchCountDown(currentOpenid,user.getNo(),user.getPassword()));
+        cache.put(currentOpenid,"");
         return R.ok();
     }
 }
-
