@@ -68,6 +68,16 @@ public class CountDownServiceImpl extends ServiceImpl<CountDownMapper, CountDown
         DomNodeList<DomElement> trList = null;
         try {
             loginPage = LoginUtils.login(webClient, no, password);
+            searchCountDown(userOpenid,loginPage);
+        } catch (IOException e) {
+            //e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void searchCountDown(String userOpenid, HtmlPage loginPage) {
+        DomNodeList<DomElement> trList = null;
+        try {
             HtmlElement testSchedule = loginPage.getHtmlElementById("NEW_XSD_KSBM_WDKS_KSAPCX");
             HtmlPage testPage = testSchedule.click();
             HtmlElement queryBtn = testPage.getHtmlElementById("btn_query");
