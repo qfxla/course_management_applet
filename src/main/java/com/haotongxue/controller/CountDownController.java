@@ -54,8 +54,8 @@ public class CountDownController {
     @Autowired
     IUserService userService;
 
-    @Resource(name = "countDownCache")
-    Cache<String,String> cache;
+//    @Resource(name = "countDownCache")
+//    Cache<String,String> cache;
 
     ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -83,9 +83,9 @@ public class CountDownController {
     @PostMapping("/authority/triCountDown")
     public R triggerSearchCountDown(){
         String currentOpenid = UserContext.getCurrentOpenid();
-        if (cache.asMap().containsKey(currentOpenid)){
-            return R.ok();
-        }
+//        if (cache.asMap().containsKey(currentOpenid)){
+//            return R.ok();
+//        }
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
         userQueryWrapper.select("no","password").eq("openid",currentOpenid);
         User user = userService.getOne(userQueryWrapper);
@@ -102,7 +102,7 @@ public class CountDownController {
         }
         HtmlPage finalLogin = login;
         executorService.execute(() -> iCountDownService.searchCountDown(currentOpenid, finalLogin));
-        cache.put(currentOpenid,"");
+        //cache.put(currentOpenid,"");
         return R.ok();
     }
 }
