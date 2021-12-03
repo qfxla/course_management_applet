@@ -61,11 +61,12 @@ public class CountDownController {
             LocalDateTime startTime = countDownVo.getStartTime();
             long now = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
             long start = startTime.toInstant(ZoneOffset.of("+8")).toEpochMilli();
-            int countDownHour = (int) ((start - now) / (1000 * 60 * 60));
+            int countDownHour = (int) ((start - now) / (1000 * 60 * 60) - 8);
             countDownVo.setCountDownHour(countDownHour);
         }
         return R.ok().data("data",listVo);
     }
+
 
     @ApiOperation("触发一下查考试倒计时信息")
     @PostMapping("/authority/triCountDown")
