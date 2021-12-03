@@ -3,6 +3,9 @@ package com.haotongxue.controller;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.Html;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.haotongxue.entity.CountDown;
 import com.haotongxue.entity.User;
@@ -10,9 +13,7 @@ import com.haotongxue.entity.vo.CountDownVo;
 import com.haotongxue.service.ICountDownService;
 import com.haotongxue.service.ICourseService;
 import com.haotongxue.service.IUserService;
-import com.haotongxue.utils.ConvertUtil;
-import com.haotongxue.utils.R;
-import com.haotongxue.utils.UserContext;
+import com.haotongxue.utils.*;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.management.Query;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Comparator;
@@ -89,7 +91,18 @@ public class CountDownController {
         userQueryWrapper.select("no","password").eq("openid",currentOpenid);
         User user = userService.getOne(userQueryWrapper);
         log.info("----->"+currentOpenid+"触发了查考试倒计时");
-        executorService.execute(() -> iCountDownService.searchCountDown(currentOpenid,user.getNo(),user.getPassword()));
+        WebClient webClient = WebClientUtils.getWebClient();
+        HtmlPage login = null;
+        try {
+            login = LoginUtils.login(webClient, user.getNo(), user.getPassword());
+            if (login == null){
+                return R.error().code(ResultCode.NO_OR_PASSWORD_ERROR);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        HtmlPage finalLogin = login;
+        executorService.execute(() -> iCountDownService.searchCountDown(currentOpenid, finalLogin));
         cache.put(currentOpenid,"");
         return R.ok();
     }
