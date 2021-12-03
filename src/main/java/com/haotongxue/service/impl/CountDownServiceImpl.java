@@ -47,7 +47,7 @@ public class CountDownServiceImpl extends ServiceImpl<CountDownMapper, CountDown
     IUserService userService;
 
     @Override
-    @Scheduled(cron = "0 0 3 * * ?")
+    //@Scheduled(cron = "0 0 3 * * ?")
     public void refreshCountDown(){
         log.info("开始查询考试信息--->");
         ExecutorService executorService = Executors.newFixedThreadPool(2);
