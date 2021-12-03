@@ -101,8 +101,8 @@ public class CountDownController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        HtmlPage finalLogin = login;
-        executorService.execute(() -> iCountDownService.searchCountDown(currentOpenid, finalLogin));
+//        HtmlPage finalLogin = login;
+//        executorService.execute(() -> iCountDownService.searchCountDown(currentOpenid, finalLogin));
         //cache.put(currentOpenid,"");
         return R.ok();
     }
