@@ -34,5 +34,12 @@ public class WeekController {
         int week = (int)weekCache.get("week");
         return R.ok().data("week",week);
     }
+
+    @ApiOperation(value = "删除当前周的缓存")
+    @GetMapping("/delWeekCache")
+    public R delWeekCache(){
+        weekCache.invalidate("week");
+        return R.ok().data("mes","清除成功");
+    }
 }
 
