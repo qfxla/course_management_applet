@@ -26,13 +26,13 @@ public class ClassroomServiceImpl extends ServiceImpl<ClassroomMapper, Classroom
 
     @Override
     public Integer addClassroom(String classroomName) {
-        if(classroomName == null || classroomName.equals("")){
+        if(classroomName == null || classroomName.equals("") || classroomName.contains("通知") || classroomName.contains("上机")){
             classroomName = "无";
         }
         int existClassroomCount = classroomMapper.isExistClassroom(classroomName);
         if(existClassroomCount >= 1){
             QueryWrapper<Classroom> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("location",classroomName);
+            queryWrapper.eq("location",classroomName).last("limit 1");
             Classroom existedClassroom = getOne(queryWrapper);
             return existedClassroom.getClassroomId();
         }else{
