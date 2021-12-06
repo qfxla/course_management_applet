@@ -2,6 +2,8 @@ package com.haotongxue.service.impl;
 
 
 import com.gargoylesoftware.htmlunit.ScriptException;
+import com.gargoylesoftware.htmlunit.html.DomNodeList;
+import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.javascript.JavaScriptErrorListener;
 import com.haotongxue.mapper.*;
 import org.jsoup.Jsoup;
@@ -98,6 +100,7 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void pa(WebClient webClient,String currentOpenid) throws IOException {
+        boolean isSwitch = false;
         HtmlPage page = null;
         try {
             page = webClient.getPage("http://edu-admin.zhku.edu.cn/jsxsd/xskb/xskb_list.do");
@@ -105,74 +108,58 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
             e.printStackTrace();
         }
         String enter = "\n";
-        String[] sectionIds = new String[6];
-
-
-        DomElement timetable = page.getElementById("timetable");
-        String timeTableXml = timetable.asXml();
-        Document doc = Jsoup.parse(timeTableXml);
-        Elements trs = doc.select("table").select("td");
-        int count = 0;
-        for (Element oneClass :trs.toggleClass("kbcontent")){
-            if(count >= 42){
-                break;
-            }
-            Element child = oneClass.child(0);
-            String val = child.val();
-            String sub = val.substring(0, 32);
-
-            switch (count){
-                case 6:
-                    sectionIds[0] = sub;
-                    break;
-                case 13:
-                    sectionIds[1] = sub;
-                    break;
-                case 20:
-                    sectionIds[2] = sub;
-                    break;
-                case 27:
-                    sectionIds[3] = sub;
-                    break;
-                case 34:
-                    sectionIds[4] = sub;
-                    break;
-                case 41:
-                    sectionIds[5] = sub;
-                    break;
-            }
-            count++;
-        }
-
-
-//        sectionIds[0] = "A0510B4234BA451499C8DDE3AD796254";  //1-2节
-//        sectionIds[1] = "CEEE5CA18F9546968B2478B34BECAF59";  //3-4节
-//        sectionIds[2] = "13CC5FA094F34E519AFA1A151EC9676E";  //5节
-//        sectionIds[3] = "FE4BF6D361F648CF902A89C879DF0A81";  //6-7节
-//        sectionIds[4] = "DAB50D67E3684EE7AE7781D2DCA83158";  //8-9节
-//        sectionIds[5] = "273908B0CB2248D2BF96D0CF529EB31F";  //10-12节
-
-
-
-        DomElement[][] domElements = new DomElement[7][6];
         String key = "";
         int courseTotal = 0;
         //星期一~星期日：1-2~7-2
         if(page == null){
-            CourseException courseException = new CourseException();
-            courseException.setMsg("page为空。");
-            courseException.setCode(555);
-            throw courseException;
+            throw new CourseException(555,"page为空！");
         }
 
+        DomElement[][] domElements = new DomElement[7][6];
+        String[] sectionIds = getSectionId(page);
+
+        int switchFlag = 0;
+        for (int i = 0;i < 7;i++){
+            for (int j = 0;j <= 5;j++) {
+                if (Thread.currentThread().isInterrupted()) {
+                    System.out.println("Thread.currentThread().isInterrupted()");
+                }
+                if (j == 2) {     //由于第5节为空，略过
+                    continue;
+                }
+                key = sectionIds[j] + "-" + (i + 1) + "-2";
+                if (page.getElementById(key) == null) {
+                    throw new NullPointerException("Key过期了！");
+                } else {
+                    domElements[i][j] = page.getElementById(key);
+                }
+                String course = domElements[i][j].asText();
+                if(course.length() < 5){
+                    switchFlag++;
+                }
+                if(switchFlag >= 30){
+                    log.info("发现他是白云课程表");
+                    isSwitch = true;
+                    break;
+                }
+            }
+        }
+
+        if(isSwitch){
+            DomElement kbjcmsid = page.getElementById("kbjcmsid");
+            DomNodeList<HtmlElement> options = kbjcmsid.getElementsByTagName("option");
+            HtmlElement htmlElement = options.get(1);
+            HtmlPage click = null;
+            try {
+                click = htmlElement.click();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            assert click != null;
+            sectionIds = getSectionId(click);
+        }
         String infoId;
-        //String currentOpenid = "o2LPU5iId1G-iwcxH46GwuQzcuNw";
-
-
-
-//        File file = new File(System.getProperty("user.dir")+"/123.txt");
-//        FileWriter fileWriter = new FileWriter(file);
-
+        switchFlag = 0;
         for (int i = 0;i < 7;i++){     //星期一到星期日
             for (int j = 0;j <= 5;j++){     //sectionIds[0]到sectionIds[5]
                 if(Thread.currentThread().isInterrupted()){
@@ -187,14 +174,11 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
                     throw new NullPointerException("Key过期了！");
                 }else{
                     domElements[i][j] = page.getElementById(key);
-//                    fileWriter.append(page.asText());
-//                    fileWriter.flush();
                 }
                 String course = domElements[i][j].asText();
                 String[] temp;
 //                int num = 0;
 //                int index;
-
 //                for (int g = 0; course.contains("----"); g = g + index) {
 //                    index = course.indexOf("---");
 //                    temp[num] = course.substring(0,index);
@@ -293,6 +277,12 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
 //                    System.out.println("星期" + (i+1));
                     log.info(currentOpenid+":"+courseTotal);
                 }
+                if(course.length() < 5){
+                    switchFlag++;
+                }
+                if(switchFlag >= 30){
+                    throw new CourseException(555,"发现他海珠白云均为空课表");
+                }
             }
         }
         System.out.println(currentOpenid+"总课程数===" + courseTotal);
@@ -357,8 +347,6 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
             index = weekAndSection.indexOf("(单周)");
         }else if(weekAndSection.contains("(周)")){
             index = weekAndSection.indexOf("(周)");
-        }else if(weekAndSection.contains("(单周)")){
-            index = weekAndSection.indexOf("(单周)");
         }else{
             throw new CourseException(555,"周次这里要改Bug咯！");
         }
@@ -415,6 +403,52 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
             sectionList.add(i);
         }
         return sectionList;
+    }
+
+    public static String[] getSectionId(HtmlPage page){
+        DomElement timetable = page.getElementById("timetable");
+        String timeTableXml = timetable.asXml();
+        Document doc = Jsoup.parse(timeTableXml);
+        String[] sectionIds = new String[6];
+        Elements trs = doc.select("table").select("td");
+        int count = 0;
+        for (Element oneClass :trs.toggleClass("kbcontent")){
+            if(count >= 42){
+                break;
+            }
+            Element child = oneClass.child(0);
+            String val = child.val();
+            String sub = val.substring(0, 32);
+
+            switch (count){
+                case 6:
+                    sectionIds[0] = sub;
+                    break;
+                case 13:
+                    sectionIds[1] = sub;
+                    break;
+                case 20:
+                    sectionIds[2] = sub;
+                    break;
+                case 27:
+                    sectionIds[3] = sub;
+                    break;
+                case 34:
+                    sectionIds[4] = sub;
+                    break;
+                case 41:
+                    sectionIds[5] = sub;
+                    break;
+            }
+            count++;
+        }
+        for (String sectionId : sectionIds) {
+            if(sectionId.length() < 32){
+                throw new CourseException(555,"sectionId不全！");
+            }
+        }
+
+        return sectionIds;
     }
 
 
