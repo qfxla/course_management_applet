@@ -47,41 +47,41 @@ public class ReReptileRunnable implements Runnable{
     @SneakyThrows
     @Override
     public void run(){
-//        boolean rePa = false;
-//        Thread.sleep(2*1000*60);
-//        if(userService.getById(currentOpenid).getIsPaing() == 1){
-//            rePa = true;
-//        }
-//        if(rePa){
-//            log.info("正常爬超过2分钟，得重爬了。。。。。。");
-//            Thread.currentThread().setName(currentOpenid + "===重爬的线程");
-//            try {
-//                Thread.sleep(2000);
-//                paThread.interrupt();
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
+        boolean rePa = false;
+        Thread.sleep(2*1000*60);
+        if(userService.getById(currentOpenid).getIsPaing() == 1){
+            rePa = true;
+        }
+        if(rePa){
+            log.info("正常爬超过2分钟，得重爬了。。。。。。");
+            Thread.currentThread().setName(currentOpenid + "===重爬的线程");
+            try {
+                Thread.sleep(2000);
+                paThread.interrupt();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+//            try{
+//                paThread.stop();
+//            }catch (Exception exception){
+//                exception.printStackTrace();
 //            }
-////            try{
-////                paThread.stop();
-////            }catch (Exception exception){
-////                exception.printStackTrace();
-////            }
-//            log.info("正常爬的线程的名字---" + paThread.getName());
-////            log.info("已将正常爬的线程杀死");
-////            Thread.currentThread().wait();
-////            log.info("重爬的线程已被唤醒，开始重爬");
-//            if (webClient == null){
-//                webClient = WebClientUtils.getWebClient();
-//                try {
-//                    HtmlPage afterLogin = LoginUtils.login(webClient, no, password);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//            reptileService.pa(webClient,currentOpenid);
-//            UpdateWrapper<User> userUpdateWrapperTwo = new UpdateWrapper<>();
-//            userUpdateWrapperTwo.set("is_paing",0).eq("openid",currentOpenid);
-//            userService.update(userUpdateWrapperTwo);
-//        }
+            log.info("正常爬的线程的名字---" + paThread.getName());
+//            log.info("已将正常爬的线程杀死");
+//            Thread.currentThread().wait();
+//            log.info("重爬的线程已被唤醒，开始重爬");
+            if (webClient == null){
+                webClient = WebClientUtils.getWebClient();
+                try {
+                    HtmlPage afterLogin = LoginUtils.login(webClient, no, password);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            reptileService.pa(webClient,currentOpenid);
+            UpdateWrapper<User> userUpdateWrapperTwo = new UpdateWrapper<>();
+            userUpdateWrapperTwo.set("is_paing",0).eq("openid",currentOpenid);
+            userService.update(userUpdateWrapperTwo);
+        }
     }
 }
