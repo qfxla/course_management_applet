@@ -11,21 +11,15 @@ import com.haotongxue.entity.CountDown;
 import com.haotongxue.entity.User;
 import com.haotongxue.entity.vo.CountDownVo;
 import com.haotongxue.service.ICountDownService;
-import com.haotongxue.service.ICourseService;
 import com.haotongxue.service.IUserService;
 import com.haotongxue.utils.*;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.annotation.Resource;
-import javax.management.Query;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
