@@ -176,6 +176,12 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
                     domElements[i][j] = page.getElementById(key);
                 }
                 String course = domElements[i][j].asText();
+                if(course.length() < 5){
+                    switchFlag++;
+                }
+                if(switchFlag >= 30){
+                    throw new CourseException(555,"发现他海珠白云均为空课表");
+                }
                 String[] temp;
 //                int num = 0;
 //                int index;
@@ -276,12 +282,6 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
 //                    System.out.println("地点===" + courseInfo[3]);
 //                    System.out.println("星期" + (i+1));
                     log.info(currentOpenid+":"+courseTotal);
-                }
-                if(course.length() < 5){
-                    switchFlag++;
-                }
-                if(switchFlag >= 30){
-                    throw new CourseException(555,"发现他海珠白云均为空课表");
                 }
             }
         }
