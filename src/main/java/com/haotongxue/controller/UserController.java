@@ -295,5 +295,18 @@ public class UserController {
         cache.invalidate(openid);
         return R.ok().data("msg","删除成功");
     }
+
+
+    @ApiOperation("删除所有课程为0且is_pa为1的人的信息")
+    @GetMapping("/deleteAllZeroPa")
+    public R deleteAllZeroPa(){
+        return userService.deleteAllZeroPa();
+    }
+
+    @ApiOperation("删除所有ispaing")
+    @GetMapping("/deleteAllPaing")
+    public R deleteAllPaing(){
+        return userService.deleteAllPaing();
+    }
 }
 

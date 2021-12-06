@@ -3,6 +3,7 @@ package com.haotongxue.service;
 import com.haotongxue.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.haotongxue.entity.WeChatLoginResponse;
+import com.haotongxue.utils.R;
 
 /**
  * <p>
@@ -15,4 +16,7 @@ import com.haotongxue.entity.WeChatLoginResponse;
 public interface IUserService extends IService<User> {
 
     WeChatLoginResponse getLoginResponse(String code);
+
+    R deleteAllZeroPa();
+    R deleteAllPaing();
 }

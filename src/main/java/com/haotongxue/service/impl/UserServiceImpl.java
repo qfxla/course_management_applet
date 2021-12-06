@@ -1,16 +1,29 @@
 package com.haotongxue.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.haotongxue.entity.User;
+import com.haotongxue.entity.UserInfo;
 import com.haotongxue.entity.WeChatLoginResponse;
 import com.haotongxue.exceptionhandler.CourseException;
-import com.haotongxue.mapper.UserMapper;
+import com.haotongxue.handler.ReptileHandler;
+import com.haotongxue.handler.WatchIsPaingHandler;
+import com.haotongxue.mapper.*;
+import com.haotongxue.service.EduLoginService;
+import com.haotongxue.service.IUserInfoService;
 import com.haotongxue.service.IUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.haotongxue.utils.R;
 import com.haotongxue.utils.WeChatUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import javax.annotation.Resource;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -21,6 +34,7 @@ import org.springframework.web.client.RestTemplate;
  * @since 2021-11-06
  */
 @Service
+@Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
 
     @Autowired
@@ -29,6 +43,42 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Autowired
     RestTemplate restTemplate;
 
+    @Autowired
+    UserMapper userMapper;
+
+    @Autowired
+    IUserService userService;
+
+    @Resource(name = "loginCache")
+    LoadingCache<String,Object> cache;
+    @Resource(name = "courseCache")
+    LoadingCache<String,Object> courseCache;
+
+    @Autowired
+    EduLoginService eduLoginService;
+
+    @Autowired
+    ReptileHandler reptileHandler;
+
+    @Autowired
+    WatchIsPaingHandler watchIsPaingHandler;
+
+    @Autowired
+    private InfoSectionMapper infoSectionMapper;
+    @Autowired
+    private InfoWeekMapper infoWeekMapper;
+    @Autowired
+    private InfoCourseMapper infoCourseMapper;
+    @Autowired
+    private InfoClassroomMapper infoClassroomMapper;
+    @Autowired
+    private InfoTeacherMapper infoTeacherMapper;
+    @Autowired
+    private UserInfoMapper userInfoMapper;
+    @Autowired
+    private InfoMapper infoMapper;
+    @Autowired
+    private IUserInfoService iUserInfoService;
 
     @Override
     public WeChatLoginResponse getLoginResponse(String code) {
@@ -58,4 +108,55 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return loginResponse;
     }
 
+    @Override
+    public R deleteAllZeroPa() {
+        List<String> openIdList = userMapper.selectZeroPa();
+        log.info("删除全部0课且isPa为1的用户");
+        for (String openId : openIdList) {
+            userMapper.deleteByInfoId(openId);
+            cache.invalidate(openId);
+            for (int i = 1;i <= 20;i++){
+                courseCache.invalidate("cour" + openId + ":" + i);
+            }
+            QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
+            wrapper.eq("openid",openId);
+            List<String> infoList = iUserInfoService.list(wrapper).stream().map(UserInfo::getInfoId).collect(Collectors.toList());
+            if(infoList.size() != 0){
+                infoSectionMapper.deleteByInfoId(infoList);
+                infoWeekMapper.deleteByInfoId(infoList);
+                infoCourseMapper.deleteByInfoId(infoList);
+                infoClassroomMapper.deleteByInfoId(infoList);
+                infoTeacherMapper.deleteByInfoId(infoList);
+                infoMapper.deleteByInfoId(infoList);
+                userInfoMapper.deleteByInfoId(infoList);
+            }
+        }
+        return R.ok().data("msg","清除成功，共" + openIdList.size() + "个");
+    }
+
+    @Override
+    public R deleteAllPaing() {
+        List<String> openIdList = userMapper.selectPaing();
+        log.info("删除全部paing");
+        for (String openId : openIdList) {
+            userMapper.deleteByInfoId(openId);
+            cache.invalidate(openId);
+            for (int i = 1;i <= 20;i++){
+                courseCache.invalidate("cour" + openId + ":" + i);
+            }
+            QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
+            wrapper.eq("openid",openId);
+            List<String> infoList = iUserInfoService.list(wrapper).stream().map(UserInfo::getInfoId).collect(Collectors.toList());
+            if(infoList.size() != 0){
+                infoSectionMapper.deleteByInfoId(infoList);
+                infoWeekMapper.deleteByInfoId(infoList);
+                infoCourseMapper.deleteByInfoId(infoList);
+                infoClassroomMapper.deleteByInfoId(infoList);
+                infoTeacherMapper.deleteByInfoId(infoList);
+                infoMapper.deleteByInfoId(infoList);
+                userInfoMapper.deleteByInfoId(infoList);
+            }
+        }
+        return R.ok().data("msg","清除成功，共" + openIdList.size() + "个");
+    }
 }
