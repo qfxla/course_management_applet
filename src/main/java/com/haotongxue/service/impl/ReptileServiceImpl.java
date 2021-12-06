@@ -157,6 +157,7 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
             }
             assert click != null;
             sectionIds = getSectionId(click);
+            page = click;
         }
         String infoId;
         switchFlag = 0;
