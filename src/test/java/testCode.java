@@ -1,4 +1,6 @@
 import com.haotongxue.Main9001;
+import com.haotongxue.entity.vo.SelectedVo;
+import com.haotongxue.mapper.SelectedMapper;
 import com.haotongxue.service.impl.InfoServiceImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -8,6 +10,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author zcj
@@ -18,6 +21,8 @@ import java.util.Date;
 public class testCode {
     @Autowired
     private InfoServiceImpl infoServiceImpl;
+    @Autowired
+    private SelectedMapper selectedMapper;
     @Test
     public void test() throws InterruptedException {
         Calendar calendar = Calendar.getInstance();
