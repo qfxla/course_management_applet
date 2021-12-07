@@ -26,7 +26,7 @@ public class SmallKind implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-      @TableId(value = "samll_id", type = IdType.AUTO)
+    @TableId(value = "samll_id", type = IdType.AUTO)
     private Integer samllId;
 
     @ApiModelProperty("小类名")
@@ -38,6 +38,4 @@ public class SmallKind implements Serializable {
     @ApiModelProperty("逻辑删除")
     @TableLogic
     private Boolean isDeleted;
-
-
 }

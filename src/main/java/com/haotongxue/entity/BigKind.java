@@ -37,4 +37,5 @@ public class BigKind implements Serializable {
     private Boolean isDeleted;
 
 
+
 }

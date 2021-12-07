@@ -1,9 +1,22 @@
 package com.haotongxue.controller;
 
 
+import com.haotongxue.entity.SmallKind;
+import com.haotongxue.service.ISmallKindService;
+import jxl.Cell;
+import jxl.Sheet;
+import jxl.Workbook;
+import jxl.read.biff.BiffException;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * <p>
@@ -16,6 +29,33 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/smallKind")
 public class SmallKindController {
+    @Resource
+    ISmallKindService iSmallKindService;
 
+    @GetMapping("/insertSmallKind")
+    public boolean insertSmallKind() throws BiffException, IOException {
+        Workbook workbook = Workbook.getWorkbook(new File("C:/selected.xls"));
+        Sheet sheet = workbook.getSheet(0);
+        Set<String> smallSet = new HashSet<>();
+        int c = 8;
+        for (int i = 0; i < sheet.getRows(); i++) {
+            Cell cell = sheet.getCell(c,i);
+            String smallStr = cell.getContents();
+            if(smallStr == null || i == 1 || smallStr.equals("")){
+                continue;
+            }
+            smallSet.add(smallStr);
+        }
+        System.out.println(smallSet);
+        for (String smallKindStr : smallSet) {
+            SmallKind smallKind = new SmallKind();
+            smallKind.setName(smallKindStr);
+            boolean saveFlag = iSmallKindService.save(smallKind);
+            if(!saveFlag){
+                return false;
+            }
+        }
+        return true;
+    }
 }
 
