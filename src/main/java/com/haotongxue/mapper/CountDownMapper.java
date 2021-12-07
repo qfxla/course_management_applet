@@ -2,6 +2,9 @@ package com.haotongxue.mapper;
 
 import com.haotongxue.entity.CountDown;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * <p>
@@ -11,6 +14,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author DJT
  * @since 2021-12-01
  */
-public interface CountDownMapper extends BaseMapper<CountDown> {
 
+@Repository
+public interface CountDownMapper extends BaseMapper<CountDown> {
+    List<String> getOpenIdByArg(String arg);
 }
