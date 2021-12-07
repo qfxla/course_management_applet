@@ -16,7 +16,7 @@ import lombok.Setter;
  * </p>
  *
  * @author DJT
- * @since 2021-12-06
+ * @since 2021-12-07
  */
 @Getter
 @Setter
@@ -31,9 +31,6 @@ public class SmallKind implements Serializable {
 
     @ApiModelProperty("小类名")
     private String name;
-
-    @ApiModelProperty("大类id")
-    private Integer bigId;
 
     @ApiModelProperty("逻辑删除")
     @TableLogic

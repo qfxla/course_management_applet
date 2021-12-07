@@ -2,4 +2,25 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.haotongxue.mapper.SelectedMapper">
 
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.haotongxue.entity.vo.SelectedVo">
+        <result column="selected_id" property="selectedId" />
+        <result column="selected_name" property="selectedName"/>
+        <result column="selected_score" property="selectedScore"/>
+        <result column="big_name" property="bigName"/>
+        <result column="small_name" property="smallName"/>
+    </resultMap>
+
+    <sql id="SelectedVo">
+        t_selected.selected_id,t_selected.selected_name,t_selected.selected_score,b.name as big_name,s.name as small_name
+    </sql>
+
+    <select id="myChoice" resultType="com.haotongxue.entity.vo.SelectedVo" resultMap="BaseResultMap">
+        select
+        <include refid="SelectedVo"></include>
+        from t_user_selected us left join t_selected on us.selected_id = t_selected.selected_id
+        left join t_big_kind b on t_selected.big_id = b.big_id
+        left join t_small_kind s on t_selected.small_id = s.samll_id
+        where us.openid = #{openid}
+    </select>
 </mapper>

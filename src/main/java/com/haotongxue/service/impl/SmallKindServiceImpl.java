@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * </p>
  *
  * @author DJT
- * @since 2021-12-06
+ * @since 2021-12-07
  */
 @Service
 public class SmallKindServiceImpl extends ServiceImpl<SmallKindMapper, SmallKind> implements ISmallKindService {

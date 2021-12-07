@@ -2,7 +2,6 @@ package com.haotongxue.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
@@ -20,21 +19,17 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@TableName("t_big_kind")
-@ApiModel(value = "BigKind对象", description = "")
-public class BigKind implements Serializable {
+@TableName("t_college")
+@ApiModel(value = "College对象", description = "")
+public class College implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-      @TableId(value = "big_id", type = IdType.AUTO)
-    private Integer bigId;
+      @TableId(value = "id", type = IdType.ASSIGN_ID)
+    private Integer id;
 
-    @ApiModelProperty("大类名")
+    @ApiModelProperty("学院名称")
     private String name;
-
-    @ApiModelProperty("逻辑删除")
-    @TableLogic
-    private Boolean isDeleted;
 
 
 }

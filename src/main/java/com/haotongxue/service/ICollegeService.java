@@ -1,6 +1,6 @@
 package com.haotongxue.service;
 
-import com.haotongxue.entity.SmallKind;
+import com.haotongxue.entity.College;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author DJT
  * @since 2021-12-07
  */
-public interface ISmallKindService extends IService<SmallKind> {
+public interface ICollegeService extends IService<College> {
 
 }

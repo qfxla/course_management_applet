@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * </p>
  *
  * @author DJT
- * @since 2021-12-06
+ * @since 2021-12-07
  */
 public interface BigKindMapper extends BaseMapper<BigKind> {
 

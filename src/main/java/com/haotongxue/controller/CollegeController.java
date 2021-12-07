@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2021-12-07
  */
 @RestController
-@RequestMapping("/bigKind")
-public class BigKindController {
+@RequestMapping("/college")
+public class CollegeController {
 
 }
 

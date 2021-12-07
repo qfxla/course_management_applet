@@ -1,8 +1,8 @@
 package com.haotongxue.service.impl;
 
-import com.haotongxue.entity.BigKind;
-import com.haotongxue.mapper.BigKindMapper;
-import com.haotongxue.service.IBigKindService;
+import com.haotongxue.entity.Score;
+import com.haotongxue.mapper.ScoreMapper;
+import com.haotongxue.service.IScoreService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +15,6 @@ import org.springframework.stereotype.Service;
  * @since 2021-12-07
  */
 @Service
-public class BigKindServiceImpl extends ServiceImpl<BigKindMapper, BigKind> implements IBigKindService {
+public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements IScoreService {
 
 }
