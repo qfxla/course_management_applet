@@ -13,14 +13,17 @@ import java.time.LocalDateTime;
 public class SelectedVo {
     private static final long serialVersionUID = 1L;
 
-    private String selectedId;
+    public String selectedId;
 
-    private String selectedName;
+    public String selectedName;
 
-    private Float selectedScore;
+    public Float selectedScore;
 
-    private String bigName;
+    public String bigName;
 
-    private String smallName;
+    public Integer bigId;
 
+    public String smallName;
+
+    public Integer smallId;
 }

@@ -8,11 +8,28 @@
         <result column="selected_name" property="selectedName"/>
         <result column="selected_score" property="selectedScore"/>
         <result column="big_name" property="bigName"/>
+        <result column="big_id" property="bigId"/>
         <result column="small_name" property="smallName"/>
+        <result column="samll_id" property="smallId"/>
+    </resultMap>
+
+    <resultMap id="rule" type="com.haotongxue.entity.vo.SelectedRuleVo">
+        <result column="college_id" property="collegeId" />
+        <result column="big_name" property="bigName"/>
+        <result column="big_id" property="bigId"/>
+        <result column="score" property="score"/>
+    </resultMap>
+    <resultMap id="smallVo" type="com.haotongxue.entity.vo.SmallKindVo">
+        <result column="samll_id" property="smallId" />
+        <result column="name" property="smallName"/>
     </resultMap>
 
     <sql id="SelectedVo">
-        t_selected.selected_id,t_selected.selected_name,t_selected.selected_score,b.name as big_name,s.name as small_name
+        t_selected.selected_id,t_selected.selected_name,t_selected.selected_score,s.samll_id ,s.name as small_name
+    </sql>
+
+    <sql id="rule">
+        s.college_id,b.name big_name, b.big_id big_id,s.score
     </sql>
 
     <select id="myChoice" resultType="com.haotongxue.entity.vo.SelectedVo" resultMap="BaseResultMap">
@@ -22,5 +39,22 @@
         left join t_big_kind b on t_selected.big_id = b.big_id
         left join t_small_kind s on t_selected.small_id = s.samll_id
         where us.openid = #{openid}
+    </select>
+    <select id="rule" resultType="com.haotongxue.entity.vo.SelectedRuleVo">
+        SELECT
+        <include refid="rule"></include>
+        FROM (SELECT DISTINCT big_id FROM t_college_big_small WHERE college_id = #{collegeId}) cbs
+        LEFT JOIN t_big_kind b ON cbs.big_id = b.big_id
+        LEFT JOIN t_score s ON s.big_id = cbs.big_id
+        WHERE b.big_id = s.big_id AND s.college_id = #{collegeId}
+    </select>
+    <select id="ruleSmallKind" resultType="com.haotongxue.entity.vo.SmallKindVo" resultMap="smallVo">
+        select name,samll_id from t_small_kind
+        where samll_id in
+            (
+            select small_id from t_college_big_small cbs
+            where cbs.college_id = #{collegeId}
+              and cbs.big_id = #{bigId}
+            )
     </select>
 </mapper>
