@@ -308,5 +308,25 @@ public class UserController {
     public R deleteAllPaing(){
         return userService.deleteAllPaing();
     }
+
+    @ApiOperation("检测密码是否正确")
+    @PostMapping("/passwordCheck/authority")
+    public R passwordCheck(){
+        String currentOpenid = UserContext.getCurrentOpenid();
+        User user = (User) cache.get(currentOpenid);
+        if (user == null){
+            return R.error();
+        }
+        WebClient webClient = WebClientUtils.getWebClient();
+        try {
+            HtmlPage login = LoginUtils.login(webClient, user.getNo(), user.getPassword());
+            if (login == null){
+                return R.error().code(ResultCode.NO_OR_PASSWORD_ERROR);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return R.ok();
+    }
 }
 
