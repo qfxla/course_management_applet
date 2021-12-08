@@ -61,9 +61,6 @@ public class CountDownController {
     @Resource
     CountDownMapper countDownMapper;
 
-//    @Resource(name = "countDownCache")
-//    Cache<String,String> cache;
-
     ExecutorService executorService = Executors.newCachedThreadPool();
 
     @ApiOperation("获得登录用户的倒计时信息")
@@ -90,13 +87,10 @@ public class CountDownController {
     @PostMapping("/authority/triCountDown")
     public R triggerSearchCountDown(){
         String currentOpenid = UserContext.getCurrentOpenid();
-//        if (cache.asMap().containsKey(currentOpenid)){
-//            return R.ok();
-//        }
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
         userQueryWrapper.select("no","password").eq("openid",currentOpenid);
         User user = userService.getOne(userQueryWrapper);
-        log.info("----->"+currentOpenid+"触发了查考试倒计时");
+        log.info("----->"+currentOpenid+"新用户触发了查考试倒计时");
         WebClient webClient = WebClientUtils.getWebClient();
         HtmlPage login = null;
         try {
@@ -104,12 +98,12 @@ public class CountDownController {
             if (login == null){
                 return R.error().code(ResultCode.NO_OR_PASSWORD_ERROR);
             }
+            executorService.execute(()->{
+                iCountDownService.searchCountDown(currentOpenid,webClient);
+            });
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        HtmlPage finalLogin = login;
-//        executorService.execute(() -> iCountDownService.searchCountDown(currentOpenid, finalLogin));
-        //cache.put(currentOpenid,"");
         return R.ok();
     }
 

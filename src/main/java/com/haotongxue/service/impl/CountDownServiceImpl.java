@@ -42,44 +42,11 @@ import java.util.concurrent.Executors;
 @Slf4j
 public class CountDownServiceImpl extends ServiceImpl<CountDownMapper, CountDown> implements ICountDownService {
 
-    @Autowired
-    IUserService userService;
-
     @Override
-    //@Scheduled(cron = "0 0 3 * * ?")
-    public void refreshCountDown(){
-        log.info("开始查询考试信息--->");
-        ExecutorService executorService = Executors.newFixedThreadPool(2);
-        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        userQueryWrapper.select("openid","no","password");
-        List<User> list = userService.list(userQueryWrapper);
-        for (User user : list){
-            executorService.execute(() -> {
-                searchCountDown(user.getOpenid(),user.getNo(),user.getPassword());
-            });
-        }
-        executorService.shutdown();
-    }
-
-    @Override
-    public void searchCountDown(String userOpenid,String no,String password){
-        WebClient webClient = WebClientUtils.getWebClient();
-        HtmlPage loginPage = null;
+    public void searchCountDown(String userOpenid, WebClient webClient) {
         DomNodeList<DomElement> trList = null;
         try {
-            loginPage = LoginUtils.login(webClient, no, password);
-            searchCountDown(userOpenid,loginPage);
-        } catch (IOException e) {
-            //e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void searchCountDown(String userOpenid, HtmlPage loginPage) {
-        DomNodeList<DomElement> trList = null;
-        try {
-            HtmlElement testSchedule = loginPage.getHtmlElementById("NEW_XSD_KSBM_WDKS_KSAPCX");
-            HtmlPage testPage = testSchedule.click();
+            HtmlPage testPage = webClient.getPage("http://edu-admin.zhku.edu.cn/jsxsd/xsks/xsksap_query");
             HtmlElement queryBtn = testPage.getHtmlElementById("btn_query");
             HtmlPage testQueryMsg = queryBtn.click();
             trList = testQueryMsg.getElementsByTagName("tr");
@@ -98,9 +65,18 @@ public class CountDownServiceImpl extends ServiceImpl<CountDownMapper, CountDown
             }
             countDown.setName(tdList.get(4).asText());
             QueryWrapper<CountDown> wrapperTwo = new QueryWrapper<>();
-            wrapperTwo.eq("openid",userOpenid).eq("name",countDown.getName());
-            if (count(wrapperTwo) != 0){
-                continue;
+            wrapperTwo
+                    .select("id")
+                    .eq("openid",userOpenid)
+                    .eq("name",countDown.getName());
+            CountDown one = null;
+            try {
+                one = getOne(wrapperTwo);
+            }catch (Exception e){
+                log.info(userOpenid+"---->报错");
+            }
+            if (one != null){
+                countDown.setId(one.getId());
             }
             countDown.setLocation(tdList.get(7).asText());
             String startAndEndTime = tdList.get(6).asText();
@@ -113,6 +89,7 @@ public class CountDownServiceImpl extends ServiceImpl<CountDownMapper, CountDown
             LocalTime endTime = LocalTime.parse(timeSplit[1], timeFormatter);
             countDown.setStartTime(LocalDateTime.of(localDate,startTime));
             countDown.setEndTime(LocalDateTime.of(localDate,endTime));
+            //log.info(userOpenid+"-->插入或更新考试倒计时一条");
             saveOrUpdate(countDown);
         }
     }
