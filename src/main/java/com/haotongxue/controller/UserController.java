@@ -297,18 +297,6 @@ public class UserController {
     }
 
 
-    @ApiOperation("删除所有课程为0且is_pa为1的人的信息")
-    @GetMapping("/deleteAllZeroPa")
-    public R deleteAllZeroPa(){
-        return userService.deleteAllZeroPa();
-    }
-
-    @ApiOperation("删除所有ispaing")
-    @GetMapping("/deleteAllPaing")
-    public R deleteAllPaing(){
-        return userService.deleteAllPaing();
-    }
-
     @ApiOperation("检测密码是否正确")
     @PostMapping("/passwordCheck/authority")
     public R passwordCheck(){

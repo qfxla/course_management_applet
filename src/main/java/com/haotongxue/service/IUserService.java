@@ -16,7 +16,4 @@ import com.haotongxue.utils.R;
 public interface IUserService extends IService<User> {
 
     WeChatLoginResponse getLoginResponse(String code);
-
-    R deleteAllZeroPa();
-    R deleteAllPaing();
 }
