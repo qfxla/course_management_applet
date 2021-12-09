@@ -1,10 +1,23 @@
 package com.haotongxue.service.impl;
 
+import com.haotongxue.controller.SelectedController;
 import com.haotongxue.entity.Selected;
+import com.haotongxue.entity.vo.SelectedRuleVo;
+import com.haotongxue.entity.vo.SelectedVo;
+import com.haotongxue.entity.vo.SmallKindVo;
 import com.haotongxue.mapper.SelectedMapper;
 import com.haotongxue.service.ISelectedService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * <p>
@@ -16,5 +29,53 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class SelectedServiceImpl extends ServiceImpl<SelectedMapper, Selected> implements ISelectedService {
+    private static Logger logger = LoggerFactory.getLogger(SelectedServiceImpl.class);
 
+    @Autowired
+    SelectedMapper selectedMapper;
+
+    ExecutorService executorService = Executors.newCachedThreadPool();
+
+    @Override
+    public List<SelectedRuleVo> getSelected(int collegeId,String openid) throws InterruptedException {
+        List<SelectedVo> selectedVoList = selectedMapper.myChoice(openid);
+        List<SelectedRuleVo> ruleList = selectedMapper.rule(collegeId);
+        CountDownLatch countDownLatch = new CountDownLatch(ruleList.size());
+        try {
+            for (SelectedRuleVo rule : ruleList) {
+                executorService.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        List<SmallKindVo> smallKindVos = selectedMapper.ruleSmallKind(rule.getCollegeId(), rule.getBigId());
+                        for (SmallKindVo smallKindVo : smallKindVos) {
+                            List<SelectedVo> selectList = new ArrayList<>();
+                            for (SelectedVo myChoice : selectedVoList) {
+                                if (smallKindVo.getSmallId() == myChoice.getSmallId()){
+                                    selectList.add(myChoice);
+                                }
+                            }
+                            smallKindVo.setSelectedVoList(selectList);
+                        }
+                        rule.setSmallVo(smallKindVos);
+
+                        int iHave = 0;
+                        //根据小类判断自己的所选科目是不是归在这里面的,是的话这个大类的得分就加
+                        for (SmallKindVo smallKindVo : smallKindVos) {
+                            for (SelectedVo selectedVo : selectedVoList) {
+                                if (smallKindVo.getSmallId() == selectedVo.getSmallId()){
+                                    iHave += selectedVo.getSelectedScore();
+                                }
+                            }
+                        }
+                        rule.setIHave(iHave);
+                        countDownLatch.countDown();
+                    }
+                });
+            }
+        }finally {
+//            executorService.shutdown();
+        }
+        countDownLatch.await();
+        return ruleList;
+    }
 }
