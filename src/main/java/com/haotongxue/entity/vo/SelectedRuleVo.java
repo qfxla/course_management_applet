@@ -22,5 +22,5 @@ public class SelectedRuleVo {
 
     String score;
 
-    Integer iHave;
+    float iHave;
 }

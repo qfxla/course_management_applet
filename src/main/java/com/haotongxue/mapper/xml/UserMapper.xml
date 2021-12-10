@@ -13,7 +13,7 @@
         SELECT openid FROM t_user WHERE t_user.openid NOT IN (SELECT DISTINCT openid FROM t_user_info) AND t_user.is_pa=1;
     </select>
 
-    <select id="selectPaing" resultType="java.lang.String">
+    <select id="selectPaing" resultType="com.haotongxue.entity.User">
         SELECT * FROM t_user WHERE is_paing=1;
     </select>
 </mapper>
