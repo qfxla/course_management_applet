@@ -98,6 +98,9 @@ public class CountDownController {
             executorService.execute(()->{
                 iCountDownService.searchCountDown(currentOpenid,webClient);
             });
+            executorService.execute(()->{
+                iCountDownService.searchOptionCourse(currentOpenid,webClient);
+            });
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -17,4 +17,5 @@ import java.io.IOException;
  */
 public interface ICountDownService extends IService<CountDown> {
     void searchCountDown(String userOpenid, WebClient webClient);
+    void searchOptionCourse(String userOpenid, WebClient webClient);
 }
