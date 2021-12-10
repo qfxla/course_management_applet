@@ -65,11 +65,11 @@ public class SelectedController {
 
 
     @ApiOperation("获得选课信息")
-//    @GetMapping("/authority/myChoice")
-    @GetMapping("/myChoice")
+    @GetMapping("/authority/myChoice")
+//    @GetMapping("/myChoice")
     public R myChoice(@RequestParam(name = "collegeId",required = false)Integer collegeId) throws InterruptedException {
-//        String openid = UserContext.getCurrentOpenid();
-        String openid = "ohpVk5XeOL8loKJw1rTBvQ7C4ygI";
+        String openid = UserContext.getCurrentOpenid();
+//        String openid = "ohpVk5XeOL8loKJw1rTBvQ7C4ygI";
         User user = (User)loginCache.get(openid);
         if (Integer.valueOf(user.getNo().substring(2,4)) < 20){
             return R.error().code(ResultCode.NO_TARGET);
