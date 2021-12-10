@@ -58,7 +58,7 @@ public class SelectedServiceImpl extends ServiceImpl<SelectedMapper, Selected> i
                         }
                         rule.setSmallVo(smallKindVos);
 
-                        int iHave = 0;
+                        float iHave = 0;
                         //根据小类判断自己的所选科目是不是归在这里面的,是的话这个大类的得分就加
                         for (SmallKindVo smallKindVo : smallKindVos) {
                             for (SelectedVo selectedVo : selectedVoList) {
