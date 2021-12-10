@@ -19,6 +19,6 @@ import java.util.List;
 public interface UserMapper extends BaseMapper<User> {
     int deleteByInfoId(@Param("openid") String openid);
     List<String> selectZeroPa();
-    List<String> selectPaing();
+    List<User> selectPaing();
 
 }
