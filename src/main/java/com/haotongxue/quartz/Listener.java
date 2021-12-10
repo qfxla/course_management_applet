@@ -16,5 +16,6 @@ public class Listener implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         Schedule.updateWeekCourse();  //服务启动调用每周更新课表的定时器
+        Schedule.insertFailedPa();
     }
 }

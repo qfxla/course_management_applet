@@ -25,4 +25,14 @@ public class Schedule {
 
         scheduler.scheduleJob(jobDetail, cronTrigger);
     }
+
+    protected void insertFailedPa() throws SchedulerException {
+        Scheduler scheduler = stdSchedulerFactory.getScheduler();
+        JobDetail jobDetail = JobBuilder.newJob(FailedPaJob.class).withIdentity("paFailed","paFailedGroup").build();
+        CronTrigger cronTrigger = TriggerBuilder.newTrigger().withIdentity("failedPaTrigger","failedPaTrigger")
+                .startNow()
+                .withSchedule(CronScheduleBuilder.cronSchedule("0 0 3 * * ?"))
+                .build();
+        scheduler.scheduleJob(jobDetail,cronTrigger);
+    }
 }
