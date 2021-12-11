@@ -107,7 +107,8 @@ public class CountDownController {
     @GetMapping("/insertRenWenCountDown")
     public boolean insertRenWenCountDown(){
         HashMap<String,String> zhuanYe = new HashMap<>();
-        zhuanYe.put("行管","11414");
+//        zhuanYe.put("行管","11414");
+        zhuanYe.put("行管","11412");
         zhuanYe.put("社工","11424");
         zhuanYe.put("文管","11434");
         List<RenWenCountDown> renWenList = null;
@@ -118,6 +119,7 @@ public class CountDownController {
         }
 
 //20 19114142 03
+        int count = 0;
         for (RenWenCountDown renWenCountDown : renWenList) {
             String banJiStr = renWenCountDown.getBanJi();
             String gradeClassNum = banJiStr.substring(2);
@@ -136,9 +138,14 @@ public class CountDownController {
             if(!arg.equals("")){
                 List<String> openIdList = countDownMapper.getOpenIdByArg(arg);
                 for (String openId : openIdList) {
+                    if(countDownMapper.concludeInsert(openId) >= 0){
+                        count++;
+                        continue;
+                    }
                     if(openIdList.size() <= 0){
                         continue;
                     }
+                    System.out.println("@@@@@@@@@@有考试，插！");
                     CountDown countDown = new CountDown();
                     countDown.setOpenid(openId);
                     countDown.setName(renWenCountDown.getCourseName());
@@ -149,9 +156,10 @@ public class CountDownController {
                 }
             }
         }
-        for (RenWenCountDown renWenCountDown : renWenList) {
-            System.out.println(renWenCountDown);
-        }
+        System.out.println("总人数：" + count);
+//        for (RenWenCountDown renWenCountDown : renWenList) {
+//            System.out.println(renWenCountDown);
+//        }
         return true;
     }
 

@@ -30,6 +30,13 @@ public class FailedPaJob implements Job {
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
         log.info("清除failedUser开始了");
+        FailedUser testFailedUser = new FailedUser();
+        testFailedUser.setOpenid("123456");
+        testFailedUser.setNickName("测试");
+        testFailedUser.setNo("123456");
+        testFailedUser.setPassword("123456");
+        failedUserMapper.insert(testFailedUser);
+
         String deleteUrl = "https://course-1383871-1308162715.ap-shanghai.run.tcloudbase.com/user/deleteLoginCache?openid=";
         List<User> failedUserList = userMapper.selectPaing();
         for (User user : failedUserList) {
@@ -40,7 +47,9 @@ public class FailedPaJob implements Job {
             failedUser.setPassword(user.getPassword());
             failedUserMapper.insert(failedUser);
             String res = HttpUtil.sendGetRequest(deleteUrl + user.getOpenid());
-            log.info(user.getOpenid() + "删除了用户的缓存及所有数据");
+            if(res!=null){
+                log.info(user.getOpenid() + "删除了用户的缓存及所有数据");
+            }
         }
     }
 }
