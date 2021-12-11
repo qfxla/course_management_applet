@@ -65,8 +65,8 @@ public class CountDownController {
     public R getCountDownMes(){
         String openid = UserContext.getCurrentOpenid();
         QueryWrapper<CountDown> wrapper = new QueryWrapper<>();
-//        wrapper.eq("openid",openid).eq("is_deleted",0).gt("start_time",new Date());
-        wrapper.eq("openid",openid).eq("is_deleted",0);
+        wrapper.eq("openid",openid).eq("is_deleted",0).gt("start_time",new Date());
+//        wrapper.eq("openid",openid).eq("is_deleted",0);
         List<CountDown> list = iCountDownService.list(wrapper);
         List<CountDownVo> listVo1 = ConvertUtil.convert(list, CountDownVo.class);
         for (CountDownVo countDownVo : listVo1) {
