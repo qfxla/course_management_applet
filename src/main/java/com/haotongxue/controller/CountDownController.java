@@ -58,8 +58,6 @@ public class CountDownController {
     @Resource
     CountDownMapper countDownMapper;
 
-    ExecutorService executorService = Executors.newCachedThreadPool();
-
     @ApiOperation("获得登录用户的倒计时信息")
     @GetMapping("/authority/getCountDownMes")
     public R getCountDownMes(){
@@ -83,27 +81,25 @@ public class CountDownController {
     @ApiOperation("触发一下查考试倒计时信息")
     @PostMapping("/authority/triCountDown")
     public R triggerSearchCountDown(){
-        String currentOpenid = UserContext.getCurrentOpenid();
-        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
-        userQueryWrapper.select("no","password").eq("openid",currentOpenid);
-        User user = userService.getOne(userQueryWrapper);
-        log.info("----->"+currentOpenid+"新用户触发了查考试倒计时");
-        WebClient webClient = WebClientUtils.getWebClient();
-        HtmlPage login = null;
-        try {
-            login = LoginUtils.login(webClient, user.getNo(), user.getPassword());
-            if (login == null){
-                return R.error().code(ResultCode.NO_OR_PASSWORD_ERROR);
-            }
-            executorService.execute(()->{
-                iCountDownService.searchCountDown(currentOpenid,webClient);
-            });
-            executorService.execute(()->{
-                iCountDownService.searchOptionCourse(currentOpenid,webClient);
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        String currentOpenid = UserContext.getCurrentOpenid();
+//        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+//        userQueryWrapper.select("no","password").eq("openid",currentOpenid);
+//        User user = userService.getOne(userQueryWrapper);
+//        log.info("----->"+currentOpenid+"新用户触发了查考试倒计时");
+//        WebClient webClient = WebClientUtils.getWebClient();
+//        HtmlPage login = null;
+//        try {
+//            login = LoginUtils.login(webClient, user.getNo(), user.getPassword());
+//            if (login == null){
+//                return R.error().code(ResultCode.NO_OR_PASSWORD_ERROR);
+//            }
+//            executorService.execute(()->{
+//                iCountDownService.searchOptionCourse(currentOpenid,webClient);
+//                iCountDownService.searchCountDown(currentOpenid,webClient);
+//            });
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         return R.ok();
     }
 

@@ -1,19 +1,26 @@
 package com.haotongxue.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.haotongxue.entity.User;
 import com.haotongxue.entity.WeChatLoginResponse;
 import com.haotongxue.exceptionhandler.CourseException;
 import com.haotongxue.handler.WatchIsPaingHandler;
 import com.haotongxue.mapper.*;
 import com.haotongxue.service.EduLoginService;
+import com.haotongxue.service.ICountDownService;
 import com.haotongxue.service.IUserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.haotongxue.utils.WeChatUtil;
+import com.haotongxue.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import java.io.IOException;
+import java.util.concurrent.ExecutorService;
 
 /**
  * <p>
@@ -45,6 +52,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Autowired
     WatchIsPaingHandler watchIsPaingHandler;
 
+    @Autowired
+    ICountDownService iCountDownService;
 
     @Override
     public WeChatLoginResponse getLoginResponse(String code) {
@@ -72,6 +81,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             throw courseException;
         }
         return loginResponse;
+    }
+
+    @Override
+    public void triggerSearchCountDown(String currentOpenid,WebClient webClient) {
+        QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
+        userQueryWrapper.select("no","password").eq("openid",currentOpenid);
+        User user = userService.getOne(userQueryWrapper);
+        log.info("----->"+currentOpenid+"新用户触发了查考试倒计时");
+        iCountDownService.searchOptionCourse(currentOpenid,webClient);
+        iCountDownService.searchCountDown(currentOpenid,webClient);
     }
 
 }

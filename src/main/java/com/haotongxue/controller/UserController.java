@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 /**
@@ -83,6 +85,8 @@ public class UserController {
     private IUserInfoService iUserInfoService;
     @Autowired
     private UserMapper userMapper;
+
+    ExecutorService executorService = Executors.newCachedThreadPool();
 
     @ApiOperation(value = "微信登录")
     @PostMapping("/login")
@@ -154,7 +158,6 @@ public class UserController {
         String token = JwtUtils.generate(openid);
         boolean isHaiZhu = user.getIsHaizhu().equals(1);
 //        if (isRefreshInfo){
-//
 //            //设置unionId
 //            user.setUnionId(unionid);
 //            userService.updateById(user);

@@ -10,11 +10,13 @@ import com.haotongxue.utils.GetBeanUtil;
 import com.haotongxue.utils.LoginUtils;
 import com.haotongxue.utils.WebClientUtils;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationContext;
 
 import java.io.IOException;
 
+@Slf4j
 public class ReptileRunnable implements Runnable{
 
     private WebClient webClient;
@@ -55,13 +57,14 @@ public class ReptileRunnable implements Runnable{
                 e.printStackTrace();
             }
         }
-        reptileService.pa(webClient,currentOpenid);
-        UpdateWrapper<User> userUpdateWrapperTwo = new UpdateWrapper<>();
-        userUpdateWrapperTwo.set("is_paing",0).eq("openid",currentOpenid);
-        userService.update(userUpdateWrapperTwo);
-//        }else {
-//            //save
-//            return;
-//        }
+        try {
+            reptileService.pa(webClient,currentOpenid);
+            UpdateWrapper<User> userUpdateWrapperTwo = new UpdateWrapper<>();
+            userUpdateWrapperTwo.set("is_paing",0).eq("openid",currentOpenid);
+            userService.update(userUpdateWrapperTwo);
+        } catch (Exception e){
+            log.info("爬虫失败，继续爬倒计时和选课");
+        }
+        userService.triggerSearchCountDown(currentOpenid,webClient);
     }
 }
