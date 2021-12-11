@@ -18,4 +18,5 @@ import java.util.List;
 @Repository
 public interface CountDownMapper extends BaseMapper<CountDown> {
     List<String> getOpenIdByArg(String arg);
+    int concludeInsert(String openId);
 }

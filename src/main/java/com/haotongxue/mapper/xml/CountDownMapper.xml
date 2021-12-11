@@ -4,4 +4,7 @@
 <select id="getOpenIdByArg" resultType="java.lang.String">
     SELECT openid FROM t_user WHERE NO LIKE concat('__',#{arg},'__');
 </select>
+    <select id="concludeInsert" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM t_count_down WHERE openid = #{openId};
+    </select>
 </mapper>
