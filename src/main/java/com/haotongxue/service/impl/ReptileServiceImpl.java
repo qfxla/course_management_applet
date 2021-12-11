@@ -137,7 +137,7 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
                 if(course.length() < 5){
                     switchFlag++;
                 }
-                if(switchFlag >= 30){
+                if(switchFlag >= 42){
                     log.info("发现他是白云课程表");
                     isSwitch = true;
                     break;
