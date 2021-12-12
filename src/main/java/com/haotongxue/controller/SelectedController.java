@@ -9,6 +9,7 @@ import com.haotongxue.entity.User;
 import com.haotongxue.entity.vo.SelectedRuleVo;
 import com.haotongxue.entity.vo.SelectedVo;
 import com.haotongxue.entity.vo.SmallKindVo;
+import com.haotongxue.mapper.CollegeBigSmallMapper;
 import com.haotongxue.mapper.SelectedMapper;
 import com.haotongxue.service.ICollegeBigSmallService;
 import com.haotongxue.service.ISelectedService;
@@ -81,7 +82,12 @@ public class SelectedController {
         if (ruleList == null || ruleList.size() == 0){
             return R.error().data("msg","暂无数据");
         }
-        return R.ok().data("rule",ruleList);
+
+
+        //无效选课invalidSelected
+        List<SelectedVo> invalidSelected = iSelectedService.getInvalidSelected(collegeId, openid);
+
+        return R.ok().data("rule",ruleList).data("invalidSelected",invalidSelected);
     }
 
 }

@@ -2,4 +2,10 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.haotongxue.mapper.CollegeBigSmallMapper">
 
+    <select id="getInvalidSmallId" resultType="java.lang.Integer">
+        SELECT * FROM t_small_kind WHERE samll_id NOT IN
+         (SELECT small_id FROM t_college_big_small
+          WHERE college_id = #{collegeId}
+         )
+    </select>
 </mapper>

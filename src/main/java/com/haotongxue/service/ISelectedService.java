@@ -3,6 +3,7 @@ package com.haotongxue.service;
 import com.haotongxue.entity.Selected;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.haotongxue.entity.vo.SelectedRuleVo;
+import com.haotongxue.entity.vo.SelectedVo;
 
 import java.util.List;
 
@@ -16,4 +17,6 @@ import java.util.List;
  */
 public interface ISelectedService extends IService<Selected> {
     List<SelectedRuleVo> getSelected(int collegeId,String openid) throws InterruptedException;
+
+    List<SelectedVo> getInvalidSelected(int collegeId, String openid);
 }
