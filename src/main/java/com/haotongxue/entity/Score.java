@@ -37,5 +37,6 @@ public class Score implements Serializable {
     @ApiModelProperty("分数")
     private String score;
 
-
+    @ApiModelProperty("方案适应年代")
+    private Integer grade;
 }

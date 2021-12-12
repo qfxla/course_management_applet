@@ -68,16 +68,22 @@ public class SelectedController {
         String openid = UserContext.getCurrentOpenid();
 //        String openid = "ohpVk5VjCMQ9IZsZzfmwruWvhXeA";
         User user = (User)loginCache.get(openid);
-        if (Integer.valueOf(user.getNo().substring(2,4)) < 20){
-            return R.error().code(ResultCode.NO_TARGET);
-        }
+
+
+        /*
+        * 本来打算19级不行，现在可以了*/
+//        if (Integer.valueOf(user.getNo().substring(2,4)) < 20){
+//            return R.error().code(ResultCode.NO_TARGET);
+//        }
+
+
 
         //如果没有传参，默认为null
         if (collegeId == null){
             collegeId = WhichCollege.getCollegeId(user.getNo());
         }
 
-//        List<SelectedRuleVo> ruleList = (List<SelectedRuleVo>)selectedCache.get("selected:" + collegeId + ":" + openid);
+
         List<SelectedRuleVo> ruleList = iSelectedService.getSelected(collegeId, openid);
         if (ruleList == null || ruleList.size() == 0){
             return R.error().data("msg","暂无数据");
