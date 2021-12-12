@@ -19,5 +19,5 @@ import java.util.List;
 @Mapper
 public interface CollegeBigSmallMapper extends BaseMapper<CollegeBigSmall> {
     //查某个学院的无效选课
-    public List<Integer> getInvalidSmallId(@Param("collegeId")Integer collegeId);
+    public List<Integer> getInvalidSmallId(@Param("collegeId")Integer collegeId, @Param("grade")Integer grade);
 }

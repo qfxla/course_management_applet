@@ -17,8 +17,7 @@ public class Test {
 
     @org.junit.Test
     public void test(){
-//        WhichCollege whichCollege = new WhichCollege();
-        int collegeId = WhichCollege.getCollegeId("202010244130");
-        System.out.println("hh" + collegeId);
+        int i = Integer.valueOf("202010244130".substring(2,4));
+        System.out.println(i);
     }
 }

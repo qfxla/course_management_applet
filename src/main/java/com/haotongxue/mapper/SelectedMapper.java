@@ -24,7 +24,7 @@ import java.util.List;
 public interface SelectedMapper extends BaseMapper<Selected> {
     List<SelectedVo> myChoice(@Param("openid")String openid);
 
-    List<SelectedRuleVo> rule(@Param("collegeId")int collegeId);
+    List<SelectedRuleVo> rule(@Param("collegeId")int collegeId,@Param("grade")int grade);
 
-    List<SmallKindVo> ruleSmallKind(@Param("collegeId") int collegeId, @Param("bigId")int bigId);
+    List<SmallKindVo> ruleSmallKind(@Param("collegeId") int collegeId, @Param("bigId")int bigId,@Param("grade")int grade);
 }
