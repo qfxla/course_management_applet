@@ -2,6 +2,9 @@ package com.haotongxue.service;
 
 import com.haotongxue.entity.Score;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.haotongxue.excel.DemoData;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IScoreService extends IService<Score> {
 
+    void saveExcel(List<DemoData> cachedDataList, int collegeId,int grade);
 }

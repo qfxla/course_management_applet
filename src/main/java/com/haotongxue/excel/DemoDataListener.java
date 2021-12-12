@@ -24,13 +24,19 @@ public class DemoDataListener implements ReadListener<DemoData> {
      */
     private IScoreService scoreService;
 
+    private int collegeId;
+
+    private int grade;
+
     /**
      * 如果使用了spring,请使用这个构造方法。每次创建Listener的时候需要把spring管理的类传进来
      *
      * @param scoreService
      */
-    public DemoDataListener(IScoreService scoreService) {
+    public DemoDataListener(IScoreService scoreService,int collegeId,int grade) {
         this.scoreService = scoreService;
+        this.collegeId = collegeId;
+        this.grade = grade;
     }
 
     /**
@@ -68,7 +74,7 @@ public class DemoDataListener implements ReadListener<DemoData> {
      */
     private void saveData() {
         log.info("{}条数据，开始存储数据库！", cachedDataList.size());
-        //scoreService.save(cachedDataList);
+        scoreService.saveExcel(cachedDataList,collegeId,grade);
         log.info("存储数据库成功！");
     }
 }

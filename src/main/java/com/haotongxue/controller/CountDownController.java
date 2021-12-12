@@ -14,10 +14,6 @@ import com.haotongxue.service.ICountDownService;
 import com.haotongxue.service.IUserService;
 import com.haotongxue.utils.*;
 import io.swagger.annotations.ApiOperation;
-import jxl.Cell;
-import jxl.Sheet;
-import jxl.Workbook;
-import jxl.read.biff.BiffException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -103,128 +99,128 @@ public class CountDownController {
     }
 
 
-    @GetMapping("/insertRenWenCountDown")
-    public boolean insertRenWenCountDown(){
-        HashMap<String,String> zhuanYe = new HashMap<>();
-//        zhuanYe.put("行管","11414");
-        zhuanYe.put("行管","11412");
-        zhuanYe.put("社工","11424");
-        zhuanYe.put("文管","11434");
-        List<RenWenCountDown> renWenList = null;
-        try {
-            renWenList = getRenWenList();
-        } catch (BiffException | IOException e) {
-            e.printStackTrace();
-        }
-
-//20 19114142 03
-        int count = 0;
-        for (RenWenCountDown renWenCountDown : renWenList) {
-            String banJiStr = renWenCountDown.getBanJi();
-            String gradeClassNum = banJiStr.substring(2);
-            String grade = gradeClassNum.substring(0,2);
-            String classs = gradeClassNum.substring(2);
-            String arg = "";
-            if (banJiStr.contains("行管")) {
-                arg = grade + zhuanYe.get("行管") + classs;
-            }else if(banJiStr.contains("社工")){
-                arg = grade + zhuanYe.get("社工") + classs;
-            }else if(banJiStr.contains("文管")){
-                arg = grade + zhuanYe.get("文管") + classs;
-            }else{
-                throw new CourseException(555,"找不到该专业！");
-            }
-            if(!arg.equals("")){
-                List<String> openIdList = countDownMapper.getOpenIdByArg(arg);
-                for (String openId : openIdList) {
-                    if(countDownMapper.concludeInsert(openId) >= 0){
-                        count++;
-                        continue;
-                    }
-                    if(openIdList.size() <= 0){
-                        continue;
-                    }
-                    System.out.println("@@@@@@@@@@有考试，插！");
-                    CountDown countDown = new CountDown();
-                    countDown.setOpenid(openId);
-                    countDown.setName(renWenCountDown.getCourseName());
-                    countDown.setStartTime(renWenCountDown.getStartTime());
-                    countDown.setEndTime(renWenCountDown.getEndTime());
-                    countDown.setLocation(renWenCountDown.getLocation());
-                    countDownMapper.insert(countDown);
-                }
-            }
-        }
-        System.out.println("总人数：" + count);
-//        for (RenWenCountDown renWenCountDown : renWenList) {
-//            System.out.println(renWenCountDown);
+//    @GetMapping("/insertRenWenCountDown")
+//    public boolean insertRenWenCountDown(){
+//        HashMap<String,String> zhuanYe = new HashMap<>();
+////        zhuanYe.put("行管","11414");
+//        zhuanYe.put("行管","11412");
+//        zhuanYe.put("社工","11424");
+//        zhuanYe.put("文管","11434");
+//        List<RenWenCountDown> renWenList = null;
+//        try {
+//            renWenList = getRenWenList();
+//        } catch (BiffException | IOException e) {
+//            e.printStackTrace();
 //        }
-        return true;
-    }
+//
+////20 19114142 03
+//        int count = 0;
+//        for (RenWenCountDown renWenCountDown : renWenList) {
+//            String banJiStr = renWenCountDown.getBanJi();
+//            String gradeClassNum = banJiStr.substring(2);
+//            String grade = gradeClassNum.substring(0,2);
+//            String classs = gradeClassNum.substring(2);
+//            String arg = "";
+//            if (banJiStr.contains("行管")) {
+//                arg = grade + zhuanYe.get("行管") + classs;
+//            }else if(banJiStr.contains("社工")){
+//                arg = grade + zhuanYe.get("社工") + classs;
+//            }else if(banJiStr.contains("文管")){
+//                arg = grade + zhuanYe.get("文管") + classs;
+//            }else{
+//                throw new CourseException(555,"找不到该专业！");
+//            }
+//            if(!arg.equals("")){
+//                List<String> openIdList = countDownMapper.getOpenIdByArg(arg);
+//                for (String openId : openIdList) {
+//                    if(countDownMapper.concludeInsert(openId) >= 0){
+//                        count++;
+//                        continue;
+//                    }
+//                    if(openIdList.size() <= 0){
+//                        continue;
+//                    }
+//                    System.out.println("@@@@@@@@@@有考试，插！");
+//                    CountDown countDown = new CountDown();
+//                    countDown.setOpenid(openId);
+//                    countDown.setName(renWenCountDown.getCourseName());
+//                    countDown.setStartTime(renWenCountDown.getStartTime());
+//                    countDown.setEndTime(renWenCountDown.getEndTime());
+//                    countDown.setLocation(renWenCountDown.getLocation());
+//                    countDownMapper.insert(countDown);
+//                }
+//            }
+//        }
+//        System.out.println("总人数：" + count);
+////        for (RenWenCountDown renWenCountDown : renWenList) {
+////            System.out.println(renWenCountDown);
+////        }
+//        return true;
+//    }
 
 
-    public static List<RenWenCountDown> getRenWenList() throws BiffException, IOException {
-        List<RenWenCountDown> renWenCountDownList = new ArrayList<>();
-        Workbook workbook = Workbook.getWorkbook(new File("C:/renwencountdown.xls"));
-        Sheet sheet = workbook.getSheet(0);
-        int timeCol = 1;
-        int courseCol = 3;
-        int localCol = 4;
-        int banJiCol = 5;
-        int[] colArr = {1,3,4,5};
-        System.out.println(Arrays.toString(colArr));
-        ArrayList<Integer> colList = new ArrayList<>();
-        colList.add(timeCol);
-        colList.add(courseCol);
-        colList.add(localCol);
-        colList.add(banJiCol);
-        for (int i = 4; i < sheet.getRows(); i++) {
-            RenWenCountDown renWenCountDown = new RenWenCountDown();
-            for (int j = 0; j < colList.size(); j++) {
-                int nowCol = colArr[j];
-                switch (nowCol) {
-                    case 1:
-                        Cell timeCell = sheet.getCell(nowCol, i);
-                        String timeStr = timeCell.getContents();
-                        if (timeStr == null || timeStr.equals("")) {
-                            System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-                            continue;
-                        }
-                        String dateStr = timeStr.substring(0, 10);
-                        int index = timeStr.lastIndexOf("）");
-                        String sub = timeStr.substring(index + 1);
-                        String[] startEnd = sub.split("-");
-                        String startTime = dateStr + " " + startEnd[0];
-                        String endTime = dateStr + " " + startEnd[1];
-                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-                        LocalDateTime localStart = LocalDateTime.parse(startTime, formatter);
-                        LocalDateTime localEnd = LocalDateTime.parse(endTime, formatter);
-                        renWenCountDown.setStartTime(localStart);
-                        renWenCountDown.setEndTime(localEnd);
-                        break;
-                    case 3:
-                        Cell courseCell = sheet.getCell(nowCol, i);
-                        String courseStr = courseCell.getContents();
-                        renWenCountDown.setCourseName(courseStr);
-                        break;
-                    case 4:
-                        Cell locationCell = sheet.getCell(nowCol, i);
-                        String locationStr = locationCell.getContents();
-                        renWenCountDown.setLocation(locationStr);
-                        break;
-                    case 5:
-                        Cell banJiCell = sheet.getCell(nowCol, i);
-                        String banJiStr = banJiCell.getContents();
-                        renWenCountDown.setBanJi(banJiStr);
-                        renWenCountDownList.add(renWenCountDown);
-                        break;
-                    default:
-                        throw new CourseException(555,"没有这个case");
-                }
-            }
-        }
-        workbook.close();
-        renWenCountDownList.remove(75);
-        return renWenCountDownList;
-    }
+//    public static List<RenWenCountDown> getRenWenList() throws BiffException, IOException {
+//        List<RenWenCountDown> renWenCountDownList = new ArrayList<>();
+//        Workbook workbook = Workbook.getWorkbook(new File("C:/renwencountdown.xls"));
+//        Sheet sheet = workbook.getSheet(0);
+//        int timeCol = 1;
+//        int courseCol = 3;
+//        int localCol = 4;
+//        int banJiCol = 5;
+//        int[] colArr = {1,3,4,5};
+//        System.out.println(Arrays.toString(colArr));
+//        ArrayList<Integer> colList = new ArrayList<>();
+//        colList.add(timeCol);
+//        colList.add(courseCol);
+//        colList.add(localCol);
+//        colList.add(banJiCol);
+//        for (int i = 4; i < sheet.getRows(); i++) {
+//            RenWenCountDown renWenCountDown = new RenWenCountDown();
+//            for (int j = 0; j < colList.size(); j++) {
+//                int nowCol = colArr[j];
+//                switch (nowCol) {
+//                    case 1:
+//                        Cell timeCell = sheet.getCell(nowCol, i);
+//                        String timeStr = timeCell.getContents();
+//                        if (timeStr == null || timeStr.equals("")) {
+//                            System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+//                            continue;
+//                        }
+//                        String dateStr = timeStr.substring(0, 10);
+//                        int index = timeStr.lastIndexOf("）");
+//                        String sub = timeStr.substring(index + 1);
+//                        String[] startEnd = sub.split("-");
+//                        String startTime = dateStr + " " + startEnd[0];
+//                        String endTime = dateStr + " " + startEnd[1];
+//                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+//                        LocalDateTime localStart = LocalDateTime.parse(startTime, formatter);
+//                        LocalDateTime localEnd = LocalDateTime.parse(endTime, formatter);
+//                        renWenCountDown.setStartTime(localStart);
+//                        renWenCountDown.setEndTime(localEnd);
+//                        break;
+//                    case 3:
+//                        Cell courseCell = sheet.getCell(nowCol, i);
+//                        String courseStr = courseCell.getContents();
+//                        renWenCountDown.setCourseName(courseStr);
+//                        break;
+//                    case 4:
+//                        Cell locationCell = sheet.getCell(nowCol, i);
+//                        String locationStr = locationCell.getContents();
+//                        renWenCountDown.setLocation(locationStr);
+//                        break;
+//                    case 5:
+//                        Cell banJiCell = sheet.getCell(nowCol, i);
+//                        String banJiStr = banJiCell.getContents();
+//                        renWenCountDown.setBanJi(banJiStr);
+//                        renWenCountDownList.add(renWenCountDown);
+//                        break;
+//                    default:
+//                        throw new CourseException(555,"没有这个case");
+//                }
+//            }
+//        }
+//        workbook.close();
+//        renWenCountDownList.remove(75);
+//        return renWenCountDownList;
+//    }
 }

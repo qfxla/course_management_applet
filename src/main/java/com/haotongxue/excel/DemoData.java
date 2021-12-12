@@ -6,12 +6,12 @@ import lombok.Data;
 @Data
 public class DemoData {
 
-    @ExcelProperty("课程类别")
+    @ExcelProperty(index = 0)
     private String bigKind;
 
-    @ExcelProperty("课程模块")
+    @ExcelProperty(index = 1)
     private String smallKind;
 
-    @ExcelProperty("最低应修学分")
+    @ExcelProperty(index = 2)
     private String lowScore;
 }
