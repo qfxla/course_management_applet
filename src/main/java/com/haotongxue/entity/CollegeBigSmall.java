@@ -39,4 +39,5 @@ public class CollegeBigSmall implements Serializable {
 
     @ApiModelProperty("方案适应年代")
     private Integer grade;
+
 }

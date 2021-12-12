@@ -9,6 +9,7 @@ import com.haotongxue.mapper.CollegeBigSmallMapper;
 import com.haotongxue.mapper.SelectedMapper;
 import com.haotongxue.service.ISelectedService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.haotongxue.utils.WhichGrade;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,16 +42,18 @@ public class SelectedServiceImpl extends ServiceImpl<SelectedMapper, Selected> i
     CollegeBigSmallMapper collegeBigSmallMapper;
 
     @Override
-    public List<SelectedRuleVo> getSelected(int collegeId,String openid) throws InterruptedException {
+    public List<SelectedRuleVo> getSelected(int collegeId,String openid,int grade) throws InterruptedException {
         List<SelectedVo> selectedVoList = selectedMapper.myChoice(openid);
-        List<SelectedRuleVo> ruleList = selectedMapper.rule(collegeId);
+
+
+        List<SelectedRuleVo> ruleList = selectedMapper.rule(collegeId,grade);
         CountDownLatch countDownLatch = new CountDownLatch(ruleList.size());
         try {
             for (SelectedRuleVo rule : ruleList) {
                 executorService.execute(new Runnable() {
                     @Override
                     public void run() {
-                        List<SmallKindVo> smallKindVos = selectedMapper.ruleSmallKind(rule.getCollegeId(), rule.getBigId());
+                        List<SmallKindVo> smallKindVos = selectedMapper.ruleSmallKind(rule.getCollegeId(), rule.getBigId(),grade);
                         for (SmallKindVo smallKindVo : smallKindVos) {
                             List<SelectedVo> selectList = new ArrayList<>();
                             for (SelectedVo myChoice : selectedVoList) {
@@ -84,8 +87,8 @@ public class SelectedServiceImpl extends ServiceImpl<SelectedMapper, Selected> i
     }
 
     @Override
-    public List<SelectedVo> getInvalidSelected(int collegeId,String openid) {
-        List<Integer> invalidSmallId = collegeBigSmallMapper.getInvalidSmallId(collegeId);
+    public List<SelectedVo> getInvalidSelected(int collegeId,String openid,int grade) {
+        List<Integer> invalidSmallId = collegeBigSmallMapper.getInvalidSmallId(collegeId,grade);
         List<SelectedVo> result = new ArrayList<>();
         List<SelectedVo> selectedVoList = selectedMapper.myChoice(openid);
 

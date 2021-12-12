@@ -14,10 +14,7 @@ import com.haotongxue.mapper.SelectedMapper;
 import com.haotongxue.service.ICollegeBigSmallService;
 import com.haotongxue.service.ISelectedService;
 import com.haotongxue.service.impl.InfoServiceImpl;
-import com.haotongxue.utils.R;
-import com.haotongxue.utils.ResultCode;
-import com.haotongxue.utils.UserContext;
-import com.haotongxue.utils.WhichCollege;
+import com.haotongxue.utils.*;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j;
@@ -56,8 +53,6 @@ public class SelectedController {
     ICollegeBigSmallService iCollegeBigSmallService;
     @Resource(name = "loginCache")
     LoadingCache loginCache;
-    @Resource(name = "selectedCache")
-    LoadingCache selectedCache;
 
 
 
@@ -66,15 +61,16 @@ public class SelectedController {
 //    @GetMapping("/myChoice")
     public R myChoice(@RequestParam(name = "collegeId",required = false)Integer collegeId) throws InterruptedException {
         String openid = UserContext.getCurrentOpenid();
-//        String openid = "ohpVk5VjCMQ9IZsZzfmwruWvhXeA";
+//        String openid = "ohpVk5VjCMQ9IZsZzfmwruWvhXeA";  //20级
+//        String openid = "ohpVk5a0g0sadhdZyBdftaBOG-Q4";
         User user = (User)loginCache.get(openid);
 
 
         /*
         * 本来打算19级不行，现在可以了*/
-//        if (Integer.valueOf(user.getNo().substring(2,4)) < 20){
-//            return R.error().code(ResultCode.NO_TARGET);
-//        }
+        if (Integer.valueOf(user.getNo().substring(2,4)) < 20){
+            return R.error().code(ResultCode.NO_TARGET);
+        }
 
 
 
@@ -83,15 +79,16 @@ public class SelectedController {
             collegeId = WhichCollege.getCollegeId(user.getNo());
         }
 
+        int grade = WhichGrade.whichGrade(user.getNo());
 
-        List<SelectedRuleVo> ruleList = iSelectedService.getSelected(collegeId, openid);
+        List<SelectedRuleVo> ruleList = iSelectedService.getSelected(collegeId, openid,grade);
         if (ruleList == null || ruleList.size() == 0){
             return R.error().data("msg","暂无数据");
         }
 
 
         //无效选课invalidSelected
-        List<SelectedVo> invalidSelected = iSelectedService.getInvalidSelected(collegeId, openid);
+        List<SelectedVo> invalidSelected = iSelectedService.getInvalidSelected(collegeId, openid,grade);
 
         return R.ok().data("rule",ruleList).data("invalidSelected",invalidSelected);
     }

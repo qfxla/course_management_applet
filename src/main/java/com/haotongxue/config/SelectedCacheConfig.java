@@ -22,19 +22,19 @@ public class SelectedCacheConfig {
     @Autowired
     ISelectedService iSelectedService;
 
-    @Bean("selectedCache")
-    public LoadingCache<String,Object> getCache(){
-        return Caffeine.newBuilder()
-                .expireAfterWrite(9999, TimeUnit.DAYS)
-                .build(new CacheLoader<String, Object>() {
-                    @Override
-                    public @Nullable Object load(String key) throws Exception {
-                        String[] split = key.split(":");
-                        if (split[0].equals("selected")){
-                            return iSelectedService.getSelected(Integer.valueOf(split[1]),split[2]);
-                        }
-                        return null;
-                    }
-                });
-    }
+//    @Bean("selectedCache")
+//    public LoadingCache<String,Object> getCache(){
+//        return Caffeine.newBuilder()
+//                .expireAfterWrite(9999, TimeUnit.DAYS)
+//                .build(new CacheLoader<String, Object>() {
+//                    @Override
+//                    public @Nullable Object load(String key) throws Exception {
+//                        String[] split = key.split(":");
+//                        if (split[0].equals("selected")){
+//                            return iSelectedService.getSelected(Integer.valueOf(split[1]),split[2]);
+//                        }
+//                        return null;
+//                    }
+//                });
+//    }
 }

@@ -5,7 +5,7 @@
     <select id="getInvalidSmallId" resultType="java.lang.Integer">
         SELECT * FROM t_small_kind WHERE samll_id NOT IN
          (SELECT small_id FROM t_college_big_small
-          WHERE college_id = #{collegeId}
+          WHERE college_id = #{collegeId} AND grade = #{grade}
          )
     </select>
 </mapper>
