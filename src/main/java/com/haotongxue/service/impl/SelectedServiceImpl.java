@@ -5,6 +5,7 @@ import com.haotongxue.entity.Selected;
 import com.haotongxue.entity.vo.SelectedRuleVo;
 import com.haotongxue.entity.vo.SelectedVo;
 import com.haotongxue.entity.vo.SmallKindVo;
+import com.haotongxue.mapper.CollegeBigSmallMapper;
 import com.haotongxue.mapper.SelectedMapper;
 import com.haotongxue.service.ISelectedService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -35,6 +36,9 @@ public class SelectedServiceImpl extends ServiceImpl<SelectedMapper, Selected> i
     SelectedMapper selectedMapper;
 
     ExecutorService executorService = Executors.newCachedThreadPool();
+
+    @Autowired
+    CollegeBigSmallMapper collegeBigSmallMapper;
 
     @Override
     public List<SelectedRuleVo> getSelected(int collegeId,String openid) throws InterruptedException {
@@ -77,5 +81,21 @@ public class SelectedServiceImpl extends ServiceImpl<SelectedMapper, Selected> i
         }
         countDownLatch.await();
         return ruleList;
+    }
+
+    @Override
+    public List<SelectedVo> getInvalidSelected(int collegeId,String openid) {
+        List<Integer> invalidSmallId = collegeBigSmallMapper.getInvalidSmallId(collegeId);
+        List<SelectedVo> result = new ArrayList<>();
+        List<SelectedVo> selectedVoList = selectedMapper.myChoice(openid);
+
+        for (Integer smallId : invalidSmallId) {
+            for (SelectedVo selectedVo : selectedVoList) {
+                if (selectedVo.getSmallId() == smallId){
+                    result.add(selectedVo);
+                }
+            }
+        }
+        return result;
     }
 }
