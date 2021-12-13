@@ -73,8 +73,6 @@ public class SelectedController {
 //            return R.error().code(ResultCode.NO_TARGET);
 //        }
 
-
-
         //如果没有传参，默认为null
         if (collegeId == null){
             collegeId = WhichCollege.getCollegeId(user.getNo());
