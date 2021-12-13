@@ -316,5 +316,11 @@ public class UserController {
         }
         return R.ok();
     }
+
+    @ApiOperation("删除某个人的数据，包括选课和倒计时")
+    @GetMapping("/authority/delSomeOneData")
+    public R delSomeOneData(){
+        return null;
+    }
 }
 

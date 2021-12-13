@@ -60,17 +60,17 @@ public class SelectedController {
     @GetMapping("/authority/myChoice")
 //    @GetMapping("/myChoice")
     public R myChoice(@RequestParam(name = "collegeId",required = false)Integer collegeId) throws InterruptedException {
-        String openid = UserContext.getCurrentOpenid();
+//        String openid = UserContext.getCurrentOpenid();
 //        String openid = "ohpVk5VjCMQ9IZsZzfmwruWvhXeA";  //20级
-//        String openid = "ohpVk5a0g0sadhdZyBdftaBOG-Q4";
+        String openid = "ohpVk5a0g0sadhdZyBdftaBOG-Q4";
         User user = (User)loginCache.get(openid);
 
 
         /*
         * 本来打算19级不行，现在可以了*/
-        if (Integer.valueOf(user.getNo().substring(2,4)) < 20){
-            return R.error().code(ResultCode.NO_TARGET);
-        }
+//        if (Integer.valueOf(user.getNo().substring(2,4)) < 20){
+//            return R.error().code(ResultCode.NO_TARGET);
+//        }
 
 
 
