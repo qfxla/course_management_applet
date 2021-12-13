@@ -51,7 +51,7 @@ public class ScoreServiceImpl extends ServiceImpl<ScoreMapper, Score> implements
             if ("体育类".equals(bigKind) || "小计".equals(bigKind)){
                 continue;
             }
-            if ("其他".equals(bigKind)){
+            if ("其他类".equals(bigKind)){
                 demoData.setLowScore("0");
             }
             String smallKind = demoData.getSmallKind();
