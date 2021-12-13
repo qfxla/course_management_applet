@@ -180,7 +180,7 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
                 if(course.length() < 5){
                     switchFlag++;
                 }
-                if(switchFlag >= 30){
+                if(switchFlag >= 42){
                     throw new CourseException(555,"发现他海珠白云均为空课表");
                 }
                 String[] temp;
@@ -209,6 +209,7 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
                     ArrayList<Integer> weekList;
                     ArrayList<Integer> sectionList;
                     if(temp[k].contains("网络课")){
+                        log.info("有网络课。。。");
                         temp[k] = temp[k].substring(0,temp[k].indexOf(enter));
                         courseInfo[0] = temp[k];
                         weekList = null;

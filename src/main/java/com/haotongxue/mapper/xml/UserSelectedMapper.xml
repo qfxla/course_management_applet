@@ -2,4 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.haotongxue.mapper.UserSelectedMapper">
 
+    <delete id="deleteByOpenId">
+        delete from t_user_selected where openid = #{openId}
+    </delete>
 </mapper>
