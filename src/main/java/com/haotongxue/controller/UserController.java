@@ -325,7 +325,7 @@ public class UserController {
     }
 
     @ApiOperation("删除某个人的数据，包括选课和倒计时")
-    @GetMapping("/authority/delSomeOneData")
+    @GetMapping("/delSomeOneData")
     public R delSomeOneData(@RequestParam("openid")String openid){
         User user = userService.getById(openid);
         if (user == null){
