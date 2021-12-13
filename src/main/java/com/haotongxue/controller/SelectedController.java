@@ -62,7 +62,8 @@ public class SelectedController {
     public R myChoice(@RequestParam(name = "collegeId",required = false)Integer collegeId) throws InterruptedException {
 //        String openid = UserContext.getCurrentOpenid();
 //        String openid = "ohpVk5VjCMQ9IZsZzfmwruWvhXeA";  //20级
-        String openid = "ohpVk5a0g0sadhdZyBdftaBOG-Q4";
+        String openid = "ohpVk5QKsZVJG94dMLCsLeF-ETwY";  //20级 一个有无效选修的人
+//        String openid = "ohpVk5a0g0sadhdZyBdftaBOG-Q4";  //19级信科
         User user = (User)loginCache.get(openid);
 
 

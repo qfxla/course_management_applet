@@ -43,10 +43,10 @@
     <select id="rule" resultType="com.haotongxue.entity.vo.SelectedRuleVo">
         SELECT
         <include refid="rule"></include>
-        FROM (SELECT DISTINCT big_id FROM t_college_big_small WHERE college_id = #{collegeId}) cbs
+        FROM (SELECT DISTINCT big_id FROM t_college_big_small WHERE college_id = #{collegeId} AND grade = #{grade}) cbs
         LEFT JOIN t_big_kind b ON cbs.big_id = b.big_id
         LEFT JOIN t_score s ON s.big_id = cbs.big_id
-        WHERE b.big_id = s.big_id AND s.college_id = #{collegeId} AND s.grade = #{grade}
+        WHERE b.big_id = s.big_id AND s.college_id = #{collegeId} AND s.grade = #{grade} ORDER BY big_id
     </select>
     <select id="ruleSmallKind" resultType="com.haotongxue.entity.vo.SmallKindVo" resultMap="smallVo">
         select name,samll_id from t_small_kind

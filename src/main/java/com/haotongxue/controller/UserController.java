@@ -83,6 +83,10 @@ public class UserController {
     private IUserInfoService iUserInfoService;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private CountDownMapper countDownMapper;
+    @Autowired
+    private UserSelectedMapper userSelectedMapper;
 
     @ApiOperation(value = "微信登录")
     @PostMapping("/login")
@@ -319,8 +323,38 @@ public class UserController {
 
     @ApiOperation("删除某个人的数据，包括选课和倒计时")
     @GetMapping("/authority/delSomeOneData")
-    public R delSomeOneData(){
-        return null;
+    public R delSomeOneData(@RequestParam("openid")String openid){
+        User user = userService.getById(openid);
+        if (user == null){
+            return R.error().data("msg","无该openid");
+        }
+        String openId = user.getOpenid();
+
+        cache.invalidate(openid);
+        for (int i = 1;i <= 20;i++){
+            courseCache.invalidate("cour" + openId + ":" + i);
+        }
+        QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
+        wrapper.eq("openid",openId);
+        List<String> infoList = iUserInfoService.list(wrapper).stream().map(UserInfo::getInfoId).collect(Collectors.toList());
+
+        log.info("查找用户的所有info数量"+ infoList.size());
+        if(infoList.size() != 0){
+            infoSectionMapper.deleteByInfoId(infoList);
+            infoWeekMapper.deleteByInfoId(infoList);
+            infoCourseMapper.deleteByInfoId(infoList);
+            infoClassroomMapper.deleteByInfoId(infoList);
+            infoTeacherMapper.deleteByInfoId(infoList);
+            infoMapper.deleteByInfoId(infoList);
+            userInfoMapper.deleteByInfoId(infoList);
+        }
+
+
+        countDownMapper.deleteByOpenId(openId);
+        userSelectedMapper.deleteByOpenId(openId);
+
+        userMapper.deleteByInfoId(openid);
+        return R.ok().data("msg","清除成功");
     }
 }
 
