@@ -18,6 +18,7 @@ import com.haotongxue.utils.*;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j;
+import org.apache.catalina.realm.UserDatabaseRealm;
 import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +65,8 @@ public class SelectedController {
 //        String openid = "ohpVk5VjCMQ9IZsZzfmwruWvhXeA";  //20级
 //        String openid = "ohpVk5QKsZVJG94dMLCsLeF-ETwY";  //20级 一个有无效选修的人
 //        String openid = "ohpVk5a0g0sadhdZyBdftaBOG-Q4";  //19级信科
+//        String openid = "ohpVk5Rh5rn6OnSQtlr75pPKXgDE";//19级轻工  专业2不在数据库中
+//        String openid = "ohpVk5XJf6d8pl7uH0hieZ4OJslM";//19级轻工  专业1在数据库中
         User user = (User)loginCache.get(openid);
 
 
@@ -80,7 +83,7 @@ public class SelectedController {
 
         int grade = WhichGrade.whichGrade(user.getNo());
 
-        List<SelectedRuleVo> ruleList = iSelectedService.getSelected(collegeId, openid,grade);
+        List<SelectedRuleVo> ruleList = iSelectedService.getSelected(collegeId, openid,grade, user.getNo());
         if (ruleList == null || ruleList.size() == 0){
             return R.error().data("msg","暂无数据");
         }

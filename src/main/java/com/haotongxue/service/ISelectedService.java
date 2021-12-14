@@ -16,7 +16,7 @@ import java.util.List;
  * @since 2021-12-06
  */
 public interface ISelectedService extends IService<Selected> {
-    List<SelectedRuleVo> getSelected(int collegeId,String openid,int grade) throws InterruptedException;
+    List<SelectedRuleVo> getSelected(int collegeId,String openid,int grade,String no) throws InterruptedException;
 
     List<SelectedVo> getInvalidSelected(int collegeId, String openid,int grade);
 }
