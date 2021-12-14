@@ -57,7 +57,7 @@ public class SelectedServiceImpl extends ServiceImpl<SelectedMapper, Selected> i
 
 
         //16版的轻工分专业
-        if (no.substring(5,8).equals("072") || no.substring(5,8).equals("073")){
+        if (WhichGrade.whichGrade(no) == 16 ||no.substring(5,8).equals("072") || no.substring(5,8).equals("073")){
             List<SelectedRuleVo> qingGongRule = isQingGong(openid);
             return qingGongRule;
         }

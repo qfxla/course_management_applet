@@ -76,7 +76,7 @@ public class WhichCollege {
                 collegeName = "自动化学院";
                 break;
             case "18" :
-                collegeName = "动物科学学院";
+                collegeName = "动物科技学院";
                 break;
             default :
                 break;

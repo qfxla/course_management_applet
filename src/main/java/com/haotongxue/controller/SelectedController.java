@@ -67,6 +67,8 @@ public class SelectedController {
 //        String openid = "ohpVk5a0g0sadhdZyBdftaBOG-Q4";  //19级信科
 //        String openid = "ohpVk5Rh5rn6OnSQtlr75pPKXgDE";//19级轻工  专业2不在数据库中
 //        String openid = "ohpVk5XJf6d8pl7uH0hieZ4OJslM";//19级轻工  专业1在数据库中
+//        String openid = "ohpVk5UDTRzfNkG-iy2uoCR86VZ0";
+//        String openid = "ohpVk5a7-Hye0Es2iTtuk0lnzIGI";
         User user = (User)loginCache.get(openid);
 
 
