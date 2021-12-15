@@ -125,31 +125,31 @@ public class SelectedServiceImpl extends ServiceImpl<SelectedMapper, Selected> i
 
         List<SelectedRuleVo> ruleList = new ArrayList<>();
         SelectedRuleVo object1 = new SelectedRuleVo();
-        object1.setCollegeId(07);
+        object1.setCollegeId(10);
         object1.setBigName("创新创业教育类");
         object1.setBigId(20);
         object1.setScore("2");
 
         SelectedRuleVo object2 = new SelectedRuleVo();
-        object2.setCollegeId(07);
+        object2.setCollegeId(10);
         object2.setBigName("人文社科类");
         object2.setBigId(21);
         object2.setScore("6");
 
         SelectedRuleVo object3 = new SelectedRuleVo();
-        object3.setCollegeId(07);
+        object3.setCollegeId(10);
         object3.setBigName("艺术类");
         object3.setBigId(22);
         object3.setScore("1");
 
         SelectedRuleVo object4 = new SelectedRuleVo();
-        object4.setCollegeId(07);
+        object4.setCollegeId(10);
         object4.setBigName("心理健康类");
         object4.setBigId(34);
         object4.setScore("1");
 
         SelectedRuleVo object5 = new SelectedRuleVo();
-        object5.setCollegeId(07);
+        object5.setCollegeId(10);
         object5.setBigName("其他类");
         object5.setBigId(25);
         object5.setScore("0");
