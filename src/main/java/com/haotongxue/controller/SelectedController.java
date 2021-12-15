@@ -61,7 +61,7 @@ public class SelectedController {
     @GetMapping("/authority/myChoice")
 //    @GetMapping("/myChoice")
     public R myChoice(@RequestParam(name = "collegeId",required = false)Integer collegeId) throws InterruptedException {
-        String openid = UserContext.getCurrentOpenid();
+//        String openid = UserContext.getCurrentOpenid();
 //        String openid = "ohpVk5VjCMQ9IZsZzfmwruWvhXeA";  //20级
 //        String openid = "ohpVk5QKsZVJG94dMLCsLeF-ETwY";  //20级 一个有无效选修的人
 //        String openid = "ohpVk5a0g0sadhdZyBdftaBOG-Q4";  //19级信科
@@ -69,6 +69,7 @@ public class SelectedController {
 //        String openid = "ohpVk5XJf6d8pl7uH0hieZ4OJslM";//19级轻工  专业1在数据库中
 //        String openid = "ohpVk5UDTRzfNkG-iy2uoCR86VZ0";
 //        String openid = "ohpVk5a7-Hye0Es2iTtuk0lnzIGI";
+        String openid = "ohpVk5VonsNaR3o9rSwJCWD3H-Zw";
         User user = (User)loginCache.get(openid);
 
 
