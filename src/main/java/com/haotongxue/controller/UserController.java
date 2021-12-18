@@ -32,8 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 /**
@@ -90,7 +88,9 @@ public class UserController {
     @Autowired
     private UserSelectedMapper userSelectedMapper;
 
-    ExecutorService executorService = Executors.newCachedThreadPool();
+    @Autowired
+    private IOfficialUserService officialUserService;
+
 
     @ApiOperation(value = "微信登录")
     @PostMapping("/login")
@@ -214,7 +214,14 @@ public class UserController {
         if (user == null){
             return R.error();
         }
-        return R.ok().data("isSubscribe",user.getSubscribe());
+        QueryWrapper<OfficialUser> officialUserQueryWrapper = new QueryWrapper<>();
+        officialUserQueryWrapper.eq("unionid",user.getUnionId());
+        int count = officialUserService.count(officialUserQueryWrapper);
+        if (count == 1 && user.getSubscribe().equals(1)){
+            return R.ok();
+        }else {
+            return R.error();
+        }
     }
 
     @ApiOperation("查看用户是否关注了公众号")

@@ -133,8 +133,8 @@ public class CountDownServiceImpl extends ServiceImpl<CountDownMapper, CountDown
                         QueryWrapper<Selected> selectedQueryWrapper = new QueryWrapper<>();
                         selectedQueryWrapper
                                 .select("selected_id")
-                                .eq("selected_name",courseName);
-                        //.eq("selected_score",score);
+                                .eq("selected_name",courseName)
+                                .eq("selected_score",score);
                         UserSelected userSelected = new UserSelected();
                         userSelected.setOpenid(userOpenid);
                         if (selectedService.count(selectedQueryWrapper) == 0){
