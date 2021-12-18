@@ -35,7 +35,7 @@
     <select id="myChoice" resultType="com.haotongxue.entity.vo.SelectedVo" resultMap="BaseResultMap">
         select
         <include refid="SelectedVo"></include>
-        from t_user_selected us left join t_selected on us.selected_id = t_selected.selected_id
+        from t_user_selected us join t_selected on us.selected_id = t_selected.selected_id
         left join t_big_kind b on t_selected.big_id = b.big_id
         left join t_small_kind s on t_selected.small_id = s.samll_id
         where us.openid = #{openid}

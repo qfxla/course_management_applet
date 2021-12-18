@@ -15,6 +15,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.haotongxue.service.ISmallKindService;
 import com.haotongxue.utils.UserContext;
 import com.haotongxue.utils.WhichGrade;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,7 @@ import java.util.concurrent.Executors;
  * @author DJT
  * @since 2021-12-06
  */
+@Slf4j
 @Service
 public class SelectedServiceImpl extends ServiceImpl<SelectedMapper, Selected> implements ISelectedService {
     private static Logger logger = LoggerFactory.getLogger(SelectedServiceImpl.class);
@@ -73,8 +75,13 @@ public class SelectedServiceImpl extends ServiceImpl<SelectedMapper, Selected> i
                         for (SmallKindVo smallKindVo : smallKindVos) {
                             List<SelectedVo> selectList = new ArrayList<>();
                             for (SelectedVo myChoice : selectedVoList) {
-                                if (smallKindVo.getSmallId() == myChoice.getSmallId()){
-                                    selectList.add(myChoice);
+                                try {
+                                    if (smallKindVo.getSmallId() == myChoice.getSmallId()){
+                                        selectList.add(myChoice);
+                                    }
+                                }catch (Exception e){
+                                    log.info("有课程没有smallid-->",myChoice);
+                                    throw new RuntimeException(e);
                                 }
                             }
                             smallKindVo.setSelectedVoList(selectList);
