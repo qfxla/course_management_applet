@@ -317,6 +317,7 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
             String arg = xueHao.substring(4,9);
             if(!(arg.equals("11414") || arg.equals("11424") || arg.equals("11434") || arg.equals("11412"))){
                 //不是人文学院的人，结束该方法
+                cache.invalidate(currentOpenid);
                 return;
             }else{
                 List<RenWenCountDown> renWenList = null;
