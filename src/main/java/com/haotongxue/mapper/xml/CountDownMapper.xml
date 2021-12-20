@@ -5,9 +5,12 @@
         delete from t_count_down where openid = #{openId}
     </delete>
     <select id="getOpenIdByArg" resultType="java.lang.String">
-    SELECT openid FROM t_user WHERE NO LIKE concat('__',#{arg},'__');
+    SELECT openid FROM t_user WHERE NO LIKE concat('____',#{arg},'___');
 </select>
-    <select id="concludeInsert" resultType="java.lang.Integer">
+    <select id="selectNum" resultType="java.lang.Integer">
         SELECT COUNT(*) FROM t_count_down WHERE openid = #{openId};
+    </select>
+    <select id="ifExist" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM t_count_down WHERE name = #{name} and openid = #{openId};
     </select>
 </mapper>

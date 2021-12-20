@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * <p>
@@ -59,4 +60,19 @@ public class CountDown implements Serializable {
     @ApiModelProperty("更新时间")
       @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
+
+    @Override
+    public String toString() {
+        return "CountDown{" +
+                "id='" + id + '\'' +
+                ", openid='" + openid + '\'' +
+                ", name='" + name + '\'' +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", location='" + location + '\'' +
+                ", isDeleted=" + isDeleted +
+                ", createTime=" + createTime +
+                ", updateTime=" + updateTime +
+                '}';
+    }
 }
