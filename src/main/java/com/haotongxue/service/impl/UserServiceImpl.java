@@ -88,9 +88,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         QueryWrapper<User> userQueryWrapper = new QueryWrapper<>();
         userQueryWrapper.select("no","password").eq("openid",currentOpenid);
         User user = userService.getOne(userQueryWrapper);
-        log.info("----->"+currentOpenid+"新用户触发了查考试倒计时");
-        iCountDownService.searchOptionCourse(currentOpenid,webClient);
-        iCountDownService.searchCountDown(currentOpenid,webClient);
+        log.info("----->"+currentOpenid+"新用户触发了查考试倒计时和选课");
+        try {
+            iCountDownService.searchOptionCourse(currentOpenid,webClient);
+        }catch (Exception e){
+
+        }
+        try {
+            iCountDownService.searchCountDown(currentOpenid,webClient);
+        }catch (Exception e){
+
+        }
+
     }
 
 }

@@ -66,6 +66,9 @@ public class User implements Serializable {
     @ApiModelProperty("用户自定义推送时间")
     private Integer minutes;
 
+    @ApiModelProperty("用户真实姓名")
+    private String realName;
+
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
