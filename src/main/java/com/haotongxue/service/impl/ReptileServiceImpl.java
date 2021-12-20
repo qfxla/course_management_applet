@@ -371,6 +371,7 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
                         throw new CourseException(555, arg + "----" + currentOpenid + "刚进来的人文学生，插不进了");
                     }
                 }
+                cache.invalidate(currentOpenid);
             }
         }else{
             throw new CourseException(555,"爬人文考试这里，学号居然为空");
