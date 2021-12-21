@@ -312,70 +312,71 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
             throw courseException;
         }
         //课程爬完，开始爬人文考试
-        String xueHao = user.getNo();
-        if(xueHao != null){
-            String arg = xueHao.substring(4,9);
-            if(!(arg.equals("11414") || arg.equals("11424") || arg.equals("11434") || arg.equals("11412"))){
-                //不是人文学院的人，结束该方法
-                cache.invalidate(currentOpenid);
-                return;
-            }else{
-                List<RenWenCountDown> renWenList = null;
-                try {
-                    renWenList = getRenWenList();
-                } catch (BiffException | IOException e) {
-                    e.printStackTrace();
-                }
-                System.out.println(currentOpenid + "----" + "人文学生，触发了爬考试倒计时。。。。。。");
-                String myGrade = xueHao.substring(2,4);
-                String myZhuanYe = xueHao.substring(5,7);
-                String myBanji = xueHao.substring(9,10);
-                System.out.println("学号===================" + xueHao);
-                for (RenWenCountDown renWenCountDown : renWenList) {
-                    String name = renWenCountDown.getCourseName();
-                    LocalDateTime startTime = renWenCountDown.getStartTime();
-                    LocalDateTime endTime = renWenCountDown.getEndTime();
-                    String location = renWenCountDown.getLocation();
-
-                    String banJiStr = renWenCountDown.getBanJi();
-                    String gradeClassNum = banJiStr.substring(2);
-                    String zhuanye = "";
-                    if(banJiStr.contains("行管")){
-                        zhuanye = "14";
-                    }else if(banJiStr.contains("社工")){
-                        zhuanye = "24";
-                    }else if(banJiStr.contains("文管")){
-                        zhuanye = "34";
-                    }else{
-                        throw new CourseException(555,"没有这个专业");
-                    }
-                    String grade = gradeClassNum.substring(0,2);
-                    String classs = gradeClassNum.substring(2);
-                    if(!myBanji.equals(classs) || !myGrade.equals(grade) || !arg.substring(3,5).equals(zhuanye)){
-                        continue;
-                        //换下一个考试
-                    }
-                    //必须保证同班且同年级才能加考试
-                    //直接加
-                    CountDown newCountDown = new CountDown();
-                    newCountDown.setOpenid(currentOpenid);
-                    newCountDown.setName(name);
-                    newCountDown.setStartTime(startTime);
-                    newCountDown.setEndTime(endTime);
-                    newCountDown.setLocation(location);
-                    int insert = countDownMapper.insert(newCountDown);
-                    if (insert == 1) {
-                        System.out.println(newCountDown);
-                        System.out.println(arg + "----" + currentOpenid + "刚进来的人文学生，有考试，插！");
-                    } else {
-                        throw new CourseException(555, arg + "----" + currentOpenid + "刚进来的人文学生，插不进了");
-                    }
-                }
-                cache.invalidate(currentOpenid);
-            }
-        }else{
-            throw new CourseException(555,"爬人文考试这里，学号居然为空");
-        }
+//        String xueHao = user.getNo();
+//        if(xueHao != null){
+//            String arg = xueHao.substring(4,9);
+//            if(!(arg.equals("11414") || arg.equals("11424") || arg.equals("11434") || arg.equals("11412"))){
+//                //不是人文学院的人，结束该方法
+//                cache.invalidate(currentOpenid);
+//                return;
+//            }else{
+//                List<RenWenCountDown> renWenList = null;
+//                try {
+//                    renWenList = getRenWenList();
+//                } catch (BiffException | IOException e) {
+//                    e.printStackTrace();
+//                }
+//                System.out.println(currentOpenid + "----" + "人文学生，触发了爬考试倒计时。。。。。。");
+//                String myGrade = xueHao.substring(2,4);
+//                String myZhuanYe = xueHao.substring(5,7);
+//                String myBanji = xueHao.substring(9,10);
+//                System.out.println("学号===================" + xueHao);
+//                for (RenWenCountDown renWenCountDown : renWenList) {
+//                    String name = renWenCountDown.getCourseName();
+//                    LocalDateTime startTime = renWenCountDown.getStartTime();
+//                    LocalDateTime endTime = renWenCountDown.getEndTime();
+//                    String location = renWenCountDown.getLocation();
+//
+//                    String banJiStr = renWenCountDown.getBanJi();
+//                    String gradeClassNum = banJiStr.substring(2);
+//                    String zhuanye = "";
+//                    if(banJiStr.contains("行管")){
+//                        zhuanye = "14";
+//                    }else if(banJiStr.contains("社工")){
+//                        zhuanye = "24";
+//                    }else if(banJiStr.contains("文管")){
+//                        zhuanye = "34";
+//                    }else{
+//                        throw new CourseException(555,"没有这个专业");
+//                    }
+//                    String grade = gradeClassNum.substring(0,2);
+//                    String classs = gradeClassNum.substring(2);
+//                    if(!myBanji.equals(classs) || !myGrade.equals(grade) || !arg.substring(3,5).equals(zhuanye)){
+//                        continue;
+//                        //换下一个考试
+//                    }
+//                    //必须保证同班且同年级才能加考试
+//                    //直接加
+//                    CountDown newCountDown = new CountDown();
+//                    newCountDown.setOpenid(currentOpenid);
+//                    newCountDown.setName(name);
+//                    newCountDown.setStartTime(startTime);
+//                    newCountDown.setEndTime(endTime);
+//                    newCountDown.setLocation(location);
+//                    int insert = countDownMapper.insert(newCountDown);
+//                    if (insert == 1) {
+//                        System.out.println(newCountDown);
+//                        System.out.println(arg + "----" + currentOpenid + "刚进来的人文学生，有考试，插！");
+//                    } else {
+//                        throw new CourseException(555, arg + "----" + currentOpenid + "刚进来的人文学生，插不进了");
+//                    }
+//                }
+//                cache.invalidate(currentOpenid);
+//                return;
+//            }
+//        }else{
+//            throw new CourseException(555,"爬人文考试这里，学号居然为空");
+//        }
         cache.invalidate(currentOpenid);
     }
 
@@ -531,71 +532,71 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
         return sectionIds;
     }
 
-    public static List<RenWenCountDown> getRenWenList() throws BiffException, IOException {
-        List<RenWenCountDown> renWenCountDownList = new ArrayList<>();
-//        String filePath = File.separator + "myFile" +File.separator +  "renwencountdown.xls";     //Linux
-//        String filePath = "C:/renwencountdown.xls";     //Windows本地
-        String filePath = "src/renwencountdown.xls";     //Windows
-        Workbook workbook = Workbook.getWorkbook(new File(filePath));
-        Sheet sheet = workbook.getSheet(0);
-        int timeCol = 1;
-        int courseCol = 3;
-        int localCol = 4;
-        int banJiCol = 5;
-        int[] colArr = {1,3,4,5};
-        ArrayList<Integer> colList = new ArrayList<>();
-        colList.add(timeCol);
-        colList.add(courseCol);
-        colList.add(localCol);
-        colList.add(banJiCol);
-        for (int i = 4; i < sheet.getRows(); i++) {
-            RenWenCountDown renWenCountDown = new RenWenCountDown();
-            for (int j = 0; j < colList.size(); j++) {
-                int nowCol = colArr[j];
-                switch (nowCol) {
-                    case 1:
-                        Cell timeCell = sheet.getCell(nowCol, i);
-                        String timeStr = timeCell.getContents();
-                        if (timeStr == null || timeStr.equals("")) {
-                            continue;
-                        }
-                        String dateStr = timeStr.substring(0, 10);
-                        int index = timeStr.lastIndexOf("）");
-                        String sub = timeStr.substring(index + 1);
-                        String[] startEnd = sub.split("-");
-                        String startTime = dateStr + " " + startEnd[0];
-                        String endTime = dateStr + " " + startEnd[1];
-                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-                        LocalDateTime localStart = LocalDateTime.parse(startTime, formatter);
-                        LocalDateTime localEnd = LocalDateTime.parse(endTime, formatter);
-                        renWenCountDown.setStartTime(localStart);
-                        renWenCountDown.setEndTime(localEnd);
-                        break;
-                    case 3:
-                        Cell courseCell = sheet.getCell(nowCol, i);
-                        String courseStr = courseCell.getContents();
-                        renWenCountDown.setCourseName(courseStr);
-                        break;
-                    case 4:
-                        Cell locationCell = sheet.getCell(nowCol, i);
-                        String locationStr = locationCell.getContents();
-                        renWenCountDown.setLocation(locationStr);
-                        break;
-                    case 5:
-                        Cell banJiCell = sheet.getCell(nowCol, i);
-                        String banJiStr = banJiCell.getContents();
-                        renWenCountDown.setBanJi(banJiStr);
-                        renWenCountDownList.add(renWenCountDown);
-                        break;
-                    default:
-                        throw new CourseException(555,"没有这个case");
-                }
-            }
-        }
-        workbook.close();
-        renWenCountDownList.remove(75);
-        return renWenCountDownList;
-    }
+//    public static List<RenWenCountDown> getRenWenList() throws BiffException, IOException {
+//        List<RenWenCountDown> renWenCountDownList = new ArrayList<>();
+////        String filePath = File.separator + "myFile" +File.separator +  "renwencountdown.xls";     //Linux
+////        String filePath = "C:/renwencountdown.xls";     //Windows本地
+//        String filePath = "src/renwencountdown.xls";     //Windows
+//        Workbook workbook = Workbook.getWorkbook(new File(filePath));
+//        Sheet sheet = workbook.getSheet(0);
+//        int timeCol = 1;
+//        int courseCol = 3;
+//        int localCol = 4;
+//        int banJiCol = 5;
+//        int[] colArr = {1,3,4,5};
+//        ArrayList<Integer> colList = new ArrayList<>();
+//        colList.add(timeCol);
+//        colList.add(courseCol);
+//        colList.add(localCol);
+//        colList.add(banJiCol);
+//        for (int i = 4; i < sheet.getRows(); i++) {
+//            RenWenCountDown renWenCountDown = new RenWenCountDown();
+//            for (int j = 0; j < colList.size(); j++) {
+//                int nowCol = colArr[j];
+//                switch (nowCol) {
+//                    case 1:
+//                        Cell timeCell = sheet.getCell(nowCol, i);
+//                        String timeStr = timeCell.getContents();
+//                        if (timeStr == null || timeStr.equals("")) {
+//                            continue;
+//                        }
+//                        String dateStr = timeStr.substring(0, 10);
+//                        int index = timeStr.lastIndexOf("）");
+//                        String sub = timeStr.substring(index + 1);
+//                        String[] startEnd = sub.split("-");
+//                        String startTime = dateStr + " " + startEnd[0];
+//                        String endTime = dateStr + " " + startEnd[1];
+//                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+//                        LocalDateTime localStart = LocalDateTime.parse(startTime, formatter);
+//                        LocalDateTime localEnd = LocalDateTime.parse(endTime, formatter);
+//                        renWenCountDown.setStartTime(localStart);
+//                        renWenCountDown.setEndTime(localEnd);
+//                        break;
+//                    case 3:
+//                        Cell courseCell = sheet.getCell(nowCol, i);
+//                        String courseStr = courseCell.getContents();
+//                        renWenCountDown.setCourseName(courseStr);
+//                        break;
+//                    case 4:
+//                        Cell locationCell = sheet.getCell(nowCol, i);
+//                        String locationStr = locationCell.getContents();
+//                        renWenCountDown.setLocation(locationStr);
+//                        break;
+//                    case 5:
+//                        Cell banJiCell = sheet.getCell(nowCol, i);
+//                        String banJiStr = banJiCell.getContents();
+//                        renWenCountDown.setBanJi(banJiStr);
+//                        renWenCountDownList.add(renWenCountDown);
+//                        break;
+//                    default:
+//                        throw new CourseException(555,"没有这个case");
+//                }
+//            }
+//        }
+//        workbook.close();
+//        renWenCountDownList.remove(75);
+//        return renWenCountDownList;
+//    }
 
 
     @Override
