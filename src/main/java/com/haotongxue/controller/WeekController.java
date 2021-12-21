@@ -21,7 +21,7 @@ import javax.annotation.Resource;
  * @since 2021-11-06
  */
 @RestController
-@RequestMapping("/week")
+@RequestMapping("/zkCourse/week")
 public class WeekController {
 
     @Resource(name = "weekCache")

@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
  * @since 2021-12-01
  */
 @RestController
-@RequestMapping("/countDown")
+@RequestMapping("/zkCourse/countDown")
 @Slf4j
 public class CountDownController {
 

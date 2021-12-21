@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
  */
 @Api(tags = "用户管理")
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/zkCourse/user")
 @Slf4j
 public class UserController {
 

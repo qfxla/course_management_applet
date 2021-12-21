@@ -18,7 +18,7 @@ import javax.annotation.Resource;
  * @since 2021-12-07
  */
 @RestController
-@RequestMapping("/smallKind")
+@RequestMapping("/zkCourse/smallKind")
 public class SmallKindController {
     @Resource
     ISmallKindService iSmallKindService;

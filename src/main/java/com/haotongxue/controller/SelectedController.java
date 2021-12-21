@@ -43,7 +43,7 @@ import java.util.List;
  * @since 2021-12-06
  */
 @RestController
-@RequestMapping("/selected")
+@RequestMapping("/zkCourse/selected")
 public class SelectedController {
     private static Logger logger = LoggerFactory.getLogger(SelectedController.class);
     @Autowired

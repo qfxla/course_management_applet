@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2021-12-07
  */
 @RestController
-@RequestMapping("/score")
+@RequestMapping("/zkCourse/score")
 public class ScoreController {
 
 }

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2021-11-10
  */
 @RestController
-@RequestMapping("/officialUser")
+@RequestMapping("/zkCourse/officialUser")
 public class OfficialUserController {
 
 }

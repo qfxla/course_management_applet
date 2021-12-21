@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2021-11-06
  */
 @RestController
-@RequestMapping("/infoCourse")
+@RequestMapping("/zkCourse/infoCourse")
 public class InfoCourseController {
 
 }

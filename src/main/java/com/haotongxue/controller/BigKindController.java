@@ -23,7 +23,7 @@ import java.util.Set;
  * @since 2021-12-07
  */
 @RestController
-@RequestMapping("/bigKind")
+@RequestMapping("/zkCourse/bigKind")
 public class BigKindController {
     @Resource
     IBigKindService iBigKindService;

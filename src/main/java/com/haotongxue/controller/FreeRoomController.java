@@ -23,7 +23,7 @@ import java.util.Map;
  * @since 2021-11-26
  */
 @RestController
-@RequestMapping("/freeRoom")
+@RequestMapping("/zkCourse/freeRoom")
 public class FreeRoomController {
 
     @Resource

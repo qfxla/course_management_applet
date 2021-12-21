@@ -33,7 +33,7 @@ import java.util.List;
 @RestController@CrossOrigin
 @Slf4j
 @Api(tags = "课程表信息")
-@RequestMapping("/authority/info")
+@RequestMapping("/zkCourse/authority/info")
 public class InfoController {
     @Autowired
     private IInfoService iInfoService;
