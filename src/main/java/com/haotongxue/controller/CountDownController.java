@@ -237,6 +237,192 @@ public class CountDownController {
                         continue;
                         //换下一个考试
                     }
+                    //必须保证同班且同年级同专业才能加考试
+                    QueryWrapper<CountDown> queryWrapper = new QueryWrapper<>();
+                    queryWrapper.eq("openid",openid);
+                    int integer = countDownMapper.selectCount(queryWrapper);
+                    if(integer == 0){
+                        //一节课都没有，加！
+                        System.out.println(openid + "#########################################################一节课都没有，加！");
+                        CountDown newCountDown = new CountDown();
+                        newCountDown.setOpenid(openid);
+                        newCountDown.setName(name);
+                        newCountDown.setStartTime(startTime);
+                        newCountDown.setEndTime(endTime);
+                        newCountDown.setLocation(location);
+                        int insert = countDownMapper.insert(newCountDown);
+                        if (insert == 1) {
+                            System.out.println(newCountDown);
+                            System.out.println("0000----" + arg + "----" + openid + "有考试，插！");
+                            addCount++;
+                            //加了一个考试，换下一个考试
+                        } else {
+                            throw new CourseException(555, arg + "----" + openid + "插不进了");
+                        }
+                    }else{
+                        QueryWrapper<CountDown> exist = new QueryWrapper<>();
+                        exist.eq("openid",openid).eq("name",name);
+                        //看这个openid下的这节课是否存在
+                        int num = countDownMapper.ifExist(name,openid);
+                        if(num < 1){
+                            //没有这个考试，加
+                            CountDown newCountDown = new CountDown();
+                            newCountDown.setOpenid(openid);
+                            newCountDown.setName(name);
+                            newCountDown.setStartTime(startTime);
+                            newCountDown.setEndTime(endTime);
+                            newCountDown.setLocation(location);
+                            int insert = countDownMapper.insert(newCountDown);
+                            if (insert == 1) {
+                                System.out.println(newCountDown.toString());
+                                System.out.println(arg + "----" + openid + "有考试，插！");
+                                addCount++;
+                            } else {
+                                throw new CourseException(555, arg + "----" + openid + "插不进了");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        System.out.println("总人数：" + count);
+        System.out.println("刚加考试的总数：" + addCount);
+        return addCount;
+    }
+
+
+    @GetMapping("/insertRenWenCountDown3")
+    @Transactional(rollbackFor = Exception.class)
+    public int insertRenWenCountDown3(@RequestParam(value = "xueHao",required = false) String xueHao){
+        List<RenWenCountDown> renWenList = null;
+        try {
+            renWenList = getRenWenList();
+        } catch (BiffException | IOException e) {
+            e.printStackTrace();
+        }
+        if(xueHao != null){
+            String arg = xueHao.substring(4,9);
+            if(!(arg.equals("11414") || arg.equals("11424") || arg.equals("11434") || arg.equals("11412"))){
+                return 0;
+            }
+            String openid = UserContext.getCurrentOpenid();
+            System.out.println(openid + "----" + "人文学生，触发了爬考试倒计时。。。。。。");
+            String myGrade = xueHao.substring(2,4);
+            String myZhuanYe = xueHao.substring(5,7);
+            String myBanji = xueHao.substring(9,10);
+            System.out.println("学号===================" + xueHao);
+            for (RenWenCountDown renWenCountDown : renWenList) {
+                String name = renWenCountDown.getCourseName();
+                LocalDateTime startTime = renWenCountDown.getStartTime();
+                LocalDateTime endTime = renWenCountDown.getEndTime();
+                String location = renWenCountDown.getLocation();
+
+                String banJiStr = renWenCountDown.getBanJi();
+                String gradeClassNum = banJiStr.substring(2);
+                String zhuanye = "";
+                if(banJiStr.contains("行管")){
+                    zhuanye = "14";
+                }else if(banJiStr.contains("社工")){
+                    zhuanye = "24";
+                }else if(banJiStr.contains("文管")){
+                    zhuanye = "34";
+                }else{
+                    throw new CourseException(555,"没有这个专业");
+                }
+                String grade = gradeClassNum.substring(0,2);
+                String classs = gradeClassNum.substring(2);
+                if(!myBanji.equals(classs) || !myGrade.equals(grade) || !arg.substring(3,5).equals(zhuanye)){
+                    continue;
+                    //换下一个考试
+                }
+                //必须保证同班且同年级同专业才能加考试
+                CountDown newCountDown = new CountDown();
+                newCountDown.setOpenid(openid);
+                newCountDown.setName(name);
+                newCountDown.setStartTime(startTime);
+                newCountDown.setEndTime(endTime);
+                newCountDown.setLocation(location);
+                int insert = countDownMapper.insert(newCountDown);
+                if (insert == 1) {
+                    System.out.println(newCountDown);
+                    System.out.println(arg + "----" + openid + "刚进来的人文学生，有考试，插！");
+                } else {
+                    throw new CourseException(555, arg + "----" + openid + "刚进来的人文学生，插不进了");
+                }
+            }
+            return 1;
+        }
+//20 19114142 03
+        int count = 0;
+        int addCount = 0;
+        assert renWenList != null;
+        for (int i = 1; i <= 3; i++) {
+            /////////////////////////////////////////////////////
+            if(i!=1){
+                continue;
+            }
+            /////////////////////////////////////////////////////
+//            String arg = "114" + i + "4";
+            /////////////////////////////////////////////////////
+            String arg = "114" + i + "2";
+            /////////////////////////////////////////////////////
+            System.out.println("@@@@@@@@@@@@@@@" + arg);
+            List<String> openIdList = countDownMapper.getOpenIdByArg(arg);
+            for (String openid : openIdList) {
+                count++;
+                boolean conFlag = false;
+                QueryWrapper<CountDown> isBai = new QueryWrapper<>();
+                isBai.eq("openid",openid);
+                List<CountDown> countDowns = countDownMapper.selectList(isBai);
+                for (CountDown oldCountDown : countDowns) {
+                    if (oldCountDown.getLocation().contains("白")) {
+                        System.out.println(openid + "---------@@@@@@@@@@@@@@@@@有一个白云");
+                        conFlag = true;
+                        break;
+                        //换下一个openid
+                    }
+                }
+                if(conFlag){
+                    continue;
+                    //换下一个openid
+                }
+                QueryWrapper<User> oneUser = new QueryWrapper<>();
+                oneUser.eq("openid",openid);
+                User user = userMapper.selectOne(oneUser);
+                String no = user.getNo();
+                String myGrade = no.substring(2,4);
+                String myZhuanYe = no.substring(5,7);
+                String myBanji = no.substring(9,10);
+                /////////////////////////////////////////////////////
+                if(Integer.parseInt(myBanji) <= 3){
+                    continue;
+                    //换下一个openid
+                }
+                /////////////////////////////////////////////////////
+                for (RenWenCountDown renWenCountDown : renWenList) {
+                    String name = renWenCountDown.getCourseName();
+                    LocalDateTime startTime = renWenCountDown.getStartTime();
+                    LocalDateTime endTime = renWenCountDown.getEndTime();
+                    String location = renWenCountDown.getLocation();
+
+                    String banJiStr = renWenCountDown.getBanJi();
+                    String gradeClassNum = banJiStr.substring(2);
+                    String zhuanye = "";
+                    if(banJiStr.contains("行管")){
+                        zhuanye = "14";
+                    }else if(banJiStr.contains("社工")){
+                        zhuanye = "24";
+                    }else if(banJiStr.contains("文管")){
+                        zhuanye = "34";
+                    }else{
+                        throw new CourseException(555,"没有这个专业");
+                    }
+                    String grade = gradeClassNum.substring(0,2);
+                    String classs = gradeClassNum.substring(2);
+                    if(!myBanji.equals(classs) || !myGrade.equals(grade) || !arg.substring(3,5).equals(zhuanye)){
+                        continue;
+                        //换下一个考试
+                    }
                     //必须保证同班且同年级才能加考试
                     QueryWrapper<CountDown> queryWrapper = new QueryWrapper<>();
                     queryWrapper.eq("openid",openid);

@@ -130,7 +130,18 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
         }
 
         DomElement[][] domElements = new DomElement[7][6];
-        String[] sectionIds = getSectionId(page);
+        DomElement xnxq01id = page.getElementById("xnxq01id");
+        DomNodeList<HtmlElement> options = xnxq01id.getElementsByTagName("option");
+        HtmlElement htmlElement = options.get(1);
+        HtmlPage click = null;
+        try {
+            click = htmlElement.click();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assert click != null;
+        String[] sectionIds = getSectionId(click);
+        page = click;
 
         int switchFlag = 0;
         for (int i = 0;i < 7;i++){
@@ -161,17 +172,17 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
 
         if(isSwitch){
             DomElement kbjcmsid = page.getElementById("kbjcmsid");
-            DomNodeList<HtmlElement> options = kbjcmsid.getElementsByTagName("option");
-            HtmlElement htmlElement = options.get(1);
-            HtmlPage click = null;
+            DomNodeList<HtmlElement> baiyunOpt = kbjcmsid.getElementsByTagName("option");
+            HtmlElement baiyunEle = baiyunOpt.get(1);
+            HtmlPage baiyunClick = null;
             try {
-                click = htmlElement.click();
+                baiyunClick = baiyunEle.click();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            assert click != null;
-            sectionIds = getSectionId(click);
-            page = click;
+            assert baiyunClick != null;
+            sectionIds = getSectionId(baiyunClick);
+            page = baiyunClick;
         }
         String infoId;
         switchFlag = 0;
