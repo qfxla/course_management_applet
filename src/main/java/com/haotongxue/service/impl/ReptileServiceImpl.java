@@ -394,7 +394,6 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
             zSub = ws.substring(0, zhouIdx + 2);
             return zSub;  //返回周次
         }
-
         return "无";     //只有节次 或者 都没有
     }
 
