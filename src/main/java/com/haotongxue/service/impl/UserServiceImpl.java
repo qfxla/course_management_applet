@@ -4,10 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.DomNode;
-import com.gargoylesoftware.htmlunit.html.DomNodeList;
-import com.gargoylesoftware.htmlunit.html.HtmlElement;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.html.*;
 import com.haotongxue.entity.User;
 import com.haotongxue.entity.WeChatLoginResponse;
 import com.haotongxue.exceptionhandler.CourseException;
@@ -26,6 +23,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * <p>
@@ -177,5 +175,36 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             e.printStackTrace();
         }
         return false;
+    }
+
+
+    public void beginEva(HtmlPage page){
+        List<HtmlElement> radios = page.getByXPath("//label/input");
+        int count = 0;
+        try {
+            for (int i = 0; i < radios.size() / 4; i++) {  //0~11
+                int choice = ThreadLocalRandom.current().nextInt(2);    //随机选择“完全同意”或“比较同意”
+                for (int j = 0; j < 4; j++) {  //0~3
+                    if(j == choice){
+                        System.out.println("第" + (i+1) + "道题，" + "选择了：" + choice);
+                        int index = (4*(i+1)-1)-(4-(j+1));
+                        HtmlElement element = radios.get(index);
+                        element.click();
+                        break;
+                    }
+                }
+                count++;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println(UserContext.getCurrentOpenid() + "---总共" + count + "道题");
+        DomElement tj = page.getHtmlElementById("tj");
+        Page submit = null;
+        try {
+            submit = tj.click();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

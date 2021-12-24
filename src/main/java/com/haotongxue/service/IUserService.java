@@ -23,4 +23,6 @@ public interface IUserService extends IService<User> {
     void triggerSearchCountDown(String currentOpenid, WebClient webClient);
 
     boolean studentEvaluate(WebClient webClient);
+
+
 }
