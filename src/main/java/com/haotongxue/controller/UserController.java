@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -383,14 +384,15 @@ public class UserController {
     }
 
     @ApiOperation("学生评教")
-    @PostMapping("/authority/evaluate")
-    public R studentEvaluate(@RequestHeader("Authority") @ApiParam("放在请求头的token") String authority){
-        String currentOpenid = UserContext.getCurrentOpenid();
-        User user = (User) cache.get(currentOpenid);
-//        String no = "202010244504";
-//        String password = "Zhku182311";
-        String no = user.getNo();
-        String password = user.getPassword();
+    @PostMapping("/evaluate")
+//    public R studentEvaluate(@RequestHeader("Authority") @ApiParam("放在请求头的token") String authority){
+    public R studentEvaluate(){
+//        String currentOpenid = UserContext.getCurrentOpenid();
+//        User user = (User) cache.get(currentOpenid);
+        String no = "202010244304";
+        String password = "Ctc779684470...";
+//        String no = user.getNo();
+//        String password = user.getPassword();
         for (int i=0;i<10;i++){
             WebClient webClient = WebClientUtils.getWebClient();
             try {
@@ -405,6 +407,48 @@ public class UserController {
             break;
         }
         return R.error();
+    }
+
+
+    @ApiOperation("删除所有Paing，返回所有nickname")
+    @GetMapping("/delAllPaing")
+    public List<String> delAllPaing(){
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        QueryWrapper<User> paingUsers = queryWrapper.eq("is_paing", 1);
+        List<String> nickNames = new ArrayList<>();
+        List<User> userList = userMapper.selectList(paingUsers);
+        System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@paing数：" + userList.size());
+        for (User user : userList) {
+            nickNames.add(user.getNickName());
+            nickNames.add(user.getNo());
+            String openId = user.getOpenid();
+            System.out.println("删除所有缓存和数据-----" + openId);
+//            cache.invalidate(openId);
+//            for (int i = 1;i <= 20;i++){
+//                courseCache.invalidate("cour" + openId + ":" + i);
+//            }
+//            QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
+//            wrapper.eq("openid",openId);
+//            List<String> infoList = iUserInfoService.list(wrapper).stream().map(UserInfo::getInfoId).collect(Collectors.toList());
+//            if(infoList.size() != 0){
+//                infoSectionMapper.deleteByInfoId(infoList);
+//                infoWeekMapper.deleteByInfoId(infoList);
+//                infoCourseMapper.deleteByInfoId(infoList);
+//                infoClassroomMapper.deleteByInfoId(infoList);
+//                infoTeacherMapper.deleteByInfoId(infoList);
+//                infoMapper.deleteByInfoId(infoList);
+//                userInfoMapper.deleteByInfoId(infoList);
+//            }
+//            countDownMapper.deleteByOpenId(openId);
+//            userSelectedMapper.deleteByOpenId(openId);
+//            userMapper.deleteByInfoId(openId);
+        }
+        if(nickNames.size()!=0){
+            return nickNames;
+        }else {
+            nickNames.add("没有paing");
+            return nickNames;
+        }
     }
 }
 
