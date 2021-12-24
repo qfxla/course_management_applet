@@ -111,18 +111,67 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public boolean studentEvaluate(WebClient webClient) {
         try {
             HtmlPage htmlPage = webClient.getPage("http://edu-admin.zhku.edu.cn/jsxsd/xspj/xspj_find.do");
+            //System.out.println(htmlPage.asXml());
             List<HtmlElement> table = htmlPage.getByXPath("//table[@class='layui-table']");
-            DomNode tbody = table.get(0).getFirstChild();
-            DomNodeList<DomNode> childNodes = tbody.getChildNodes();
-            for (int i=1;i<childNodes.size();i++){
-                DomNode tr = childNodes.get(i);
-                DomNodeList<DomNode> tdList = tr.getChildNodes();
+            DomNodeList<HtmlElement> trList = table.get(0).getElementsByTagName("tr");
+            for (int i=1;i<trList.size();i++){
+                HtmlElement tr = trList.get(i);
+                DomNodeList<HtmlElement> tdList = tr.getElementsByTagName("td");
+                //获取倒数第二个
                 DomNode isEvaluate = tdList.get(tdList.size() - 2);
+                //System.out.println(isEvaluate.asText());
                 if ("否".equals(isEvaluate.asText())){
-                    HtmlElement gotoEvaluate = (HtmlElement) tdList.get(tdList.size() - 1);
-                    HtmlPage evaluatePage = gotoEvaluate.click();
-                    System.out.println(evaluatePage.asText());
+                    System.out.println("-------->第一次点");
+                    HtmlElement gotoEvaluate = tdList.get(tdList.size() - 1);
+                    DomNodeList<HtmlElement> a = gotoEvaluate.getElementsByTagName("a");
+                    HtmlPage evaluatePage = a.get(0).click();
+                    //System.out.println(evaluatePage.asXml());
+                    HtmlElement dataList = evaluatePage.getHtmlElementById("dataList");
+                    DomNodeList<HtmlElement> dataListTrList = dataList.getElementsByTagName("tr");
+                    for (int j=1;j<dataListTrList.size();j++){
+                        HtmlElement trNode = dataListTrList.get(j);
+                        DomNodeList<HtmlElement> trTdList = trNode.getElementsByTagName("td");
+                        HtmlElement isCommit = trTdList.get(trTdList.size() - 2);
+                        if ("否".equals(isCommit.asText())){
+                            HtmlElement evaluate = trTdList.get(trTdList.size() - 1);
+                            DomNodeList<HtmlElement> aTwo = evaluate.getElementsByTagName("a");
+                            HtmlPage afterClick = aTwo.get(0).click();
+                            //System.out.println(afterClick.asText());
+                        }
+                        if (j == dataListTrList.size() - 1){
+                            List<HtmlElement> pageCountDiv = evaluatePage.getByXPath("//div[@class='rt edu-pagination paginationDom']");
+                            DomNodeList<HtmlElement> span = pageCountDiv.get(0).getElementsByTagName("span");
+                            HtmlElement pageCountText = span.get(0);
+                            String[] split = pageCountText.asText().split("/");
+                            String[] preSplit = split[0].split("页");
+                            String[] afterSplit = split[1].split("页");
+                            int preCount = Integer.valueOf(preSplit[0]);
+                            int afterCount = Integer.valueOf(afterSplit[0]);
+                            if (preCount != afterCount){
+                                List<HtmlElement> iList = evaluatePage.getByXPath("//i[@class='rt edu-pagination paginationDom']");
+                                HtmlElement nextPage = iList.get(0);
+                                HtmlPage click = nextPage.click();
+                                evaluatePage = click;
+                                dataListTrList = click.getHtmlElementById("dataList");
+                                j = 1;
+                            }
+                        }
+                    }
                 }
+//                if (i == trList.size() - 1){
+//                    List<HtmlElement> pageCountDiv = htmlPage.getByXPath("//div[@class='rt edu-pagination paginationDom']");
+//                    DomNodeList<HtmlElement> span = pageCountDiv.get(0).getElementsByTagName("span");
+//                    HtmlElement pageCountText = span.get(0);
+//                    System.out.println(pageCountText.asText());
+//                    String[] split = pageCountText.asText().split("/");
+//                    String[] preSplit = split[0].split("页");
+//                    String[] afterSplit = split[1].split("页");
+//                    int preCount = Integer.valueOf(preSplit[0]);
+//                    int afterCount = Integer.valueOf(afterSplit[0]);
+//                    if (preCount != afterCount){
+//
+//                    }
+//                }
             }
         } catch (IOException e) {
             e.printStackTrace();
