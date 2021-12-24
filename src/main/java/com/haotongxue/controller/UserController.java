@@ -384,14 +384,14 @@ public class UserController {
 
     @ApiOperation("学生评教")
     @PostMapping("/evaluate")
-//    public R studentEvaluate(@RequestHeader("Authority") @ApiParam("放在请求头的token") String authority){
-    public R studentEvaluate(){
-//        String currentOpenid = UserContext.getCurrentOpenid();
-//        User user = (User) cache.get(currentOpenid);
-        String no = "202010244304";
-        String password = "Ctc779684470...";
-//        String no = user.getNo();
-//        String password = user.getPassword();
+    public R studentEvaluate(@RequestHeader("Authority") @ApiParam("放在请求头的token") String authority){
+//    public R studentEvaluate(){
+        String currentOpenid = UserContext.getCurrentOpenid();
+        User user = (User) cache.get(currentOpenid);
+//        String no = "202010244304";
+//        String password = "Ctc779684470...";
+        String no = user.getNo();
+        String password = user.getPassword();
         for (int i=0;i<10;i++){
             WebClient webClient = WebClientUtils.getWebClient();
             try {
