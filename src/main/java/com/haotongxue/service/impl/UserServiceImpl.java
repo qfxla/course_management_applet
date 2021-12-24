@@ -135,6 +135,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                             DomNodeList<HtmlElement> aTwo = evaluate.getElementsByTagName("a");
                             HtmlPage afterClick = aTwo.get(0).click();
                             //System.out.println(afterClick.asText());
+                            beginEva(afterClick);
                         }
                         if (j == dataListTrList.size() - 1){
                             List<HtmlElement> pageCountDiv = evaluatePage.getByXPath("//div[@class='rt edu-pagination paginationDom']");
@@ -174,7 +175,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return false;
+        return true;
     }
 
 
