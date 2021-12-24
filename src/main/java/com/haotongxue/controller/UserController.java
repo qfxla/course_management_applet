@@ -130,10 +130,9 @@ public class UserController {
                     CourseException courseException = (CourseException) e;
                     if (courseException.getCode().equals(400)){
                         return R.error().code(ResultCode.NO_OR_PASSWORD_ERROR);
-                    }else {
-                        return R.error().code(ResultCode.EDU_PROBLEM);
                     }
                 }
+                return R.error().code(ResultCode.EDU_PROBLEM);
             }
             user = new User();
             BeanUtils.copyProperties(loginDTO,user);
