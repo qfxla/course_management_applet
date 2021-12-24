@@ -34,10 +34,12 @@ public class LoginUtils {
             throw new CourseException(440,"教务网的问题");
         }
         List<HtmlElement> byXPath = afterClick.getByXPath("//div[@class='tips']");
-        DomNode firstChild = byXPath.get(0).getFirstChild();
-        //System.out.println(firstChild.asText());
-        if ("Invalid credentials.".equals(firstChild.asText())){
-            throw new CourseException(400,"密码或账号错误");
+        DomNodeList<HtmlElement> span = byXPath.get(0).getElementsByTagName("span");
+        if (span != null && !span.isEmpty()){
+            //System.out.println(firstChild.asText());
+            if ("Invalid credentials.".equals(span.get(0).asText())){
+                throw new CourseException(400,"密码或账号错误");
+            }
         }
         throw new CourseException(440,"教务网的问题");
     }
