@@ -121,7 +121,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 DomNode isEvaluate = tdList.get(tdList.size() - 2);
                 //System.out.println(isEvaluate.asText());
                 if ("否".equals(isEvaluate.asText())){
-                    System.out.println("-------->第一次点");
+                    //System.out.println("-------->第一次点");
                     HtmlElement gotoEvaluate = tdList.get(tdList.size() - 1);
                     DomNodeList<HtmlElement> a = gotoEvaluate.getElementsByTagName("a");
                     HtmlPage evaluatePage = a.get(0).click();

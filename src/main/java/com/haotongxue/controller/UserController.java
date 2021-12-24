@@ -387,18 +387,20 @@ public class UserController {
     public R studentEvaluate(){
         String no = "202010244504";
         String password = "Zhku182311";
-        while (true){
+        for (int i=0;i<10;i++){
             WebClient webClient = WebClientUtils.getWebClient();
             try {
                 LoginUtils.login(webClient,no,password);
-                userService.studentEvaluate(webClient);
+                if (userService.studentEvaluate(webClient)){
+                    return R.ok();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 continue;
             }
             break;
         }
-        return R.ok();
+        return R.error();
     }
 }
 
