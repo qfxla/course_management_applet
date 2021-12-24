@@ -422,25 +422,25 @@ public class UserController {
             nickNames.add(user.getNo());
             String openId = user.getOpenid();
             System.out.println("删除所有缓存和数据-----" + openId);
-//            cache.invalidate(openId);
-//            for (int i = 1;i <= 20;i++){
-//                courseCache.invalidate("cour" + openId + ":" + i);
-//            }
-//            QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
-//            wrapper.eq("openid",openId);
-//            List<String> infoList = iUserInfoService.list(wrapper).stream().map(UserInfo::getInfoId).collect(Collectors.toList());
-//            if(infoList.size() != 0){
-//                infoSectionMapper.deleteByInfoId(infoList);
-//                infoWeekMapper.deleteByInfoId(infoList);
-//                infoCourseMapper.deleteByInfoId(infoList);
-//                infoClassroomMapper.deleteByInfoId(infoList);
-//                infoTeacherMapper.deleteByInfoId(infoList);
-//                infoMapper.deleteByInfoId(infoList);
-//                userInfoMapper.deleteByInfoId(infoList);
-//            }
-//            countDownMapper.deleteByOpenId(openId);
-//            userSelectedMapper.deleteByOpenId(openId);
-//            userMapper.deleteByInfoId(openId);
+            cache.invalidate(openId);
+            for (int i = 1;i <= 20;i++){
+                courseCache.invalidate("cour" + openId + ":" + i);
+            }
+            QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
+            wrapper.eq("openid",openId);
+            List<String> infoList = iUserInfoService.list(wrapper).stream().map(UserInfo::getInfoId).collect(Collectors.toList());
+            if(infoList.size() != 0){
+                infoSectionMapper.deleteByInfoId(infoList);
+                infoWeekMapper.deleteByInfoId(infoList);
+                infoCourseMapper.deleteByInfoId(infoList);
+                infoClassroomMapper.deleteByInfoId(infoList);
+                infoTeacherMapper.deleteByInfoId(infoList);
+                infoMapper.deleteByInfoId(infoList);
+                userInfoMapper.deleteByInfoId(infoList);
+            }
+            countDownMapper.deleteByOpenId(openId);
+            userSelectedMapper.deleteByOpenId(openId);
+            userMapper.deleteByInfoId(openId);
         }
         if(nickNames.size()!=0){
             return nickNames;
