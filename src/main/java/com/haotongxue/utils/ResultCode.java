@@ -18,4 +18,6 @@ public interface ResultCode {
     Integer NEED_REFRESH_INFO = 20005; //需要重新获取用户信息，以达到最新
 
     Integer NO_TARGET = 20006; //不是我们的目标
+
+    Integer EDU_PROBLEM = 20007; //教务网的问题
 }

@@ -7,6 +7,6 @@ import java.io.IOException;
  * @creat 2021-11-26-8:09
  */
 public interface getFreeRoomService {
-    void paFreeRoom() throws IOException;
-    void paFreeRoom2() throws IOException;
+    void paFreeRoom() throws Exception;
+    void paFreeRoom2() throws Exception;
 }

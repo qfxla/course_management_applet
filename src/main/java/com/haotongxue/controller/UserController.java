@@ -9,6 +9,7 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.haotongxue.entity.*;
 import com.haotongxue.entity.dto.PushSettingDTO;
 import com.haotongxue.entity.dto.WeChatLoginDTO;
+import com.haotongxue.exceptionhandler.CourseException;
 import com.haotongxue.handler.ReptileHandler;
 import com.haotongxue.handler.WatchIsPaingHandler;
 import com.haotongxue.mapper.*;
@@ -94,7 +95,7 @@ public class UserController {
 
     @ApiOperation(value = "微信登录")
     @PostMapping("/login")
-    public R login(@RequestBody WeChatLoginDTO loginDTO) throws IOException {
+    public R login(@RequestBody WeChatLoginDTO loginDTO) {
         WeChatLoginResponse loginResponse = userService.getLoginResponse(loginDTO.getCode());
         String openid = loginResponse.getOpenid();
         String unionid = loginResponse.getUnionid();
@@ -120,10 +121,19 @@ public class UserController {
             }
 
             webClient = WebClientUtils.getWebClient();
-            HtmlPage afterLogin = LoginUtils.login(webClient, loginDTO.getNo(), loginDTO.getPassword());
+            try {
+                LoginUtils.login(webClient, loginDTO.getNo(), loginDTO.getPassword());
 
-            if (afterLogin == null){
-                return R.error().code(ResultCode.NO_OR_PASSWORD_ERROR);
+            }catch (Exception e){
+                e.printStackTrace();
+                if (e instanceof CourseException){
+                    CourseException courseException = (CourseException) e;
+                    if (courseException.getCode().equals(400)){
+                        return R.error().code(ResultCode.NO_OR_PASSWORD_ERROR);
+                    }else {
+                        return R.error().code(ResultCode.EDU_PROBLEM);
+                    }
+                }
             }
             user = new User();
             BeanUtils.copyProperties(loginDTO,user);
@@ -185,7 +195,7 @@ public class UserController {
 
     @ApiOperation("修改用户密码")
     @PostMapping("/authority")
-    public R editPassword(@RequestBody PasswordEditEntity passwordEditEntity) throws IOException {
+    public R editPassword(@RequestBody PasswordEditEntity passwordEditEntity) throws Exception {
         String no = passwordEditEntity.getNo();
         String password = passwordEditEntity.getPassword();
         if (StringUtils.isEmpty(no) || StringUtils.isEmpty(password)){
@@ -321,12 +331,17 @@ public class UserController {
         }
         WebClient webClient = WebClientUtils.getWebClient();
         try {
-            HtmlPage login = LoginUtils.login(webClient, user.getNo(), user.getPassword());
-            if (login == null){
-                return R.error().code(ResultCode.NO_OR_PASSWORD_ERROR);
+            LoginUtils.login(webClient, user.getNo(), user.getPassword());
+        } catch (Exception e) {
+            //e.printStackTrace();
+            if (e instanceof CourseException){
+                CourseException courseException = (CourseException) e;
+                if (courseException.getCode().equals(400)){
+                    return R.error().code(ResultCode.NO_OR_PASSWORD_ERROR);
+                }else {
+                    return R.error().code(ResultCode.EDU_PROBLEM);
+                }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         return R.ok();
     }
@@ -365,6 +380,22 @@ public class UserController {
 
         userMapper.deleteByInfoId(openid);
         return R.ok().data("msg","清除成功");
+    }
+
+    @ApiOperation("学生评教")
+    @PostMapping("/evaluate")
+    public R studentEvaluate(){
+        String no = "202010244504";
+        String password = "Zhku182311";
+        WebClient webClient = WebClientUtils.getWebClient();
+        try {
+            LoginUtils.login(webClient,no,password);
+            userService.studentEvaluate(webClient);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return R.error();
+        }
+        return R.ok();
     }
 }
 

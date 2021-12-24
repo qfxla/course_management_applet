@@ -31,5 +31,5 @@ public interface IInfoService extends IService<Info> {
     int insertInfo(Info info);
 
     //重新获取课程表数据
-    boolean updateCourseData() throws IOException;
+    boolean updateCourseData() throws Exception;
 }

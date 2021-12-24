@@ -99,7 +99,7 @@ public class InfoController {
 
     @ApiOperation(value = "重新爬取课程表数据")
     @GetMapping("/updateCourseData")
-    public R updateCourseData() throws IOException {
+    public R updateCourseData() throws Exception {
         String openId = UserContext.getCurrentOpenid();
         boolean b = iInfoService.updateCourseData();
         //删除缓存

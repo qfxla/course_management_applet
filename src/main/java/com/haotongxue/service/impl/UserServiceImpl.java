@@ -2,7 +2,11 @@ package com.haotongxue.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.DomNode;
+import com.gargoylesoftware.htmlunit.html.DomNodeList;
+import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.haotongxue.entity.User;
 import com.haotongxue.entity.WeChatLoginResponse;
@@ -20,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -102,4 +107,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     }
 
+    @Override
+    public boolean studentEvaluate(WebClient webClient) {
+        try {
+            HtmlPage htmlPage = webClient.getPage("http://edu-admin.zhku.edu.cn/jsxsd/xspj/xspj_find.do");
+            List<HtmlElement> table = htmlPage.getByXPath("//table[@class='layui-table']");
+            DomNode tbody = table.get(0).getFirstChild();
+            DomNodeList<DomNode> childNodes = tbody.getChildNodes();
+            for (int i=1;i<childNodes.size();i++){
+                DomNode tr = childNodes.get(i);
+                DomNodeList<DomNode> tdList = tr.getChildNodes();
+                DomNode isEvaluate = tdList.get(tdList.size() - 2);
+                if ("否".equals(isEvaluate.asText())){
+                    HtmlElement gotoEvaluate = (HtmlElement) tdList.get(tdList.size() - 1);
+                    HtmlPage evaluatePage = gotoEvaluate.click();
+                    System.out.println(evaluatePage.asText());
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

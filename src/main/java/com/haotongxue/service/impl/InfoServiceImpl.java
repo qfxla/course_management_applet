@@ -256,7 +256,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public boolean updateCourseData() throws IOException {
+    public boolean updateCourseData() throws Exception {
         String openId = UserContext.getCurrentOpenid();
         UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("openid",openId).set("is_pa",0);

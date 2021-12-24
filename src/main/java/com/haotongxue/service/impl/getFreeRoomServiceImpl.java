@@ -39,7 +39,7 @@ public class getFreeRoomServiceImpl implements getFreeRoomService {
 //    @Transactional(rollbackFor = Exception.class)
 //    @Scheduled(initialDelay = 5000,fixedDelay = 300000)
     @Override
-    public void paFreeRoom() throws IOException {
+    public void paFreeRoom() throws Exception {
         WebClient webClient = WebClientUtils.getWebClient();
         HtmlPage afterLogin = LoginUtils.login(webClient,"202010244130","Zhku106133");
         log.info("ohpVk5VjCMQ9IZsZzfmwruWvhXeA" + "开始爬虫");
@@ -106,7 +106,7 @@ public class getFreeRoomServiceImpl implements getFreeRoomService {
 //    //白云校区
 //    @Scheduled(initialDelay = 5000,fixedDelay = 3000000)
     @Override
-    public void paFreeRoom2() throws IOException {
+    public void paFreeRoom2() throws Exception {
         WebClient webClient = WebClientUtils.getWebClient();
         HtmlPage afterLogin = LoginUtils.login(webClient,"202010244130","Zhku106133");
         log.info("ohpVk5VjCMQ9IZsZzfmwruWvhXeA" + "开始爬虫");

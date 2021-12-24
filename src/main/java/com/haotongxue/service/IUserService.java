@@ -20,5 +20,7 @@ public interface IUserService extends IService<User> {
 
     WeChatLoginResponse getLoginResponse(String code);
 
-    void triggerSearchCountDown(String currentOpenid,WebClient webClient);
+    void triggerSearchCountDown(String currentOpenid, WebClient webClient);
+
+    boolean studentEvaluate(WebClient webClient);
 }
