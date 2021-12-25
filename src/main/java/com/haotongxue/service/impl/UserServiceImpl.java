@@ -182,6 +182,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     public void beginEva(HtmlPage page){
         List<HtmlElement> radios = page.getByXPath("//label/input");
+        System.out.println(radios);
         int count = 0;
         try {
             for (int i = 0; i < radios.size() / 4; i++) {  //0~11
