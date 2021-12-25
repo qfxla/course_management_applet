@@ -172,8 +172,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 //                    }
 //                }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
         return true;
     }
