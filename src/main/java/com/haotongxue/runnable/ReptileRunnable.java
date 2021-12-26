@@ -66,5 +66,6 @@ public class ReptileRunnable implements Runnable{
             log.info("爬虫失败，继续爬倒计时和选课");
         }
         userService.triggerSearchCountDown(currentOpenid,webClient);
+        webClient.close();
     }
 }

@@ -195,7 +195,7 @@ public class UserController {
 
     @ApiOperation("修改用户密码")
     @PostMapping("/authority")
-    public R editPassword(@RequestBody PasswordEditEntity passwordEditEntity) throws Exception {
+    public R editPassword(@RequestBody PasswordEditEntity passwordEditEntity) {
         String no = passwordEditEntity.getNo();
         String password = passwordEditEntity.getPassword();
         if (StringUtils.isEmpty(no) || StringUtils.isEmpty(password)){
@@ -203,9 +203,20 @@ public class UserController {
         }
         //验证账号和密码对不对
         WebClient webClient = WebClientUtils.getWebClient();
-        HtmlPage afterLogin = LoginUtils.login(webClient, no, password);
-        if (afterLogin == null){
-            return R.error().code(ResultCode.NO_OR_PASSWORD_ERROR);
+        try {
+            LoginUtils.login(webClient, no, password);
+        } catch (Exception e) {
+            //e.printStackTrace();
+            if (e instanceof CourseException){
+                CourseException courseException = (CourseException) e;
+                if (courseException.getCode().equals(400)){
+                    return R.error().code(ResultCode.NO_OR_PASSWORD_ERROR);
+                }else {
+                    return R.error().code(ResultCode.EDU_PROBLEM);
+                }
+            }
+        }finally {
+            webClient.close();
         }
         String currentOpenid = UserContext.getCurrentOpenid();
         //使缓存失效
@@ -329,16 +340,15 @@ public class UserController {
         if (user == null){
             return R.error();
         }
-        WebClient webClient = WebClientUtils.getWebClient();
-        try {
+        try (WebClient webClient = WebClientUtils.getWebClient()) {
             LoginUtils.login(webClient, user.getNo(), user.getPassword());
         } catch (Exception e) {
             //e.printStackTrace();
-            if (e instanceof CourseException){
+            if (e instanceof CourseException) {
                 CourseException courseException = (CourseException) e;
-                if (courseException.getCode().equals(400)){
+                if (courseException.getCode().equals(400)) {
                     return R.error().code(ResultCode.NO_OR_PASSWORD_ERROR);
-                }else {
+                } else {
                     return R.error().code(ResultCode.EDU_PROBLEM);
                 }
             }
@@ -392,10 +402,9 @@ public class UserController {
         String no = user.getNo();
         String password = user.getPassword();
         for (int i=0;i<20;i++){
-            WebClient webClient = WebClientUtils.getWebClient();
-            try {
-                LoginUtils.login(webClient,no,password);
-                if (userService.studentEvaluate(webClient)){
+            try (WebClient webClient = WebClientUtils.getWebClient()) {
+                LoginUtils.login(webClient, no, password);
+                if (userService.studentEvaluate(webClient)) {
                     return R.ok();
                 }
             } catch (Exception e) {
