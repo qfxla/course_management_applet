@@ -71,7 +71,8 @@ public class CountDownController {
             LocalDateTime startTime = countDownVo.getStartTime();
             long now = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
             long start = startTime.toInstant(ZoneOffset.of("+8")).toEpochMilli();
-            int countDownHour = (int) ((start - now) / (1000 * 60 * 60) - 8);
+//            int countDownHour = (int) ((start - now) / (1000 * 60 * 60) - 8);
+            int countDownHour = (int) ((start - now) / (1000 * 60 * 60));
             countDownVo.setCountDownHour(countDownHour);
         }
         List<CountDownVo> listVo = listVo1.stream().sorted(Comparator.comparing(CountDownVo::getCountDownHour)).collect(Collectors.toList());
