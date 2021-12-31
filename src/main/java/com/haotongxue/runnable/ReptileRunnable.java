@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.haotongxue.entity.User;
+import com.haotongxue.service.GradeService;
 import com.haotongxue.service.IUserService;
 import com.haotongxue.service.ReptileService;
 import com.haotongxue.utils.GetBeanUtil;
@@ -34,6 +35,8 @@ public class ReptileRunnable implements Runnable{
     private ReptileService reptileService = GetBeanUtil.getBean(ReptileService.class);
 
     private IUserService userService = GetBeanUtil.getBean(IUserService.class);
+
+    private GradeService gradeService = GetBeanUtil.getBean(GradeService.class);
 
     public ReptileRunnable(WebClient webClient, String no, String password,String currentOpenid,ReReptileRunnable reptileRunnable) {
         this.webClient = webClient;
@@ -66,6 +69,7 @@ public class ReptileRunnable implements Runnable{
             log.info("爬虫失败，继续爬倒计时和选课");
         }
         userService.triggerSearchCountDown(currentOpenid,webClient);
+        gradeService.paGrade(currentOpenid,webClient);
         webClient.close();
     }
 }

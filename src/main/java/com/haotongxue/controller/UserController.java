@@ -93,6 +93,9 @@ public class UserController {
     @Autowired
     private IOfficialUserService officialUserService;
 
+    @Autowired
+    private GradeService gradeService;
+
 
     @ApiOperation(value = "微信登录")
     @PostMapping("/login")
@@ -457,5 +460,10 @@ public class UserController {
             return nickNames;
         }
     }
+
+//    @PostMapping("/insertGrade")
+//    public int insertGrade(){
+//        return gradeService.paGrade();
+//    }
 }
 

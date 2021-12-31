@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -328,6 +330,9 @@ public class CountDownController {
                 }else if(banJiStr.contains("文管")){
                     zhuanye = "34";
                 }else{
+//                    int[] arr = new Integer(){1,2,3};       //错
+//                    int[] arr = new int(){1,2,3};       //错
+//                    int[] arr = new int[]{1,2,3};       //对
                     throw new CourseException(555,"没有这个专业");
                 }
                 String grade = gradeClassNum.substring(0,2);
