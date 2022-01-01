@@ -3,6 +3,7 @@ package com.haotongxue.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.haotongxue.cacheUtil.LoadingRedisCache;
 import com.haotongxue.entity.CollegeBigSmall;
 import com.haotongxue.entity.Selected;
 import com.haotongxue.entity.User;
@@ -52,8 +53,11 @@ public class SelectedController {
     SelectedMapper selectedMapper;
     @Autowired
     ICollegeBigSmallService iCollegeBigSmallService;
+//    @Resource(name = "loginCache")
+//    LoadingCache loginCache;
+
     @Resource(name = "loginCache")
-    LoadingCache loginCache;
+    LoadingRedisCache loginCache;
 
 
 

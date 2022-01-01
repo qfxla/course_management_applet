@@ -3,6 +3,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.haotongxue.cacheUtil.LoadingRedisCache;
 import com.haotongxue.entity.*;
 import com.haotongxue.entity.vo.AddCourseVo;
 import com.haotongxue.mapper.InfoMapper;
@@ -41,14 +42,23 @@ public class InfoController {
     @Autowired
     private InfoMapper infoMapper;
 
+//    @Resource(name = "loginCache")
+//    LoadingCache<String,Object> userCache;
+
     @Resource(name = "loginCache")
-    LoadingCache<String,Object> userCache;
+    LoadingRedisCache userCache;
+
+//    @Resource(name = "weekCache")
+//    LoadingCache<String,Object> weekCache;
 
     @Resource(name = "weekCache")
-    LoadingCache<String,Object> weekCache;
+    LoadingRedisCache weekCache;
+
+//    @Resource(name = "courseCache")
+//    LoadingCache<String,Object> courseCache;
 
     @Resource(name = "courseCache")
-    LoadingCache<String,Object> courseCache;
+    LoadingRedisCache courseCache;
 
     @Autowired
     AddCourseService addCourseService;

@@ -2,6 +2,7 @@ package com.haotongxue.controller;
 
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.haotongxue.cacheUtil.LoadingRedisCache;
 import com.haotongxue.utils.R;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +25,11 @@ import javax.annotation.Resource;
 @RequestMapping("/zkCourse/week")
 public class WeekController {
 
+//    @Resource(name = "weekCache")
+//    LoadingCache<String,Object> weekCache;
+
     @Resource(name = "weekCache")
-    LoadingCache<String,Object> weekCache;
+    LoadingRedisCache weekCache;
 
     @ApiOperation(value = "获得当前是哪周")
     @GetMapping()

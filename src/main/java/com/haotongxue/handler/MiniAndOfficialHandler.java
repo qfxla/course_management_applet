@@ -3,6 +3,7 @@ package com.haotongxue.handler;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.haotongxue.cacheUtil.LoadingRedisCache;
 import com.haotongxue.entity.OfficialUser;
 import com.haotongxue.entity.User;
 import com.haotongxue.exceptionhandler.CourseException;
@@ -31,8 +32,12 @@ public class MiniAndOfficialHandler {
     @Autowired
     IOfficialUserService officialUserService;
 
+//    @Resource(name = "loginCache")
+//    LoadingCache<String,Object> cache;
+
     @Resource(name = "loginCache")
-    LoadingCache<String,Object> cache;
+    LoadingRedisCache cache;
+
     /**
      * 确认用户是否有订阅课程推送
      */

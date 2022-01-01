@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.gargoylesoftware.htmlunit.*;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.haotongxue.cacheUtil.LoadingRedisCache;
 import com.haotongxue.entity.*;
 import com.haotongxue.entity.dto.PushSettingDTO;
 import com.haotongxue.entity.dto.WeChatLoginDTO;
@@ -28,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -53,10 +53,17 @@ public class UserController {
     @Autowired
     IUserService userService;
 
+//    @Resource(name = "loginCache")
+//    LoadingCache<String,Object> cache;
+
     @Resource(name = "loginCache")
-    LoadingCache<String,Object> cache;
+    LoadingRedisCache cache;
+
+//    @Resource(name = "courseCache")
+//    LoadingCache<String,Object> courseCache;
+
     @Resource(name = "courseCache")
-    LoadingCache<String,Object> courseCache;
+    LoadingRedisCache courseCache;
 
     @Autowired
     EduLoginService eduLoginService;
@@ -307,17 +314,17 @@ public class UserController {
         return R.ok().data("msg","清除成功");
     }
 
-    @ApiOperation("删除所有人的登录缓存")
-    @GetMapping("/deleteAllLoginCache")
-    public R deleteAllLoginCache(){
-        ConcurrentMap<@NonNull String, @NonNull Object> map = cache.asMap();
-        Set<Map.Entry<@NonNull String, @NonNull Object>> set = map.entrySet();
-        for (Map.Entry<String, Object> entry : set) {
-            cache.invalidate(entry.getKey());
-        }
-
-        return R.ok();
-    }
+//    @ApiOperation("删除所有人的登录缓存")
+//    @GetMapping("/deleteAllLoginCache")
+//    public R deleteAllLoginCache(){
+//        ConcurrentMap<@NonNull String, @NonNull Object> map = cache.asMap();
+//        Set<Map.Entry<@NonNull String, @NonNull Object>> set = map.entrySet();
+//        for (Map.Entry<String, Object> entry : set) {
+//            cache.invalidate(entry.getKey());
+//        }
+//
+//        return R.ok();
+//    }
 
     @ApiOperation("只删某个人的登录缓存")
     @GetMapping("/authority/justDeleteCache")

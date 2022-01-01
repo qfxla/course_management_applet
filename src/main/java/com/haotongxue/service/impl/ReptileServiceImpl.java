@@ -5,6 +5,7 @@ import com.gargoylesoftware.htmlunit.ScriptException;
 import com.gargoylesoftware.htmlunit.html.DomNodeList;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.javascript.JavaScriptErrorListener;
+import com.haotongxue.cacheUtil.LoadingRedisCache;
 import com.haotongxue.entity.CountDown;
 import com.haotongxue.entity.RenWenCountDown;
 import com.haotongxue.mapper.*;
@@ -83,8 +84,11 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
     @Resource
     IUserService iUserService;
 
+//    @Resource(name = "loginCache")
+//    LoadingCache<String,Object> cache;
+
     @Resource(name = "loginCache")
-    LoadingCache<String,Object> cache;
+    LoadingRedisCache cache;
 
     @Resource
     CountDownMapper countDownMapper;

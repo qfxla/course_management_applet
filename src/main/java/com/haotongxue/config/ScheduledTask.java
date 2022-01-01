@@ -1,6 +1,7 @@
 package com.haotongxue.config;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.haotongxue.cacheUtil.LoadingRedisCache;
 import com.haotongxue.mapper.InfoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -21,8 +22,11 @@ public class ScheduledTask {
     @Autowired
     InfoMapper infoMapper;
 
+//    @Resource(name = "weekCache")
+//    LoadingCache<String,Object> weekCache;
+
     @Resource(name = "weekCache")
-    LoadingCache<String,Object> weekCache;
+    LoadingRedisCache weekCache;
 
 //    @Scheduled(cron = "1 0 0 ? * MON")  //星期一0点1秒
     public void updateCurrentWeek(){

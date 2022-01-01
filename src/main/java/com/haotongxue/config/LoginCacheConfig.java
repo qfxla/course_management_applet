@@ -3,6 +3,9 @@ package com.haotongxue.config;
 import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.haotongxue.cacheUtil.LoadingRedisCache;
+import com.haotongxue.cacheUtil.MyRedis;
+import com.haotongxue.cacheUtil.RedisLoader;
 import com.haotongxue.entity.*;
 import com.haotongxue.mapper.InfoMapper;
 import com.haotongxue.service.*;
@@ -21,24 +24,34 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
-public class CaffeineConfig {
+public class LoginCacheConfig {
 
     @Autowired
     IUserService userService;
+
+    @Autowired
+    MyRedis myRedis;
 
     /**
      * 用于做商品的本地缓存处理
      * @return
      */
+//    @Bean("loginCache")
+//    public LoadingCache<String,Object> getCache(){
+//        return Caffeine.newBuilder()
+//                .expireAfterWrite(3,TimeUnit.DAYS)
+//                .build(new CacheLoader<String, Object>() {
+//                    @Override
+//                    public @Nullable Object load(String key) throws Exception {
+//                        return userService.getById(key);
+//                    }
+//                });
+//    }
+
     @Bean("loginCache")
-    public LoadingCache<String,Object> getCache(){
-        return Caffeine.newBuilder()
+    public LoadingRedisCache getCache(){
+        return myRedis.newBuilder()
                 .expireAfterWrite(3,TimeUnit.DAYS)
-                .build(new CacheLoader<String, Object>() {
-                    @Override
-                    public @Nullable Object load(String key) throws Exception {
-                        return userService.getById(key);
-                    }
-                });
+                .build(key -> userService.getById(key));
     }
 }

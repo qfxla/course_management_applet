@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.haotongxue.cacheUtil.LoadingRedisCache;
 import com.haotongxue.entity.*;
 import com.haotongxue.entity.vo.CourseVo;
 import com.haotongxue.entity.vo.TodayCourseVo;
@@ -51,8 +52,11 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
     @Autowired
     private InfoMapper infoMapper;
 
+//    @Resource(name = "courseInfo")
+//    LoadingCache<String,Object> cache;
+
     @Resource(name = "courseInfo")
-    LoadingCache<String,Object> cache;
+    LoadingRedisCache cache;
 
 
     @Autowired
@@ -61,8 +65,11 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
     private IInfoClassroomService iInfoClassroomService;
     @Autowired
     private IInfoTeacherService iInfoTeacherService;
+//    @Resource(name = "weekCache")
+//    LoadingCache<String,Object> weekCache;
+
     @Resource(name = "weekCache")
-    LoadingCache<String,Object> weekCache;
+    LoadingRedisCache weekCache;
     @Autowired
     private InfoSectionMapper infoSectionMapper;
     @Autowired
@@ -85,8 +92,11 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
     private ReptileHandler reptileHandler;
     @Autowired
     private WatchIsPaingHandler WatchIsPaingHandler;
+//    @Resource(name = "loginCache")
+//    LoadingCache<String,Object> loginCache;
+
     @Resource(name = "loginCache")
-    LoadingCache<String,Object> loginCache;
+    LoadingRedisCache loginCache;
     @Autowired
     private IUserService iUserService;
 

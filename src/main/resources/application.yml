@@ -23,6 +23,17 @@ spring:
       # 数据库连接超时时间,默认30秒，即30000
       connection-timeout: 30000
       connection-test-query: SELECT 1
+  redis:
+    host: 120.77.183.115
+    port: 6379
+    database: 0
+    timeout: 1800000
+    lettuce:
+      pool:
+        max-active: 20
+        max-wait: -1
+        max-idle: 5
+        min-idle: 0
 
 server:
   port: 9001
@@ -39,3 +50,4 @@ mybatis-plus:
 wechat:
   appid: wx07ba00d351fa34c4
   secret: 70426973c5a4eda1ad65c8d79d76a594
+

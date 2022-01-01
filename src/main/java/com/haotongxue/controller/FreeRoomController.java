@@ -2,6 +2,7 @@ package com.haotongxue.controller;
 
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.haotongxue.cacheUtil.LoadingRedisCache;
 import com.haotongxue.entity.vo.FreeRoomVo;
 import com.haotongxue.service.FreeRoomVoService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,8 +31,11 @@ public class FreeRoomController {
     FreeRoomVoService freeRoomVoService;
 
 
+//    @Resource(name = "freeRoomCache")
+//    LoadingCache<String,Object> freeRoomCache;
+
     @Resource(name = "freeRoomCache")
-    LoadingCache<String,Object> freeRoomCache;
+    LoadingRedisCache freeRoomCache;
 
     @GetMapping("/getFreeByFour")
     public List<FreeRoomVo> getFreeByFour(@RequestParam("campus") String campus,

@@ -1,6 +1,7 @@
 package com.haotongxue.service.impl;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.haotongxue.cacheUtil.LoadingRedisCache;
 import com.haotongxue.entity.vo.AddCourseVo;
 import com.haotongxue.exceptionhandler.CourseException;
 import com.haotongxue.mapper.AddCourseMapper;
@@ -49,8 +50,11 @@ public class AddCourseServiceImpl implements AddCourseService {
     @Resource
     IUserInfoService iUserInfoService;
 
+//    @Resource(name = "courseCache")
+//    LoadingCache<String,Object> cache;
+
     @Resource(name = "courseCache")
-    LoadingCache<String,Object> cache;
+    LoadingRedisCache cache;
 
     @Resource
     AddCourseMapper addCourseMapper;
