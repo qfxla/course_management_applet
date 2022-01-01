@@ -1,8 +1,5 @@
 package com.haotongxue.service.impl;
 
-import com.baomidou.mybatisplus.core.MybatisConfiguration;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.haotongxue.controller.SelectedController;
 import com.haotongxue.entity.Selected;
 import com.haotongxue.entity.SmallKind;
 import com.haotongxue.entity.vo.SelectedRuleVo;
@@ -13,15 +10,13 @@ import com.haotongxue.mapper.SelectedMapper;
 import com.haotongxue.service.ISelectedService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.haotongxue.service.ISmallKindService;
-import com.haotongxue.utils.UserContext;
-import com.haotongxue.utils.WhichGrade;
+import com.haotongxue.utils.WhichUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.swing.plaf.TableUI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -59,7 +54,7 @@ public class SelectedServiceImpl extends ServiceImpl<SelectedMapper, Selected> i
 
 
         //16版的轻工分专业
-        if (WhichGrade.whichGrade(no) == 16 && (no.substring(5,8).equals("072") || no.substring(5,8).equals("073"))){
+        if (WhichUtils.whichGrade(no) == 16 && (no.substring(5,8).equals("072") || no.substring(5,8).equals("073"))){
             List<SelectedRuleVo> qingGongRule = isQingGong(openid);
             return qingGongRule;
         }

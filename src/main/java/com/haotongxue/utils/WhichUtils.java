@@ -3,8 +3,6 @@ package com.haotongxue.utils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.haotongxue.entity.College;
 import com.haotongxue.service.ICollegeService;
-import com.haotongxue.service.impl.CollegeServiceImpl;
-import org.checkerframework.framework.qual.PolyAll;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -12,10 +10,10 @@ import javax.annotation.PostConstruct;
 
 /**
  * @author zcj
- * @creat 2021-12-09-12:41
+ * @creat 2022-01-01-15:45
  */
 @Component
-public class WhichCollege {
+public class WhichUtils {
     static ICollegeService iCollegeService;
 
     @Autowired
@@ -86,4 +84,19 @@ public class WhichCollege {
         College college = iCollegeService.getOne(wrapper);
         return college.getId();
     }
+
+
+    //在选课时，看他人才培养方案是属于哪个年代的，如16,20
+    public static Integer whichGrade(String no){
+        int i = Integer.valueOf(no.substring(2,4));  //年级
+        int grade = 0;  //所使用的培养方案年代
+        if (i < 20){
+            grade = 16;
+        }else {
+            grade = 20;
+        }
+        return grade;
+    }
+
+    //查是哪个专业的
 }

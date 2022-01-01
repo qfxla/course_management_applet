@@ -85,10 +85,10 @@ public class SelectedController {
 
         //如果没有传参，默认为null
         if (collegeId == null){
-            collegeId = WhichCollege.getCollegeId(user.getNo());
+            collegeId = WhichUtils.getCollegeId(user.getNo());
         }
 
-        int grade = WhichGrade.whichGrade(user.getNo());
+        int grade = WhichUtils.whichGrade(user.getNo());
 
         List<SelectedRuleVo> ruleList = iSelectedService.getSelected(collegeId, openid,grade, user.getNo());
         if (ruleList == null || ruleList.size() == 0){
