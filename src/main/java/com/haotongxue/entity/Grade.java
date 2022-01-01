@@ -1,12 +1,11 @@
 package com.haotongxue.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModel;
 import lombok.*;
 import lombok.experimental.Accessors;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -39,6 +38,9 @@ public class Grade {
     private float score;
 
     private float gpa;
+
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createTime;
 
     public Grade(String openid, String term, String subject, String grade, String property, float score, float gpa) {
         this.openid = openid;

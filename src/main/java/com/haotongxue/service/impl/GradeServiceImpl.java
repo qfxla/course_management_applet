@@ -7,23 +7,14 @@ import com.gargoylesoftware.htmlunit.html.DomElement;
 import com.gargoylesoftware.htmlunit.html.DomNodeList;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.haotongxue.entity.CountDown;
 import com.haotongxue.entity.Grade;
-import com.haotongxue.entity.vo.AddCourseVo;
-import com.haotongxue.exceptionhandler.CourseException;
-import com.haotongxue.mapper.AddCourseMapper;
-import com.haotongxue.mapper.CountDownMapper;
 import com.haotongxue.mapper.GradeMapper;
 import com.haotongxue.service.*;
-import com.haotongxue.utils.LoginUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static com.haotongxue.utils.WebClientUtils.getWebClient;
@@ -38,11 +29,11 @@ public class GradeServiceImpl extends ServiceImpl<GradeMapper, Grade> implements
     public int paGrade(String openid, WebClient webClient){
 //    public int paGrade(){
 //        WebClient webClient = getWebClient();
-        try {
-            LoginUtils.login(webClient, "202010244304", "Ctc779684470...");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        try {
+//            LoginUtils.login(webClient, "202010244304", "Ctc779684470...");
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
         HtmlPage page = null;
         try {
             page = webClient.getPage("http://edu-admin.zhku.edu.cn/jsxsd/kscj/cjcx_list");
@@ -81,7 +72,13 @@ public class GradeServiceImpl extends ServiceImpl<GradeMapper, Grade> implements
                 }
             }
         }
-        System.out.println("考试总数：" + total);
+        System.out.println(openid + "---考试总数：" + total);
         return total > 0 ? total : -1;
+    }
+
+    @Override
+    public List<Grade> getGrade(String openid){
+        return gradeMapper.selectList(new QueryWrapper<Grade>()
+                .eq("openid",openid).orderByDesc("term").orderByDesc("create_time"));
     }
 }

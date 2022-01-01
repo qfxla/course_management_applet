@@ -11,4 +11,5 @@ import java.util.List;
 public interface GradeService extends IService<Grade> {
 //    public int paGrade();
     public int paGrade(String openid, WebClient webClient);
+    public List<Grade> getGrade(String openid);
 }
