@@ -37,7 +37,8 @@ public class GradeCacheConfig {
                    String term = split[1];
                    if (cacheType.equals("grade")){
                        List<Grade> gradeList = gradeMapper.selectList(new QueryWrapper<Grade>()
-                               .eq("openid",openId).orderByDesc("term").orderByDesc("create_time"));
+                               .eq("openid",openId).eq("term",term).
+                               orderByDesc("term").orderByDesc("create_time"));
                        return gradeList;
                    }
                    return null;

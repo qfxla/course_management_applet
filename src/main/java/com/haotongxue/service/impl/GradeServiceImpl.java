@@ -13,6 +13,7 @@ import com.haotongxue.exceptionhandler.CourseException;
 import com.haotongxue.mapper.GradeMapper;
 import com.haotongxue.mapper.UserMapper;
 import com.haotongxue.service.*;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,8 +21,7 @@ import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.haotongxue.utils.WebClientUtils.getWebClient;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Transactional(rollbackFor = Exception.class)
@@ -35,6 +35,9 @@ public class GradeServiceImpl extends ServiceImpl<GradeMapper, Grade> implements
 
     @Resource(name = "GradeCache")
     LoadingRedisCache gradeCache;
+
+    @Resource
+    RedisTemplate<Object, Grade> redisTemplate;
 
     public int paGrade(String openid, WebClient webClient){
 //    public int paGrade(){
@@ -55,9 +58,8 @@ public class GradeServiceImpl extends ServiceImpl<GradeMapper, Grade> implements
         DomElement dataList = page.getElementById("dataList");
         DomNodeList<HtmlElement> tr = dataList.getElementsByTagName("tr");
         boolean flag = true;
-//        String openid = "测试";
         int total = (tr.size()-1);
-        String ofOpenId = userMapper.getOfOpenidByOpenid(openid);
+//        String ofOpenId = userMapper.getOfOpenidByOpenid(openid);
         for (HtmlElement element : tr) {
             if(flag){
                 flag = false;
@@ -80,16 +82,16 @@ public class GradeServiceImpl extends ServiceImpl<GradeMapper, Grade> implements
             if(count == 0){
                 int insert = gradeMapper.insert(gradeObj);
                 if(insert == 1){
-                    if(gradeObj.getTerm().equals("2021-2022-1")){
-                        pushList.add(gradeObj);
-                    }
+//                    if(gradeObj.getTerm().equals("2021-2022-1")){
+//                        pushList.add(gradeObj);
+//                    }
                     System.out.println(openid + "---" + "插入考试成功---" + subject);
                 }
             }
         }
         System.out.println(openid + "---成绩总数：" + total);
-        String pushKey = "grade" + "==" +  ofOpenId;
-        gradeCache.put(pushKey,pushList);
+//        String pushKey = "grade" + "==" +  ofOpenId;
+//        gradeCache.put(pushKey,pushList);
         return total > 0 ? total : -1;
     }
 
@@ -132,10 +134,24 @@ public class GradeServiceImpl extends ServiceImpl<GradeMapper, Grade> implements
         }
         if(term == 10){
             return gradeMapper.selectList(new QueryWrapper<Grade>()
-                    .eq("openid",openId).orderByDesc("term").orderByDesc("create_time"));
+                    .eq("openid",openId).eq("term",termStr).orderByDesc("term").orderByDesc("create_time"));
         }else{
-            String key = "grade" + openId + ":" + termStr;
-            return (List<Grade>) gradeCache.get(key);
+            String key = "MyUnThisGrade" + openId + ":" + termStr;
+            List<Grade> unThisGradeList = null;
+            if(Boolean.TRUE.equals(redisTemplate.hasKey(key))){
+                unThisGradeList = redisTemplate.opsForList().range(key,0,-1);
+            }else{
+                unThisGradeList = gradeMapper.selectList(new QueryWrapper<Grade>()
+                        .eq("openid",openId).eq("term",termStr).orderByDesc("term").orderByDesc("create_time"));
+                System.out.println(key + "==" + redisTemplate.getExpire(key));
+                if(!(unThisGradeList == null || unThisGradeList.size() == 0)){
+                    redisTemplate.opsForList().rightPushAll(key,unThisGradeList);
+                    Boolean expire = redisTemplate.expire(key, 1, TimeUnit.DAYS);
+                    assert expire != null;
+                    System.out.println(redisTemplate.getExpire(key) + expire.toString());
+                }
+            }
+            return unThisGradeList;
         }
     }
 }
