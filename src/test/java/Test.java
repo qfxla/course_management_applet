@@ -2,7 +2,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.haotongxue.Main9001;
 import com.haotongxue.entity.College;
 import com.haotongxue.service.ICollegeService;
-import com.haotongxue.utils.WhichCollege;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.runner.RunWith;

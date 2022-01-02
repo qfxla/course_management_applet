@@ -3,6 +3,7 @@ package com.haotongxue.controller;
 
 import com.haotongxue.entity.Grade;
 import com.haotongxue.service.GradeService;
+import com.haotongxue.utils.UserContext;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,8 +26,10 @@ public class GradeController {
     @Resource
     GradeService gradeService;
 
-    @GetMapping("/getGrade")
-    public List<Grade> getGrade(@RequestParam("openid") String openid){
-        return gradeService.getGrade(openid);
+    @GetMapping("/authority/getGrade")
+    public List<Grade> getGrade(@RequestParam("term") int term) {
+        String openId = UserContext.getCurrentOpenid();
+//        openId = "ohpVk5SF3oodWNsodPzlmbiiHPXY";
+        return gradeService.getGrade(openId, term);
     }
 }

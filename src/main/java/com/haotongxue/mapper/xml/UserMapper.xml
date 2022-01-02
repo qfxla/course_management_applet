@@ -16,4 +16,9 @@
     <select id="selectPaing" resultType="com.haotongxue.entity.User">
         SELECT * FROM t_user WHERE is_paing=1;
     </select>
+
+    <select id="getOfOpenidByOpenid" resultType="java.lang.String">
+        SELECT o.openid FROM t_official_user o LEFT JOIN t_user u ON o.unionid = u.union_id
+        WHERE u.openid = #{openId}
+    </select>
 </mapper>
