@@ -136,17 +136,18 @@ public class GradeServiceImpl extends ServiceImpl<GradeMapper, Grade> implements
             return gradeMapper.selectList(new QueryWrapper<Grade>()
                     .eq("openid",openId).eq("term",termStr).orderByDesc("term").orderByDesc("create_time"));
         }else{
-            String key = "MyUnThisGrade" + openId + ":" + termStr;
+            String key = "QueryUnThisGrade" + openId + ":" + termStr;
             List<Grade> unThisGradeList = null;
             if(Boolean.TRUE.equals(redisTemplate.hasKey(key))){
                 unThisGradeList = redisTemplate.opsForList().range(key,0,-1);
+//                unThisGradeList = redisTemplate.boundListOps(key).range(0,-1);
             }else{
                 unThisGradeList = gradeMapper.selectList(new QueryWrapper<Grade>()
                         .eq("openid",openId).eq("term",termStr).orderByDesc("term").orderByDesc("create_time"));
                 System.out.println(key + "==" + redisTemplate.getExpire(key));
                 if(!(unThisGradeList == null || unThisGradeList.size() == 0)){
                     redisTemplate.opsForList().rightPushAll(key,unThisGradeList);
-                    Boolean expire = redisTemplate.expire(key, 1, TimeUnit.DAYS);
+                    Boolean expire = redisTemplate.expire(key, 7, TimeUnit.DAYS);
                     assert expire != null;
                     System.out.println(redisTemplate.getExpire(key) + expire.toString());
                 }
