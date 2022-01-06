@@ -4,6 +4,7 @@ package com.haotongxue.controller;
 import com.haotongxue.entity.Grade;
 import com.haotongxue.service.GradeService;
 import com.haotongxue.utils.UserContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,13 +24,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/zkCourse/grade")
 public class GradeController {
-    @Resource
+    @Autowired
     GradeService gradeService;
 
+//    @GetMapping("/getGrade")
     @GetMapping("/authority/getGrade")
     public List<Grade> getGrade(@RequestParam("term") int term) {
         String openId = UserContext.getCurrentOpenid();
-//        openId = "ohpVk5SF3oodWNsodPzlmbiiHPXY";
+//        openId = "ohpVk5TmJDKSy5Wm3rGAvLQnUneQ";
         return gradeService.getGrade(openId, term);
     }
 }

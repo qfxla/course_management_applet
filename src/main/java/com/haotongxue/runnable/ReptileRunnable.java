@@ -5,6 +5,7 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.haotongxue.entity.User;
 import com.haotongxue.service.GradeService;
+import com.haotongxue.service.ISelectedService;
 import com.haotongxue.service.IUserService;
 import com.haotongxue.service.ReptileService;
 import com.haotongxue.utils.GetBeanUtil;
@@ -66,10 +67,13 @@ public class ReptileRunnable implements Runnable{
             userUpdateWrapperTwo.set("is_paing",0).eq("openid",currentOpenid);
             userService.update(userUpdateWrapperTwo);
         } catch (Exception e){
-            log.info("爬虫失败，继续爬倒计时和选课");
+            log.info("爬虫失败，继续爬倒计时、选课、成绩、姓名");
         }
-        userService.triggerSearchCountDown(currentOpenid,webClient);
+        userService.triggerSearchCountDown(currentOpenid,webClient);    //倒计时 + 选课
         gradeService.paGrade(currentOpenid,webClient);
+        gradeService.searchName(currentOpenid,webClient);
+
+        webClient.getCurrentWindow().getJobManager().removeAllJobs();
         webClient.close();
     }
 }
