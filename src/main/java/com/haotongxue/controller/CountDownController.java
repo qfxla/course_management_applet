@@ -82,6 +82,18 @@ public class CountDownController {
     }
 
 
+    @ApiOperation("获得过去的考试信息")
+    @GetMapping("/authority/getPastMes")
+    public R getPastMes(){
+        String openid = UserContext.getCurrentOpenid();
+        QueryWrapper<CountDown> wrapper = new QueryWrapper<>();
+        wrapper.eq("openid",openid).eq("is_deleted",0).lt("start_time",new Date());
+        List<CountDown> list = iCountDownService.list(wrapper);
+        List<CountDownVo> listVo1 = ConvertUtil.convert(list, CountDownVo.class);
+        List<CountDownVo> listVo = listVo1.stream().sorted(Comparator.comparing(CountDownVo::getEndTime).reversed()).collect(Collectors.toList());
+        return R.ok().data("data",listVo);
+    }
+
     @ApiOperation("触发一下查考试倒计时信息")
     @PostMapping("/authority/triCountDown")
     public R triggerSearchCountDown(){
