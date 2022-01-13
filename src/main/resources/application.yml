@@ -36,6 +36,14 @@ spring:
         max-idle: 5
         min-idle: 0
 
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 120.77.156.205:9100
+        ip: 112.74.188.40 #铭涵
+  application:
+    name: zkcourse
+
 server:
   port: 9001
 

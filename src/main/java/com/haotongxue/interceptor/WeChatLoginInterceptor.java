@@ -1,6 +1,7 @@
 package com.haotongxue.interceptor;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.haotongxue.cacheUtil.LoadingRedisCache;
 import com.haotongxue.entity.User;
 import com.haotongxue.exceptionhandler.CourseException;
 import com.haotongxue.service.IUserService;
@@ -9,8 +10,10 @@ import com.haotongxue.utils.UserContext;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -20,16 +23,17 @@ public class WeChatLoginInterceptor implements HandlerInterceptor {
     @Autowired
     IUserService userService;
 
+    @Resource(name = "loginCache")
+    LoadingRedisCache cache;
+
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        String header = request.getHeader("Authority");
         Claims claims = JwtUtils.parse(request.getHeader("Authority"));
         if (claims != null){
             String openid = claims.getSubject(); //得到用户信息
-            QueryWrapper<User> tUserQueryWrapper = new QueryWrapper<>();
-            tUserQueryWrapper.eq("openid",openid);
-            if (userService.count()!=0){
+            Object o = cache.get(openid);
+            if (o != null){
                 UserContext.add(openid);
                 return true;
             }
