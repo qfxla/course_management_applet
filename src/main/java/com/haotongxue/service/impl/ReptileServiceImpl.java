@@ -136,7 +136,7 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
         DomElement[][] domElements = new DomElement[7][6];
         DomElement xnxq01id = page.getElementById("xnxq01id");
         DomNodeList<HtmlElement> options = xnxq01id.getElementsByTagName("option");
-        HtmlElement htmlElement = options.get(1);
+        HtmlElement htmlElement = options.get(0);
         HtmlPage click = null;
         try {
             click = htmlElement.click();
@@ -272,7 +272,7 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
                             String weekStr = "";
                             String sectionStr = "";
                             String weekAndSectionStr = courseInfo[2];
-                            if(weekAndSectionStr != null && !weekAndSectionStr.equals("") && !weekAndSectionStr.equals(" ")){
+                            if(!weekAndSectionStr.equals("") && !weekAndSectionStr.equals(" ")){
                                 weekStr  = getWeekStr(weekAndSectionStr);
                                 sectionStr = getSectionStr(weekAndSectionStr);
                             }else {
@@ -326,6 +326,7 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
             courseException.setMsg("更新isPa失败");
             throw courseException;
         }
+        cache.invalidate(currentOpenid);
         //课程爬完，开始爬人文考试
 //        String xueHao = user.getNo();
 //        if(xueHao != null){
@@ -392,7 +393,6 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
 //        }else{
 //            throw new CourseException(555,"爬人文考试这里，学号居然为空");
 //        }
-        cache.invalidate(currentOpenid);
     }
 
     public static String getWeekStr(String ws){

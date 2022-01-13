@@ -38,7 +38,7 @@ public class LoginUtils {
         if (span != null && !span.isEmpty()){
             //System.out.println(firstChild.asText());
             if ("Invalid credentials.".equals(span.get(0).asText())){
-                throw new CourseException(400,"密码或账号错误");
+                throw new CourseException(400,"账号或密码错误");
             }
         }
         throw new CourseException(440,"教务网的问题");

@@ -36,11 +36,11 @@ public class ReptileHandler {
 
     public void pa(ReptileRunnable reptileRunnable){
         String currentOpenid = UserContext.getCurrentOpenid();
-        UpdateWrapper<User> userUpdateWrapper = new UpdateWrapper<>();
-        userUpdateWrapper.set("is_paing",1).eq("openid",currentOpenid);
-        if (userService.update(userUpdateWrapper)){
+//        UpdateWrapper<User> userUpdateWrapper = new UpdateWrapper<>();
+//        userUpdateWrapper.set("is_paing",1).eq("openid",currentOpenid);
+//        if (userService.update(userUpdateWrapper)){
             cache.invalidate(currentOpenid);
             executorService.execute(reptileRunnable);
-        }
+//        }
     }
 }
