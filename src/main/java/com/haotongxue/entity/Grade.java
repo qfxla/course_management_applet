@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  * @Description TODO
- * @date 2021/12/31 20:39
+ * @Date 2021/12/31 20:39
  */
 @Data
 @NoArgsConstructor
@@ -43,10 +43,31 @@ public class Grade {
 
     private float gpa;
 
+    private String norGrade;
+    private String qimoGrade;
+
+    private String norBili;
+    private String qimoBili;
+
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
+
+
+    public Grade(String openid, String term, String subject, String grade, String property, float score, float gpa, String norGrade, String qimoGrade,String norBili, String qimoBili) {
+        this.openid = openid;
+        this.term = term;
+        this.subject = subject;
+        this.grade = grade;
+        this.property = property;
+        this.score = score;
+        this.gpa = gpa;
+        this.norGrade = norGrade;
+        this.qimoGrade = qimoGrade;
+        this.norBili = norBili;
+        this.qimoBili = qimoBili;
+    }
 
     public Grade(String openid, String term, String subject, String grade, String property, float score, float gpa) {
         this.openid = openid;
