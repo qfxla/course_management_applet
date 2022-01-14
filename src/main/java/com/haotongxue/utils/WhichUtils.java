@@ -50,7 +50,7 @@ public class WhichUtils {
                 collegeName = "管理学院";
                 break;
             case "10" :
-                collegeName = "化学与化工学院";
+                collegeName = "化学化工学院";
                 break;
             case "11" :
                 collegeName = "外国语学院";
