@@ -123,9 +123,10 @@ public class UserController {
 //            }
         }
         User user = (User) cache.get(openid);
-        boolean isDoPa = true; //是否执行学校系统登录验证
+        boolean isDoPa = false; //是否执行学校系统登录验证
         WebClient webClient = null;
         if (user == null){
+            isDoPa =  true;
             //快捷登录失败
             if (isQuickLogin){
                 return R.error().code(ResultCode.QUICK_LOGIN_ERROR);
@@ -163,14 +164,15 @@ public class UserController {
             user.setSubscribe(1);
             user.setUnionId("");
             cache.put(openid,user);
-        }else {
-            //如果为0，则爬虫还没执行成功
-            isDoPa = user.getIsPa() == 0;
-            if (!user.getUnionId().equals(unionid)){
-                user.setUnionId(unionid);
-                userService.updateById(user);
-            }
         }
+//        else {
+//            //如果为0，则爬虫还没执行成功
+//            isDoPa = user.getIsPa() == 0;
+//            if (!user.getUnionId().equals(unionid)){
+//                user.setUnionId(unionid);
+//                userService.updateById(user);
+//            }
+//        }
         if (isDoPa && user.getIsPaing() == 0){
             log.info(openid + "开始爬虫");
             ReReptileRunnable reReptileRunnable = new ReReptileRunnable(webClient,user.getNo(),user.getPassword(),UserContext.getCurrentOpenid());

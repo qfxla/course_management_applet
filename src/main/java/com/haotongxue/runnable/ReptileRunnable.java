@@ -1,6 +1,5 @@
 package com.haotongxue.runnable;
 
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.haotongxue.entity.User;
