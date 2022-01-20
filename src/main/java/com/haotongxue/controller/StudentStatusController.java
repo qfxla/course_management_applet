@@ -30,6 +30,8 @@ public class StudentStatusController {
     @Autowired
     IStudentStatusService studentStatusService;
 
+
+
     @GetMapping("/student")
     public R getStudent(@RequestParam String grade,
                         @RequestParam String collegeId,
@@ -38,6 +40,18 @@ public class StudentStatusController {
         SearchHit[] hits;
         try {
             hits = studentStatusService.getStudent(grade, collegeId, majorId, classId);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return R.error();
+        }
+        return R.ok().data("list",hits);
+    }
+
+    @GetMapping("/studentByName")
+    public R getStudentByFuzzySearch(@RequestParam String content){
+        SearchHit[] hits;
+        try {
+            hits = studentStatusService.getStudentByFuzzySearch(content);
         } catch (IOException e) {
             e.printStackTrace();
             return R.error();

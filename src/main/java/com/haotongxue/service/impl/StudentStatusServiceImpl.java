@@ -29,6 +29,7 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -114,6 +115,33 @@ public class StudentStatusServiceImpl extends ServiceImpl<StudentStatusMapper, S
         if (!StringUtils.isEmpty(classId)){
             boolQueryBuilder.must(QueryBuilders.termQuery("classId",classId));
         }
+        searchSourceBuilder.query(boolQueryBuilder);
+        request.source(searchSourceBuilder);
+
+        //发请求
+        SearchResponse search = client.search(request, RequestOptions.DEFAULT);
+
+        return search.getHits().getHits();
+    }
+
+    @Override
+    public SearchHit[] getStudentByFuzzySearch(String content) throws IOException {
+        SearchRequest request = new SearchRequest("studentstatus");
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        //设置分页
+        searchSourceBuilder.from(0);
+        searchSourceBuilder.size(500);
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        boolQueryBuilder
+                .should(QueryBuilders.matchQuery("className",content))
+                .should(QueryBuilders.matchQuery("name",content));
+        //构建高亮体
+        HighlightBuilder highlightBuilder = new HighlightBuilder();
+        highlightBuilder.preTags("<span style=\"color:red\">");
+        highlightBuilder.postTags("</span>");
+        //高亮字段
+        highlightBuilder.field("className").field("name");
+        searchSourceBuilder.highlighter(highlightBuilder);
         searchSourceBuilder.query(boolQueryBuilder);
         request.source(searchSourceBuilder);
 
