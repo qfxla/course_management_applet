@@ -2,7 +2,6 @@ package com.haotongxue.handler;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.haotongxue.cacheUtil.LoadingRedisCache;
 import com.haotongxue.entity.OfficialUser;
 import com.haotongxue.entity.User;
@@ -10,14 +9,11 @@ import com.haotongxue.exceptionhandler.CourseException;
 import com.haotongxue.service.IOfficialUserService;
 import com.haotongxue.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentMap;
 
 /**
  * 用来处理小程序和公众号之间的一些关联

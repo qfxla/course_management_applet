@@ -1,11 +1,6 @@
 package com.haotongxue.handler;
 
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.haotongxue.cacheUtil.LoadingRedisCache;
-import com.haotongxue.entity.User;
-import com.haotongxue.runnable.ReReptileRunnable;
 import com.haotongxue.runnable.ReptileRunnable;
 import com.haotongxue.service.IUserService;
 import com.haotongxue.service.ReptileService;

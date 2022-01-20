@@ -1,8 +1,8 @@
 package com.haotongxue.service.impl;
 
-import com.haotongxue.entity.Major;
-import com.haotongxue.mapper.MajorMapper;
-import com.haotongxue.service.IMajorService;
+import com.haotongxue.entity.Class;
+import com.haotongxue.mapper.ClassMapper;
+import com.haotongxue.service.IClassService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +15,6 @@ import org.springframework.stereotype.Service;
  * @since 2022-01-19
  */
 @Service
-public class MajorServiceImpl extends ServiceImpl<MajorMapper, Major> implements IMajorService {
+public class ClassServiceImpl extends ServiceImpl<ClassMapper, Class> implements IClassService {
 
 }

@@ -4,7 +4,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.concurrent.TimeUnit;
 
-public class LoadingRedisCacheBuilder {
+public class LoadingRedisCacheBuilder<T> {
 
     public static final int NO_EXPIRE = 0;
 
@@ -20,10 +20,17 @@ public class LoadingRedisCacheBuilder {
 
     private RedisTemplate<String,Object> redisTemplate;
 
-    public LoadingRedisCacheBuilder expireAfterWrite(long duration, TimeUnit timeUnit){
+    private String prefix = "";
+
+    public LoadingRedisCacheBuilder<T> expireAfterWrite(long duration, TimeUnit timeUnit){
         this.duration = duration;
         this.timeUnit = timeUnit;
         this.expireFlag = EXPIRE_AFTER_WRITE;
+        return this;
+    }
+
+    public LoadingRedisCacheBuilder<T> setPrefix(String prefix){
+        this.prefix = prefix;
         return this;
     }
 
@@ -34,9 +41,8 @@ public class LoadingRedisCacheBuilder {
 //        return this;
 //    }
 
-    public LoadingRedisCache build(RedisLoader loader){
-        LoadingRedisCache loadingRedisCache = new LoadingRedisCache(loader,redisTemplate,duration,timeUnit,expireFlag);
-        return loadingRedisCache;
+    public LoadingRedisCache<T> build(RedisLoader loader){
+        return new LoadingRedisCache<>(loader,redisTemplate,duration,timeUnit,expireFlag,prefix);
     }
 
     public LoadingRedisCacheBuilder(RedisTemplate<String, Object> redisTemplate) {

@@ -1,6 +1,6 @@
 package com.haotongxue.mapper;
 
-import com.haotongxue.entity.PrivacyTarget;
+import com.haotongxue.entity.StudentStatus;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author DJT
  * @since 2022-01-19
  */
-public interface PrivacyTargetMapper extends BaseMapper<PrivacyTarget> {
+public interface StudentStatusMapper extends BaseMapper<StudentStatus> {
 
 }

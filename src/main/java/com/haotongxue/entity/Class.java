@@ -1,5 +1,7 @@
 package com.haotongxue.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
@@ -17,16 +19,18 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@TableName("t_privacy_setting")
-@ApiModel(value = "PrivacySetting对象", description = "")
-public class PrivacySetting implements Serializable {
+@TableName("t_class")
+@ApiModel(value = "Class对象", description = "")
+public class Class implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private String openid;
+      @TableId(value = "class_id", type = IdType.ASSIGN_ID)
+    private String classId;
 
-    @ApiModelProperty("1.公开 2.私密 3.部分可见 4.不给谁看")
-    private Boolean setting;
+    private String name;
+
+    private String majorId;
 
 
 }

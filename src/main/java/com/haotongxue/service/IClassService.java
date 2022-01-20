@@ -1,6 +1,6 @@
 package com.haotongxue.service;
 
-import com.haotongxue.entity.Major;
+import com.haotongxue.entity.Class;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @author DJT
  * @since 2022-01-19
  */
-public interface IMajorService extends IService<Major> {
+public interface IClassService extends IService<Class> {
 
 }

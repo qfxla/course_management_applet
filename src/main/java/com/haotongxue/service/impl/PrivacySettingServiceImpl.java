@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
  * </p>
  *
  * @author DJT
- * @since 2022-01-01
+ * @since 2022-01-19
  */
 @Service
 public class PrivacySettingServiceImpl extends ServiceImpl<PrivacySettingMapper, PrivacySetting> implements IPrivacySettingService {

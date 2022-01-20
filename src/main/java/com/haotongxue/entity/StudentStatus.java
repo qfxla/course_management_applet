@@ -19,18 +19,27 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@TableName("t_major")
-@ApiModel(value = "Major对象", description = "")
-public class Major implements Serializable {
+@TableName("t_student_status")
+@ApiModel(value = "StudentStatus对象", description = "")
+public class StudentStatus implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-      @TableId(value = "major_id", type = IdType.ASSIGN_ID)
-    private String majorId;
+    @TableId(value = "openid", type = IdType.ASSIGN_ID)
+    private String openid;
 
     private Integer collegeId;
 
+    private String classId;
+
+    private String majorId;
+
     private String name;
+
+    private String sex;
+
+    @ApiModelProperty("学号")
+    private String no;
 
 
 }

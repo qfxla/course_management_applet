@@ -2,9 +2,11 @@ package com.haotongxue.cacheUtil;
 
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class LoadingRedisCache {
+public class LoadingRedisCache<T> {
 
     private RedisLoader redisLoader;
 
@@ -16,20 +18,74 @@ public class LoadingRedisCache {
 
     private int expireFlag;
 
-    public Object get(String key){
-        Object o = redisTemplate.opsForValue().get(key);
+    private String prefix = "";
+
+    /**
+     * 返回key对应的value
+     * @param key
+     * @return
+     */
+    public T get(String key){
+        T o = (T) redisTemplate.opsForValue().get(prefix+key);
         if (o == null){
-            o = redisLoader.load(key);
+            o = (T) redisLoader.load(key);
             put(key,o);
         }
         return o;
     }
 
+    /**
+     * 返回key对应的List
+     * @param key
+     * @return
+     */
+    public List<T> getForList(String key){
+        List<Object> list = (List<Object>) redisTemplate.opsForValue().get(prefix+key);
+        List<T> returnList = null;
+        if (list == null){
+            list = (List<Object>) redisLoader.load(key);
+            put(key,list);
+        }
+        if(list != null){
+            returnList = new ArrayList<>();
+            for (Object o : list){
+                returnList.add((T) o);
+            }
+        }
+        return returnList;
+    }
+
+//    /**
+//     * 通过多个条件查询
+//     * @param keys
+//     * @return
+//     */
+//    public List<T> getForCondition(String ...keys){
+//        StringBuilder stringBuilder = new StringBuilder();
+//        for (String key : keys) {
+//            stringBuilder.append(key);
+//        }
+//        Set<String> set = redisTemplate.keys(stringBuilder.toString());
+//        List<T> returnList = null;
+//        List<Object> list = null;
+//        if (set == null){
+//            list = (List<Object>) redisLoader.load(keys);
+//            put(stringBuilder.toString(),list);
+//        }
+//        if (list != null){
+//            returnList = new ArrayList<>();
+//            for (Object o : list){
+//                returnList.add((T) o);
+//            }
+//        }
+//        return returnList;
+//    }
+
     public void put(String key,Object object){
         if (duration != 0){
-            redisTemplate.opsForValue().set(key,object,duration,timeUnit);
+            redisTemplate.opsForValue().set(prefix+key,object,duration,timeUnit);
         }else {
-            redisTemplate.opsForValue().set(key,object);
+            redisTemplate.opsForValue().set(prefix+key,object);
         }
     }
 
@@ -79,11 +135,21 @@ public class LoadingRedisCache {
         this.expireFlag = expireFlag;
     }
 
-    public LoadingRedisCache(RedisLoader redisLoader, RedisTemplate<String, Object> redisTemplate, long duration, TimeUnit timeUnit, int expireFlag) {
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+
+
+    public LoadingRedisCache(RedisLoader redisLoader, RedisTemplate<String, Object> redisTemplate, long duration, TimeUnit timeUnit, int expireFlag,String prefix) {
         this.redisLoader = redisLoader;
         this.redisTemplate = redisTemplate;
         this.duration = duration;
         this.timeUnit = timeUnit;
         this.expireFlag = expireFlag;
+        this.prefix = prefix;
     }
 }

@@ -2,7 +2,8 @@ package com.haotongxue.config;
 
 import com.haotongxue.cacheUtil.LoadingRedisCache;
 import com.haotongxue.cacheUtil.MyRedis;
-import com.haotongxue.service.*;
+import com.haotongxue.entity.Class;
+import com.haotongxue.service.IClassService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,22 +11,19 @@ import org.springframework.context.annotation.Configuration;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
-public class LoginCacheConfig {
+public class ClassCacheConfig {
 
     @Autowired
-    IUserService userService;
+    MyRedis<Class> myRedis;
 
     @Autowired
-    MyRedis myRedis;
+    IClassService classService;
 
-    /**
-     * 用于做商品的本地缓存处理
-     * @return
-     */
-    @Bean("loginCache")
-    public LoadingRedisCache getCache(){
+    @Bean("classCache")
+    public LoadingRedisCache<Class> getCache(){
         return myRedis.newBuilder()
-                .expireAfterWrite(3,TimeUnit.DAYS)
-                .build(key -> userService.getById(key));
+                .expireAfterWrite(1, TimeUnit.DAYS)
+                .setPrefix("class")
+                .build(key -> classService.getById(key));
     }
 }

@@ -1,8 +1,6 @@
 package com.haotongxue.interceptor;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.haotongxue.cacheUtil.LoadingRedisCache;
-import com.haotongxue.entity.User;
 import com.haotongxue.exceptionhandler.CourseException;
 import com.haotongxue.service.IUserService;
 import com.haotongxue.utils.JwtUtils;
@@ -10,7 +8,6 @@ import com.haotongxue.utils.UserContext;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.annotation.Resource;

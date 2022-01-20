@@ -13,11 +13,11 @@ import lombok.Setter;
  * </p>
  *
  * @author DJT
- * @since 2022-01-01
+ * @since 2022-01-19
  */
 @Getter
 @Setter
-@TableName("p_privacy_target")
+@TableName("t_privacy_target")
 @ApiModel(value = "PrivacyTarget对象", description = "")
 public class PrivacyTarget implements Serializable {
 
