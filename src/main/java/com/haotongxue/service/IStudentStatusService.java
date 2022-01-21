@@ -19,5 +19,7 @@ public interface IStudentStatusService extends IService<StudentStatus> {
 
     SearchHit[] getStudent(String grade, String collegeId, String majorId, String classId) throws IOException;
 
+    SearchHit[] getStudent(String[] nos) throws IOException;
+
     SearchHit[] getStudentByFuzzySearch(String content) throws IOException;
 }

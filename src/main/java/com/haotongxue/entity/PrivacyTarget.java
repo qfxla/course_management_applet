@@ -1,5 +1,7 @@
 package com.haotongxue.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
@@ -23,13 +25,23 @@ public class PrivacyTarget implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private String openid;
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
+    private String id;
+
+    private String no;
 
     @ApiModelProperty("隐私设置的编号")
-    private Boolean privacySetting;
+    private Integer privacySetting;
 
     @ApiModelProperty("目标openid")
-    private String target;
+    private String targetNo;
 
+    public PrivacyTarget() {
+    }
 
+    public PrivacyTarget(String no, Integer privacySetting, String targetNo) {
+        this.no = no;
+        this.privacySetting = privacySetting;
+        this.targetNo = targetNo;
+    }
 }

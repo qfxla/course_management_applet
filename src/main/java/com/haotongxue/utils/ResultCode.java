@@ -20,4 +20,6 @@ public interface ResultCode {
     Integer NO_TARGET = 20006; //不是我们的目标
 
     Integer EDU_PROBLEM = 20007; //教务网的问题
+
+    Integer NO_AUTHORITY_TO_SEE = 20008; //没有权限查看课表
 }

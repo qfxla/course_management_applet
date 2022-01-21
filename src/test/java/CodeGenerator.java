@@ -31,7 +31,7 @@ public class CodeGenerator {
 //                            .pathInfo(Collections.singletonMap(OutputFile.mapperXml, projectPath+"src/main/java/com/haotongxue/course_service/com.haotongxue.mapper/xml")); // 设置mapperXml生成路径
                 })
                 .strategyConfig(builder -> {
-                    builder.addInclude("t_major","t_privacy_setting","t_privacy_target","t_student_status","t_class") // 设置需要生成的表名
+                    builder.addInclude("t_browsing_history") // 设置需要生成的表名
                             .addTablePrefix("t_", "c_","p_") // 设置过滤表前缀
                     .entityBuilder()
                             .enableLombok()

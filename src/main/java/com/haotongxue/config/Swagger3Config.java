@@ -24,7 +24,7 @@ public class Swagger3Config {
     public Docket createRestApi(){
         //返回文档概要信息
         return new Docket(DocumentationType.OAS_30)
-                .enable(false)
+                .enable(true)
                 .apiInfo(apiInfo())
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.haotongxue.controller"))
@@ -40,7 +40,7 @@ public class Swagger3Config {
      */
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("仲恺跳蚤后端")
+                .title("仲园课程表小程序")
                 .description("一次编码处处停运")
                 .contact(new Contact("邓景涛","localhost","834616898@qq.com"))
                 .version("1.0")

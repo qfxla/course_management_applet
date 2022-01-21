@@ -125,6 +125,21 @@ public class StudentStatusServiceImpl extends ServiceImpl<StudentStatusMapper, S
     }
 
     @Override
+    public SearchHit[] getStudent(String[] nos) throws IOException {
+        SearchRequest request = new SearchRequest("studentstatus");
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        //设置分页
+        searchSourceBuilder.from(0);
+        searchSourceBuilder.size(1);
+        searchSourceBuilder.query(QueryBuilders.termsQuery("no",nos));
+        request.source(searchSourceBuilder);
+
+        //发请求
+        SearchResponse search = client.search(request, RequestOptions.DEFAULT);
+        return search.getHits().getHits();
+    }
+
+    @Override
     public SearchHit[] getStudentByFuzzySearch(String content) throws IOException {
         SearchRequest request = new SearchRequest("studentstatus");
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
