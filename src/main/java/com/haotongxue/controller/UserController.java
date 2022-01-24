@@ -4,8 +4,6 @@ package com.haotongxue.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.gargoylesoftware.htmlunit.*;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.haotongxue.cacheUtil.LoadingRedisCache;
 import com.haotongxue.entity.*;
 import com.haotongxue.entity.dto.PushSettingDTO;
@@ -23,7 +21,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -31,9 +28,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
 /**
@@ -123,9 +117,10 @@ public class UserController {
 //            }
         }
         User user = (User) cache.get(openid);
-        boolean isDoPa = true; //是否执行学校系统登录验证
+        boolean isDoPa = false; //是否执行学校系统登录验证
         WebClient webClient = null;
         if (user == null){
+            isDoPa =  true;
             //快捷登录失败
             if (isQuickLogin){
                 return R.error().code(ResultCode.QUICK_LOGIN_ERROR);
@@ -163,14 +158,15 @@ public class UserController {
             user.setSubscribe(1);
             user.setUnionId("");
             cache.put(openid,user);
-        }else {
-            //如果为0，则爬虫还没执行成功
-            isDoPa = user.getIsPa() == 0;
-            if (!user.getUnionId().equals(unionid)){
-                user.setUnionId(unionid);
-                userService.updateById(user);
-            }
         }
+//        else {
+//            //如果为0，则爬虫还没执行成功
+//            isDoPa = user.getIsPa() == 0;
+//            if (!user.getUnionId().equals(unionid)){
+//                user.setUnionId(unionid);
+//                userService.updateById(user);
+//            }
+//        }
         if (isDoPa && user.getIsPaing() == 0){
             log.info(openid + "开始爬虫");
             ReReptileRunnable reReptileRunnable = new ReReptileRunnable(webClient,user.getNo(),user.getPassword(),UserContext.getCurrentOpenid());

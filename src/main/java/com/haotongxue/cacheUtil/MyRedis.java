@@ -5,12 +5,12 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MyRedis {
+public class MyRedis<T> {
 
     @Autowired
     RedisTemplate<String,Object> redisTemplate;
 
-    public LoadingRedisCacheBuilder newBuilder(){
-        return new LoadingRedisCacheBuilder(redisTemplate);
+    public LoadingRedisCacheBuilder<T> newBuilder(){
+        return new LoadingRedisCacheBuilder<>(redisTemplate);
     }
 }

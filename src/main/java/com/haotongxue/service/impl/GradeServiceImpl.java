@@ -15,14 +15,18 @@ import com.haotongxue.exceptionhandler.CourseException;
 import com.haotongxue.mapper.GradeMapper;
 import com.haotongxue.mapper.UserMapper;
 import com.haotongxue.service.*;
+import com.haotongxue.utils.LoginUtils;
+import com.haotongxue.utils.WebClientUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 
@@ -49,10 +53,22 @@ public class GradeServiceImpl extends ServiceImpl<GradeMapper, Grade> implements
     @Autowired
     RedisTemplate redisTemplate;
 
+    @Override
+//    @Scheduled(fixedDelay = 100000)
     public int paGrade(String openid, WebClient webClient){
+//    public void paGrade(){
         HtmlPage page = null;
+//        WebClient webClient = null;
+//        String openid = "ohpVk5TmJDKSy5Wm3rGAvLQnUneQ";
         try {
-            page = webClient.getPage("http://edu-admin.zhku.edu.cn/jsxsd/kscj/cjcx_list");
+//            webClient = WebClientUtils.getWebClient();
+//            try {
+////                LoginUtils.login(webClient, "202010244331", "Zhku10422X");
+//                LoginUtils.login(webClient, "202010244304", "Ctc779684470...");
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+            page = webClient.getPage("https://edu-admin.zhku.edu.cn/jsxsd/kscj/cjcx_list?kksj=2021-2022-1");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -61,8 +77,6 @@ public class GradeServiceImpl extends ServiceImpl<GradeMapper, Grade> implements
         DomNodeList<HtmlElement> tr = dataList.getElementsByTagName("tr");
         boolean flag = true;
         int total = (tr.size()-1);
-//        ArrayList<GradePush> pushList = new ArrayList<>();
-//        String ofOpenid = userMapper.getOfOpenidByOpenid(openid);
         for (HtmlElement element : tr) {
             if(flag){
                 flag = false;
@@ -74,9 +88,67 @@ public class GradeServiceImpl extends ServiceImpl<GradeMapper, Grade> implements
             String grade = tdd.get(4).asText();
             String scoreStr = tdd.get(6).asText();
             String gpaStr = tdd.get(8).asText();
+            String property = tdd.get(12).asText();
             float score = Float.parseFloat(scoreStr);
             float gpa = Float.parseFloat(gpaStr);
-            String property = tdd.get(12).asText();
+            DomNodeList<HtmlElement> a = element.getElementsByTagName("a");
+            for (HtmlElement htmlElement : a) {
+                String hrefStr = htmlElement.getAttribute("href");
+                String url = "https://edu-admin.zhku.edu.cn" +  hrefStr.substring(hrefStr.indexOf("('") + 2, hrefStr.indexOf("',"));
+                HtmlPage norPage = null;
+                try {
+                    norPage = webClient.getPage(url);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                if (norPage != null){
+                    DomElement norList = norPage.getElementById("dataList");
+                    DomNodeList<HtmlElement> norTr = norList.getElementsByTagName("tr");
+                    for (HtmlElement norEle : norTr) {
+                        DomNodeList<HtmlElement> norTd = norEle.getElementsByTagName("td");
+                        if (norTd.size() == 8) {
+                            String norGrade = norTd.get(1).asText();
+                            String qimoGrade = norTd.get(5).asText();
+                            String norRatioStr = norTd.get(2).asText();
+                            String qimoRatioStr = norTd.get(6).asText();
+                            if (!Objects.equals(norRatioStr, "") && !Objects.equals(qimoRatioStr, "") && norRatioStr!=null && qimoRatioStr != null) {
+//                                String bili = qimoRatioStr.substring(0, qimoRatioStr.indexOf("0%")) + ":" + norRatioStr.substring(0, norRatioStr.indexOf("0%"));
+                                if(norGrade == null || norGrade.equals("")){
+                                    norGrade = "无";
+                                }
+                                if(qimoGrade == null || qimoGrade.equals("")){
+                                    qimoGrade = "无";
+                                }
+                                Grade gradeObj = new Grade(openid,term,subject,grade,property,score,gpa,norGrade,qimoGrade,norRatioStr,qimoRatioStr);
+                                QueryWrapper<Grade> queryWrapper = new QueryWrapper<>();
+                                queryWrapper.eq("openid",openid);
+                                queryWrapper.eq("subject",subject);
+                                int count = gradeMapper.selectCount(queryWrapper);
+                                if(count == 0){
+                                    //数据库里这个人没有这个成绩
+                                    int insert = gradeMapper.insert(gradeObj);
+                                    if(insert == 1){
+                                        System.out.println(openid + "---" + "插入成绩成功---" + subject);
+                                    }else{
+                                        log.info(openid +  "未能成功插入成绩");
+                                    }
+                                }else{
+                                    //数据库里这个人有这个成绩
+                                    queryWrapper.select("id");
+                                    Grade gradeId = gradeMapper.selectOne(queryWrapper);
+                                    gradeObj.setId(gradeId.getId());
+                                    int updateNor = gradeMapper.updateById(gradeObj);
+                                    if(updateNor == 1){
+                                        System.out.println(openid + "---" + "更新平时分成功---" + subject);
+                                    }else{
+                                        log.info(openid +  "未能成功更新平时分");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             Grade gradeObj = new Grade(openid,term,subject,grade,property,score,gpa);
             QueryWrapper<Grade> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("openid",openid);
@@ -86,12 +158,6 @@ public class GradeServiceImpl extends ServiceImpl<GradeMapper, Grade> implements
                 //数据库里这个人没有这个成绩
                 int insert = gradeMapper.insert(gradeObj);
                 if(insert == 1){
-//                    if(term.equals("2021-2022-1")){
-//                        if(ofOpenid != null){
-//                            GradePush gradePush = new GradePush(ofOpenid, subject, property);
-//                            pushList.add(gradePush);
-//                        }
-//                    }
                     System.out.println(openid + "---" + "插入成绩成功---" + subject);
                 }else{
                     log.info(openid +  "未能成功插入成绩");
@@ -99,33 +165,6 @@ public class GradeServiceImpl extends ServiceImpl<GradeMapper, Grade> implements
             }
         }
         System.out.println(openid + "---成绩总数：" + total);
-
-//        String pushKey = "GradesPush";
-//        if(pushList.size() == 0){
-//            //没有本学期的新成绩，不操作redis
-//            return total > 0 ? total : -1;
-//        }
-//        if(Boolean.TRUE.equals(redisTemplate.hasKey(pushKey))){
-//            for (GradePush gradePush : pushList) {
-//                if(gradePush != null){
-//                    List<GradePush> cacheList = redisTemplate.opsForList().range(pushKey, 0, -1);
-//                    for (GradePush pushCache : cacheList) {
-//                        if(!(gradePush.getOfOpenid().equals(pushCache.getOfOpenid()) &&
-//                                gradePush.getSubject().equals(pushCache.getSubject()))){
-//                            Long num = redisTemplate.opsForList().rightPush(pushKey, gradePush);
-//                            log.info("插入" + gradePush.getSubject() + "，pushCacheList中有" + num + "个元素，" + pushKey + "的过期时间为：" + redisTemplate.getExpire(pushKey));
-//                        }else{
-//                            System.out.println("缓存list中已有同一个人的同一科目，不加");
-//                        }
-//                    }
-//                }
-//            }
-//        }else {
-//            if(pushList.size() != 0){
-//                redisTemplate.opsForList().rightPushAll(pushKey,pushList);
-//                redisTemplate.expire(pushKey,23,TimeUnit.HOURS);
-//            }
-//        }
         return total > 0 ? total : -1;
     }
 

@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * </p>
  *
  * @author DJT
- * @since 2022-01-01
+ * @since 2022-01-19
  */
 public interface IMajorService extends IService<Major> {
 

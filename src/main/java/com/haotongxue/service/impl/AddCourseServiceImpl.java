@@ -1,6 +1,5 @@
 package com.haotongxue.service.impl;
 
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.haotongxue.cacheUtil.LoadingRedisCache;
 import com.haotongxue.entity.vo.AddCourseVo;
 import com.haotongxue.exceptionhandler.CourseException;

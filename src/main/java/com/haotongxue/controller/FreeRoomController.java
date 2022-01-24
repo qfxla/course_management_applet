@@ -1,7 +1,6 @@
 package com.haotongxue.controller;
 
 
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.haotongxue.cacheUtil.LoadingRedisCache;
 import com.haotongxue.entity.vo.FreeRoomVo;
 import com.haotongxue.service.FreeRoomVoService;
@@ -13,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Map;
 
 /**
  * <p>

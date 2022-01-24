@@ -92,5 +92,4 @@ public class User implements Serializable {
     @TableLogic
     private Integer isDeleted;
 
-
 }

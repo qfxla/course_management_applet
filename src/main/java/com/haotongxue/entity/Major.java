@@ -15,25 +15,22 @@ import lombok.Setter;
  * </p>
  *
  * @author DJT
- * @since 2022-01-01
+ * @since 2022-01-19
  */
 @Getter
 @Setter
-@TableName("p_major")
+@TableName("t_major")
 @ApiModel(value = "Major对象", description = "")
 public class Major implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @ApiModelProperty("专业编号")
-      @TableId(value = "major", type = IdType.ASSIGN_ID)
-    private Integer major;
+      @TableId(value = "major_id", type = IdType.ASSIGN_ID)
+    private String majorId;
 
-    @ApiModelProperty("学院")
-    private String college;
+    private Integer collegeId;
 
-    @ApiModelProperty("专业名称")
-    private String majorName;
+    private String name;
 
 
 }

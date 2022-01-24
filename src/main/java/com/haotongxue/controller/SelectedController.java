@@ -1,30 +1,18 @@
 package com.haotongxue.controller;
 
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.haotongxue.cacheUtil.LoadingRedisCache;
-import com.haotongxue.entity.CollegeBigSmall;
-import com.haotongxue.entity.Selected;
 import com.haotongxue.entity.User;
 import com.haotongxue.entity.vo.SelectedRuleVo;
 import com.haotongxue.entity.vo.SelectedVo;
-import com.haotongxue.entity.vo.SmallKindVo;
-import com.haotongxue.mapper.CollegeBigSmallMapper;
 import com.haotongxue.mapper.SelectedMapper;
 import com.haotongxue.service.ICollegeBigSmallService;
 import com.haotongxue.service.ISelectedService;
-import com.haotongxue.service.impl.InfoServiceImpl;
 import com.haotongxue.utils.*;
-import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiOperation;
-import lombok.extern.log4j.Log4j;
-import org.apache.catalina.realm.UserDatabaseRealm;
-import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -32,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 
 /**

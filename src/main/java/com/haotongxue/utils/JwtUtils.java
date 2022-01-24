@@ -64,7 +64,7 @@ public final class JwtUtils {
                     .getBody();
         } catch (JwtException e) {
             // 这里应该用日志输出，为了演示方便就直接打印了
-            System.err.println("解析失败！");
+            //System.err.println("解析失败！");
         }
         return claims;
     }
