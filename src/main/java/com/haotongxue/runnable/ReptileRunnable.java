@@ -1,5 +1,6 @@
 package com.haotongxue.runnable;
 
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.haotongxue.entity.User;
@@ -60,14 +61,14 @@ public class ReptileRunnable implements Runnable{
                 e.printStackTrace();
             }
         }
-//        try {
-//            reptileService.pa(webClient,currentOpenid);
-//            UpdateWrapper<User> userUpdateWrapperTwo = new UpdateWrapper<>();
-//            userUpdateWrapperTwo.set("is_paing",0).eq("openid",currentOpenid);
-//            userService.update(userUpdateWrapperTwo);
-//        } catch (Exception e){
-//            log.info("爬虫失败，继续爬倒计时、选课、成绩、姓名");
-//        }
+        try {
+            reptileService.pa(webClient,currentOpenid);
+            UpdateWrapper<User> userUpdateWrapperTwo = new UpdateWrapper<>();
+            userUpdateWrapperTwo.set("is_paing",0).eq("openid",currentOpenid);
+            userService.update(userUpdateWrapperTwo);
+        } catch (Exception e){
+            log.info("爬虫失败，继续爬倒计时、选课、成绩、姓名");
+        }
         userService.triggerSearchCountDown(currentOpenid,webClient);    //倒计时 + 选课
         gradeService.paGrade(currentOpenid,webClient);
         gradeService.searchName(currentOpenid,webClient);
