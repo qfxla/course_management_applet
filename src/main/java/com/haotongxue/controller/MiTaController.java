@@ -15,6 +15,7 @@ import com.haotongxue.utils.GradeUtils;
 import com.haotongxue.utils.R;
 import com.haotongxue.utils.ResultCode;
 import com.haotongxue.utils.UserContext;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.elasticsearch.search.SearchHit;
@@ -34,6 +35,7 @@ import java.util.List;
  * @author DJT
  * @since 2022-01-19
  */
+@Api(tags = "觅他接口")
 @RestController
 @RequestMapping("/zkCourse/mita")
 public class MiTaController {
@@ -64,6 +66,7 @@ public class MiTaController {
      * 获取用户默认分类
      * @return
      */
+    @ApiOperation("获取全部分类")
     @GetMapping("/authority/classifyMsg")
     public R getDefaultClassifyMsg(){
         String currentOpenid = UserContext.getCurrentOpenid();
@@ -82,6 +85,7 @@ public class MiTaController {
                 .data("classifyVO",classifyVO);
     }
 
+    @ApiOperation("条件查询学生")
     @GetMapping("/student")
     public R getStudent(@RequestParam String grade,
                         @RequestParam String collegeId,
@@ -97,6 +101,7 @@ public class MiTaController {
         return R.ok().data("list",hits);
     }
 
+    @ApiOperation("模糊查询学生")
     @GetMapping("/studentByName")
     public R getStudentByFuzzySearch(@RequestParam String content){
         SearchHit[] hits;
@@ -115,6 +120,7 @@ public class MiTaController {
      * @param setting
      * @return
      */
+    @ApiOperation("更改隐私设置：1.公开 2.私密 3 只给谁看 4 不给谁看")
     @GetMapping("/authority/privacySetting")
     public R updatePrivacySetting(@RequestParam Integer setting){
         String currentOpenid = UserContext.getCurrentOpenid();

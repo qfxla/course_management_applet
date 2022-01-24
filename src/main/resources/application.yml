@@ -42,9 +42,15 @@ spring:
       discovery:
         server-addr: 120.77.156.205:9100
         #ip: 112.74.188.40 #铭涵
-        ip: 120.77.183.115 #涛涛
-#        ip: 119.91.78.179 #川川
-#        ip: 159.75.241.252 #川川
+        #ip: 120.77.183.115 #涛涛
+        ip: 159.75.241.252 #川川
+    sentinel:
+      transport:
+        port: 8719
+        dashboard: 159.75.241.252:8080
+        clientIp: 159.75.241.252 #川川
+        #clientIp: 120.77.183.115 #涛涛
+        #clientIp: 112.74.188.40
   application:
     name: zkcourse
 

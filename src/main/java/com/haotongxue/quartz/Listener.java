@@ -1,5 +1,6 @@
 package com.haotongxue.quartz;
 
+import com.haotongxue.sentinel.RunNacosDataSource;
 import com.haotongxue.service.IStudentStatusService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
