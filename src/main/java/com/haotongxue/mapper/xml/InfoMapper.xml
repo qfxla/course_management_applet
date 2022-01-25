@@ -12,9 +12,11 @@
     <select id="getInfoByOpenidAndWeek" resultType="com.haotongxue.entity.Info">
         SELECT i.info_id,i.xingqi,i.week_str,i.section_str
         FROM t_info i LEFT JOIN t_user_info uf
-        ON i.info_id = uf.info_id COLLATE utf8mb4_unicode_ci
+--         ON i.info_id = uf.info_id COLLATE utf8mb4_unicode_ci
+        ON i.info_id = uf.info_id
         LEFT JOIN t_info_week wf
-        ON i.info_id = wf.info_id COLLATE utf8mb4_unicode_ci
+--         ON i.info_id = wf.info_id COLLATE utf8mb4_unicode_ci
+        ON i.info_id = wf.info_id
         WHERE uf.openid = #{openid}
         AND wf.week_id = #{week}
           AND i.is_deleted = 0
@@ -34,7 +36,8 @@
         SELECT c.name
         FROM t_info_course ic
         LEFT JOIN t_course c
-        ON ic.course_id = c.course_id COLLATE utf8mb4_unicode_ci
+--         ON ic.course_id = c.course_id COLLATE utf8mb4_unicode_ci
+        ON ic.course_id = c.course_id
         WHERE ic.info_id = #{infoId}
           AND ic.is_deleted = 0
     </select>
@@ -42,7 +45,8 @@
         SELECT c.location
         FROM t_info_classroom ic
         LEFT JOIN t_classroom c
-        ON ic.classroom_id = c.classroom_id COLLATE utf8mb4_unicode_ci
+--         ON ic.classroom_id = c.classroom_id COLLATE utf8mb4_unicode_ci
+        ON ic.classroom_id = c.classroom_id
         WHERE ic.info_id = #{infoId}
           AND ic.is_deleted = 0
     </select>
@@ -50,7 +54,8 @@
         SELECT NAME
         FROM t_info_teacher it
         LEFT JOIN t_teacher t
-        ON it.teacher_id = t.teacher_id COLLATE utf8mb4_unicode_ci
+--         ON it.teacher_id = t.teacher_id COLLATE utf8mb4_unicode_ci
+        ON it.teacher_id = t.teacher_id
         WHERE it.info_id = #{infoId}
           AND it.is_deleted = 0
     </select>
