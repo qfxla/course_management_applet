@@ -65,6 +65,9 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
     @Resource
     IUserService iUserService;
 
+    @Resource
+    UserMapper userMapper;
+
 //    @Resource(name = "loginCache")
 //    LoadingCache<String,Object> cache;
 
@@ -106,208 +109,229 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
         } catch (IOException e) {
             e.printStackTrace();
         }
-        String enter = "\n";
-        String key = "";
-        int courseTotal = 0;
-        //星期一~星期日：1-2~7-2
-        if(page == null){
-            throw new CourseException(555,"page为空！");
-        }
-
-        DomElement[][] domElements = new DomElement[7][6];
-        DomElement xnxq01id = page.getElementById("xnxq01id");
-        DomNodeList<HtmlElement> options = xnxq01id.getElementsByTagName("option");
-        HtmlElement htmlElement = options.get(0);
-        HtmlPage click = null;
-        try {
-            click = htmlElement.click();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        assert click != null;
-        String[] sectionIds = getSectionId(click);
-        page = click;
-
-        int switchFlag = 0;
-        for (int i = 0;i < 7;i++){
-            for (int j = 0;j <= 5;j++) {
-                if (Thread.currentThread().isInterrupted()) {
-                    System.out.println("Thread.currentThread().isInterrupted()");
-                }
-                if (j == 2) {     //由于第5节为空，略过
-                    continue;
-                }
-                key = sectionIds[j] + "-" + (i + 1) + "-2";
-                if (page.getElementById(key) == null) {
-                    throw new NullPointerException("Key过期了！");
-                } else {
-                    domElements[i][j] = page.getElementById(key);
-                }
-                String course = domElements[i][j].asText();
-                if(course.length() < 5){
-                    switchFlag++;
-                }
-                if(switchFlag >= 42){
-                    log.info("发现他是白云课程表");
-                    isSwitch = true;
-                    break;
-                }
+        try{
+            String enter = "\n";
+            String key = "";
+            int courseTotal = 0;
+            //星期一~星期日：1-2~7-2
+            if (page == null) {
+                throw new CourseException(555, "page为空！");
             }
-        }
 
-        if(isSwitch){
-            DomElement kbjcmsid = page.getElementById("kbjcmsid");
-            DomNodeList<HtmlElement> baiyunOpt = kbjcmsid.getElementsByTagName("option");
-            HtmlElement baiyunEle = baiyunOpt.get(1);
-            HtmlPage baiyunClick = null;
+            DomElement[][] domElements = new DomElement[7][6];
+            DomElement xnxq01id = page.getElementById("xnxq01id");
+            DomNodeList<HtmlElement> options = xnxq01id.getElementsByTagName("option");
+            HtmlElement htmlElement = options.get(0);
+            HtmlPage click = null;
             try {
-                baiyunClick = baiyunEle.click();
+                click = htmlElement.click();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            assert baiyunClick != null;
-            sectionIds = getSectionId(baiyunClick);
-            page = baiyunClick;
-        }
-        String infoId;
-        switchFlag = 0;
-        for (int i = 0;i < 7;i++){     //星期一到星期日
-            for (int j = 0;j <= 5;j++){     //sectionIds[0]到sectionIds[5]
-                if(Thread.currentThread().isInterrupted()){
-                    log.info("正常爬的线程不再执行。。。");
-                    throw new CourseException(555,"正常爬的线程不再执行，回滚数据");
-                }
-                if(j == 2){     //由于第5节为空，略过
-                    continue;
-                }
-                key = sectionIds[j] + "-" + (i+1) + "-2";
-                if(page.getElementById(key) == null){
-                    throw new NullPointerException("Key过期了！");
-                }else{
-                    domElements[i][j] = page.getElementById(key);
-                }
-                String course = domElements[i][j].asText();
-                if(course.length() < 5){
-                    switchFlag++;
-                }
-                if(switchFlag >= 42){
-                    throw new CourseException(555,"发现他海珠白云均为空课表");
-                }
-                String[] temp;
-//                int num = 0;
-//                int index;
-//                for (int g = 0; course.contains("----"); g = g + index) {
-//                    index = course.indexOf("---");
-//                    temp[num] = course.substring(0,index);
-//                    course = course.substring(index+21);
-//                    course = course.substring(index+22);
-//                    num++;
-//                }
-                 temp = course.split("---------------------|----------------------");
-                //System.out.println(Arrays.toString(temp));
-                String[] courseInfo = new String[4];
-                for (int k = 0;k < temp.length;k++) {
-                    if(temp[k] == null || temp[k].equals("") || temp[k].equals(" ")){
+            assert click != null;
+            String[] sectionIds = getSectionId(click);
+            page = click;
+
+            int switchFlag = 0;
+            for (int i = 0; i < 7; i++) {
+                for (int j = 0; j <= 5; j++) {
+                    if (Thread.currentThread().isInterrupted()) {
+                        System.out.println("Thread.currentThread().isInterrupted()");
+                    }
+                    if (j == 2) {     //由于第5节为空，略过
                         continue;
                     }
-                    if (temp[k].charAt(0) == '\n'){
-                        temp[k] = temp[k].substring(1);
+                    key = sectionIds[j] + "-" + (i + 1) + "-2";
+                    if (page.getElementById(key) == null) {
+                        throw new NullPointerException("Key过期了！");
+                    } else {
+                        domElements[i][j] = page.getElementById(key);
                     }
-                    if(temp[k].indexOf(enter) == 1){
-                        temp[k] = temp[k].substring(2);
+                    String course = domElements[i][j].asText();
+                    if (course.length() < 5) {
+                        switchFlag++;
                     }
-                    ArrayList<Integer> weekList;
-                    ArrayList<Integer> sectionList;
-                    if(temp[k].contains("网络课")){
-                        log.info("有网络课。。。");
-                        temp[k] = temp[k].substring(0,temp[k].indexOf(enter));
-                        courseInfo[0] = temp[k];
-                        weekList = null;
-                        sectionList = null;
-                    }else{
-                        int idx,cnum = 0;
-                        for(int h = 0; temp[k].contains(enter) && cnum <= 3;h = h+idx){
-                            idx = temp[k].indexOf(enter);
-                            courseInfo[cnum] = temp[k].substring(0,idx);
-                            temp[k] = temp[k].substring(idx+1);
-                            cnum++;
-                        }
-                        weekList = getWeekCount(courseInfo[2]);
-                        sectionList = getSectionCount(courseInfo[2]);
+                    if (switchFlag >= 42) {
+                        log.info("发现他是白云课程表");
+                        isSwitch = true;
+                        break;
                     }
-                    int xingqiId = i+1;     //星期几
-
-                    if(weekList == null || weekList.size() == 0){
-                        String weekAndSectionStr = courseInfo[2];
-                        String weekStr = getWeekStr(weekAndSectionStr);
-                        String sectionStr = getSectionStr(weekAndSectionStr);
-
-                        infoId = iinfoService.addCourseInfo(xingqiId,weekStr,sectionStr);
-                        iUserInfoService.insertUserInfo(currentOpenid,infoId);
-                        continue;
-                    }
-
-                    for (Integer weekId : weekList) {
-                        for (Integer sectionId : sectionList) {
-                            courseTotal++;
-                            String weekStr = "";
-                            String sectionStr = "";
-                            String weekAndSectionStr = courseInfo[2];
-                            if(!weekAndSectionStr.equals("") && !weekAndSectionStr.equals(" ")){
-                                weekStr  = getWeekStr(weekAndSectionStr);
-                                sectionStr = getSectionStr(weekAndSectionStr);
-                            }else {
-                                weekStr = "无";
-                                sectionStr = "无";
-                            }
-                            infoId = iinfoService.addCourseInfo(xingqiId,weekStr,sectionStr);
-                            iUserInfoService.insertUserInfo(currentOpenid, infoId);
-
-                            String courseName = courseInfo[0];      //课程名
-                            String courseId = iCourseService.addCourse(courseName); //添加课程t_course
-                            String teacherName = courseInfo[1];     //教师名
-                            Integer teacherId = iTeacherService.addTeacher(teacherName);  //添加教师t_teacher
-                            String classroomName = courseInfo[3];   //教室名
-                            Integer classroomId = iClassroomService.addClassroom(classroomName);    //添加教室t_classroom
-
-
-                            //插入课程表与t_info的关联表
-                            iInfoCourseService.insertInfoCourse(infoId, courseId);
-
-                            //插入教师表与t_info的关联表
-                            iInfoTeacherService.insertInfoTeacher(infoId, teacherId);
-
-                            //插入教室表与t_info的关联表
-                            iInfoClassroomService.insertInfoClassroom(infoId, classroomId);
-
-                            //插入周次表与t_info的关联表
-                            iInfoWeekService.insertInfoWeek(infoId, weekId);
-
-                            //插入节次表与t_info的关联表
-                            infoSectionService.insertInfoSection(infoId,sectionId);
-                        }
-                    }
-//                    System.out.println("课程名===" + courseInfo[0]);
-//                    System.out.println("教师名===" + courseInfo[1]);
-//                    System.out.println("周次===" + weekList);
-//                    System.out.println("节次===" + sectionList);
-//                    System.out.println("地点===" + courseInfo[3]);
-//                    System.out.println("星期" + (i+1));
-                    log.info(currentOpenid+":"+courseTotal);
                 }
             }
+
+            if (isSwitch) {
+                DomElement kbjcmsid = page.getElementById("kbjcmsid");
+                DomNodeList<HtmlElement> baiyunOpt = kbjcmsid.getElementsByTagName("option");
+                HtmlElement baiyunEle = baiyunOpt.get(1);
+                HtmlPage baiyunClick = null;
+                try {
+                    baiyunClick = baiyunEle.click();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                assert baiyunClick != null;
+                sectionIds = getSectionId(baiyunClick);
+                page = baiyunClick;
+            }
+            String infoId;
+            switchFlag = 0;
+            webClient.getCurrentWindow().getJobManager().removeAllJobs();
+            webClient.close();
+            for (int i = 0; i < 7; i++) {     //星期一到星期日
+                for (int j = 0; j <= 5; j++) {     //sectionIds[0]到sectionIds[5]
+                    if (Thread.currentThread().isInterrupted()) {
+                        log.info("正常爬的线程不再执行。。。");
+                        throw new CourseException(555, "正常爬的线程不再执行，回滚数据");
+                    }
+                    if (j == 2) {     //由于第5节为空，略过
+                        continue;
+                    }
+                    key = sectionIds[j] + "-" + (i + 1) + "-2";
+                    if (page.getElementById(key) == null) {
+                        throw new NullPointerException("Key过期了！");
+                    } else {
+                        domElements[i][j] = page.getElementById(key);
+                    }
+                    String course = domElements[i][j].asText();
+                    if (course.length() < 5) {
+                        switchFlag++;
+                    }
+                    if (switchFlag >= 42) {
+                        throw new CourseException(555, "发现他海珠白云均为空课表");
+                    }
+                    String[] temp;
+                    temp = course.split("---------------------|----------------------");
+                    //System.out.println(Arrays.toString(temp));
+                    String[] courseInfo = new String[4];
+                    for (int k = 0; k < temp.length; k++) {
+//                        if(temp[k].contains("通知单编号")){
+//                            temp[k] = temp[k].substring(0,temp[k].indexOf("通知单编号"));
+//                        }
+                        if (temp[k] == null || temp[k].equals("") || temp[k].equals(" ")) {
+                            continue;
+                        }
+                        if (temp[k].charAt(0) == '\n') {
+                            temp[k] = temp[k].substring(1);
+                        }
+                        if (temp[k].indexOf(enter) == 1) {
+                            temp[k] = temp[k].substring(2);
+                        }
+                        ArrayList<Integer> weekList;
+                        ArrayList<Integer> sectionList;
+                        if (temp[k].contains("网络课")) {
+                            log.info("有网络课。。。");
+                            temp[k] = temp[k].substring(0, temp[k].indexOf(enter));
+                            courseInfo[0] = temp[k];
+                            weekList = null;
+                            sectionList = null;
+                        } else {
+                            int idx, cnum = 0;
+                            for (int h = 0; temp[k].contains(enter) && cnum <= 3; h = h + idx) {
+                                idx = temp[k].indexOf(enter);
+                                courseInfo[cnum] = temp[k].substring(0, idx);
+                                temp[k] = temp[k].substring(idx + 1);
+                                cnum++;
+                            }
+                            if (courseInfo[1].contains("篮球") || courseInfo[1].contains("匹克球")
+                                    || courseInfo[1].contains("网球") || courseInfo[1].contains("排球")
+                                    || courseInfo[1].contains("羽毛球") || courseInfo[1].contains("足球")
+                                    || courseInfo[1].contains("乒乓球") || courseInfo[1].contains("健美")
+                                    || courseInfo[1].contains("舞蹈") || courseInfo[1].contains("跆拳道")
+                                    || courseInfo[1].contains("瑜伽") || courseInfo[1].contains("排舞")
+                            ) {
+                                courseInfo[0] = courseInfo[0] + courseInfo[1];
+                                courseInfo[1] = courseInfo[2];
+                                courseInfo[2] = courseInfo[3];
+                                courseInfo[3] = "";
+                            }
+                            if (courseInfo[1].contains("(周)")){
+                                courseInfo[3] = courseInfo[2];
+                                courseInfo[2] = courseInfo[1];
+                                courseInfo[1] = "未知";
+                            }
+                            if (courseInfo[3].contains(":")) {
+                                courseInfo[3] = "无";
+                            }
+                            weekList = getWeekCount(courseInfo[2]);
+                            if(weekList.get(0) == -99){
+                                System.out.println(courseInfo[2]);
+                                throw new CourseException(555,"周次这里要改bug咯！");
+                            }
+                            sectionList = getSectionCount(courseInfo[2]);
+                        }
+                        int xingqiId = i + 1;     //星期几
+
+                        if (weekList == null || weekList.size() == 0) {
+                            String weekAndSectionStr = courseInfo[2];
+                            String weekStr = getWeekStr(weekAndSectionStr);
+                            String sectionStr = getSectionStr(weekAndSectionStr);
+
+                            infoId = iinfoService.addCourseInfo(xingqiId, weekStr, sectionStr);
+                            iUserInfoService.insertUserInfo(currentOpenid, infoId);
+                            continue;
+                        }
+
+                        for (Integer weekId : weekList) {
+                            for (Integer sectionId : sectionList) {
+                                courseTotal++;
+                                String weekStr = "";
+                                String sectionStr = "";
+                                String weekAndSectionStr = courseInfo[2];
+                                if (!weekAndSectionStr.equals("") && !weekAndSectionStr.equals(" ")) {
+                                    weekStr = getWeekStr(weekAndSectionStr);
+                                    sectionStr = getSectionStr(weekAndSectionStr);
+                                } else {
+                                    weekStr = "无";
+                                    sectionStr = "无";
+                                }
+                                infoId = iinfoService.addCourseInfo(xingqiId, weekStr, sectionStr);
+                                iUserInfoService.insertUserInfo(currentOpenid, infoId);
+                                String courseId;
+                                Integer teacherId;
+                                Integer classroomId;
+//                                synchronized (insertLock){
+                                String courseName = courseInfo[0];      //课程名
+                                courseId = iCourseService.addCourse(courseName); //添加课程t_course
+                                String teacherName = courseInfo[1];     //教师名
+                                teacherId = iTeacherService.addTeacher(teacherName);  //添加教师t_teacher
+                                String classroomName = courseInfo[3];   //教室名
+                                classroomId = iClassroomService.addClassroom(classroomName);    //添加教室t_classroom
+//                                }
+
+                                //插入课程表与t_info的关联表
+                                iInfoCourseService.insertInfoCourse(infoId, courseId);
+
+                                //插入教师表与t_info的关联表
+                                iInfoTeacherService.insertInfoTeacher(infoId, teacherId);
+
+                                //插入教室表与t_info的关联表
+                                iInfoClassroomService.insertInfoClassroom(infoId, classroomId);
+
+                                //插入周次表与t_info的关联表
+                                iInfoWeekService.insertInfoWeek(infoId, weekId);
+
+                                //插入节次表与t_info的关联表
+                                infoSectionService.insertInfoSection(infoId, sectionId);
+                            }
+                        }
+                        log.info(currentOpenid + ":" + courseTotal);
+                    }
+                }
+            }
+            QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("openid", currentOpenid);
+            User user = userMapper.selectOne(queryWrapper);
+            user.setIsPa(1);
+            if (!iUserService.updateById(user)) {
+                CourseException courseException = new CourseException();
+                courseException.setMsg("更新isPa失败");
+                throw courseException;
+            }
+                        cache.invalidate(currentOpenid);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }finally {
         }
-        System.out.println(currentOpenid+"总课程数===" + courseTotal);
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("openid",currentOpenid);
-        User user = iUserService.getById(currentOpenid);
-        user.setIsPa(1);
-        if (!iUserService.updateById(user)){
-            CourseException courseException = new CourseException();
-            courseException.setMsg("更新isPa失败");
-            throw courseException;
-        }
-        cache.invalidate(currentOpenid);
         //课程爬完，开始爬人文考试
 //        String xueHao = user.getNo();
 //        if(xueHao != null){
@@ -417,12 +441,12 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
     public static ArrayList<Integer> getWeekCount(String weekAndSection){
         ArrayList<Integer> weekList = new ArrayList<>();
         int index;
-        if(weekAndSection.contains("(双周)")){
-            index = weekAndSection.indexOf("(双周)");
+        if(weekAndSection.contains("(周)")){
+            index = weekAndSection.indexOf("(周)");
         }else if(weekAndSection.contains("(单周)")){
             index = weekAndSection.indexOf("(单周)");
-        }else if(weekAndSection.contains("(周)")){
-            index = weekAndSection.indexOf("(周)");
+        }else if(weekAndSection.contains("(双周)")){
+            index = weekAndSection.indexOf("(双周)");
         }else{
             throw new CourseException(555,"周次这里要改Bug咯！");
         }
