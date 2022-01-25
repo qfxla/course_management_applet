@@ -54,118 +54,118 @@ public class GradeServiceImpl extends ServiceImpl<GradeMapper, Grade> implements
     RedisTemplate redisTemplate;
 
     @Override
-//    @Scheduled(fixedDelay = 100000)
     public int paGrade(String openid, WebClient webClient){
-//    public void paGrade(){
         HtmlPage page = null;
-//        WebClient webClient = null;
-//        String openid = "ohpVk5TmJDKSy5Wm3rGAvLQnUneQ";
-        try {
-//            webClient = WebClientUtils.getWebClient();
-//            try {
-////                LoginUtils.login(webClient, "202010244331", "Zhku10422X");
-//                LoginUtils.login(webClient, "202010244304", "Ctc779684470...");
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-            page = webClient.getPage("https://edu-admin.zhku.edu.cn/jsxsd/kscj/cjcx_list?kksj=2021-2022-1");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        assert page != null;
-        DomElement dataList = page.getElementById("dataList");
-        DomNodeList<HtmlElement> tr = dataList.getElementsByTagName("tr");
-        boolean flag = true;
-        int total = (tr.size()-1);
-        for (HtmlElement element : tr) {
-            if(flag){
-                flag = false;
-                continue;
+        String[] xueQiArr = {
+                "2021-2022-1","2021-2022-2",
+                "2020-2021-1","2020-2021-2",
+                "2019-2020-1","2019-2020-2",
+                "2018-2019-1","2018-2019-2",
+                "2017-2018-1","2017-2018-2",
+                "2016-2017-1","2016-2017-2"
+        };
+        for (String xueQi : xueQiArr) {
+            try {
+                String url = "https://edu-admin.zhku.edu.cn/jsxsd/kscj/cjcx_list?kksj=" + xueQi;
+                page = webClient.getPage(url);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            DomNodeList<HtmlElement> tdd = element.getElementsByTagName("td");
-            String term = tdd.get(1).asText();
-            String subject = tdd.get(3).asText();
-            String grade = tdd.get(4).asText();
-            String scoreStr = tdd.get(6).asText();
-            String gpaStr = tdd.get(8).asText();
-            String property = tdd.get(12).asText();
-            float score = Float.parseFloat(scoreStr);
-            float gpa = Float.parseFloat(gpaStr);
-            DomNodeList<HtmlElement> a = element.getElementsByTagName("a");
-            for (HtmlElement htmlElement : a) {
-                String hrefStr = htmlElement.getAttribute("href");
-                String url = "https://edu-admin.zhku.edu.cn" +  hrefStr.substring(hrefStr.indexOf("('") + 2, hrefStr.indexOf("',"));
-                HtmlPage norPage = null;
-                try {
-                    norPage = webClient.getPage(url);
-                } catch (IOException e) {
-                    e.printStackTrace();
+            assert page != null;
+            DomElement dataList = page.getElementById("dataList");
+            DomNodeList<HtmlElement> tr = dataList.getElementsByTagName("tr");
+            boolean flag = true;
+            for (HtmlElement element : tr) {
+                if(flag){
+                    flag = false;
+                    continue;
                 }
-                if (norPage != null){
-                    DomElement norList = norPage.getElementById("dataList");
-                    DomNodeList<HtmlElement> norTr = norList.getElementsByTagName("tr");
-                    for (HtmlElement norEle : norTr) {
-                        DomNodeList<HtmlElement> norTd = norEle.getElementsByTagName("td");
-                        if (norTd.size() == 8) {
-                            String norGrade = norTd.get(1).asText();
-                            String qimoGrade = norTd.get(5).asText();
-                            String norRatioStr = norTd.get(2).asText();
-                            String qimoRatioStr = norTd.get(6).asText();
-                            if (!Objects.equals(norRatioStr, "") && !Objects.equals(qimoRatioStr, "") && norRatioStr!=null && qimoRatioStr != null) {
+                DomNodeList<HtmlElement> tdd = element.getElementsByTagName("td");
+                String term = tdd.get(1).asText();
+                String subject = tdd.get(3).asText();
+                String grade = tdd.get(4).asText();
+                String scoreStr = tdd.get(6).asText();
+                String gpaStr = tdd.get(8).asText();
+                String property = tdd.get(12).asText();
+                float score = Float.parseFloat(scoreStr);
+                float gpa = Float.parseFloat(gpaStr);
+                DomNodeList<HtmlElement> a = element.getElementsByTagName("a");
+                for (HtmlElement htmlElement : a) {
+                    String hrefStr = htmlElement.getAttribute("href");
+                    String url = "https://edu-admin.zhku.edu.cn" +  hrefStr.substring(hrefStr.indexOf("('") + 2, hrefStr.indexOf("',"));
+                    HtmlPage norPage = null;
+                    try {
+                        norPage = webClient.getPage(url);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (norPage != null){
+                        DomElement norList = norPage.getElementById("dataList");
+                        DomNodeList<HtmlElement> norTr = norList.getElementsByTagName("tr");
+                        for (HtmlElement norEle : norTr) {
+                            DomNodeList<HtmlElement> norTd = norEle.getElementsByTagName("td");
+                            if (norTd.size() == 8) {
+                                String norGrade = norTd.get(1).asText();
+                                String qimoGrade = norTd.get(5).asText();
+                                String norRatioStr = norTd.get(2).asText();
+                                String qimoRatioStr = norTd.get(6).asText();
+                                if (!Objects.equals(norRatioStr, "") && !Objects.equals(qimoRatioStr, "") && norRatioStr!=null && qimoRatioStr != null) {
 //                                String bili = qimoRatioStr.substring(0, qimoRatioStr.indexOf("0%")) + ":" + norRatioStr.substring(0, norRatioStr.indexOf("0%"));
-                                if(norGrade == null || norGrade.equals("")){
-                                    norGrade = "无";
-                                }
-                                if(qimoGrade == null || qimoGrade.equals("")){
-                                    qimoGrade = "无";
-                                }
-                                Grade gradeObj = new Grade(openid,term,subject,grade,property,score,gpa,norGrade,qimoGrade,norRatioStr,qimoRatioStr);
-                                QueryWrapper<Grade> queryWrapper = new QueryWrapper<>();
-                                queryWrapper.eq("openid",openid);
-                                queryWrapper.eq("subject",subject);
-                                int count = gradeMapper.selectCount(queryWrapper);
-                                if(count == 0){
-                                    //数据库里这个人没有这个成绩
-                                    int insert = gradeMapper.insert(gradeObj);
-                                    if(insert == 1){
-                                        System.out.println(openid + "---" + "插入成绩成功---" + subject);
-                                    }else{
-                                        log.info(openid +  "未能成功插入成绩");
+                                    if(norGrade == null || norGrade.equals("")){
+                                        norGrade = "无";
                                     }
-                                }else{
-                                    //数据库里这个人有这个成绩
-                                    queryWrapper.select("id");
-                                    Grade gradeId = gradeMapper.selectOne(queryWrapper);
-                                    gradeObj.setId(gradeId.getId());
-                                    int updateNor = gradeMapper.updateById(gradeObj);
-                                    if(updateNor == 1){
-                                        System.out.println(openid + "---" + "更新平时分成功---" + subject);
+                                    if(qimoGrade == null || qimoGrade.equals("")){
+                                        qimoGrade = "无";
+                                    }
+                                    Grade gradeObj = new Grade(openid,term,subject,grade,property,score,gpa,norGrade,qimoGrade,norRatioStr,qimoRatioStr);
+                                    QueryWrapper<Grade> queryWrapper = new QueryWrapper<>();
+                                    queryWrapper.eq("openid",openid);
+                                    queryWrapper.eq("subject",subject);
+                                    int count = gradeMapper.selectCount(queryWrapper);
+                                    if(count == 0){
+                                        //数据库里这个人没有这个成绩
+                                        int insert = gradeMapper.insert(gradeObj);
+                                        if(insert == 1){
+                                            System.out.println(openid + "---" + "插入成绩成功---" + subject);
+                                        }else{
+                                            log.info(openid +  "未能成功插入成绩");
+                                        }
                                     }else{
-                                        log.info(openid +  "未能成功更新平时分");
+                                        //数据库里这个人有这个成绩
+                                        queryWrapper.select("id");
+                                        Grade gradeId = gradeMapper.selectOne(queryWrapper);
+                                        gradeObj.setId(gradeId.getId());
+                                        int updateNor = gradeMapper.updateById(gradeObj);
+                                        if(updateNor == 1){
+                                            System.out.println(openid + "---" + "更新平时分成功---" + subject);
+                                        }else{
+                                            log.info(openid +  "未能成功更新平时分");
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
-            }
-            Grade gradeObj = new Grade(openid,term,subject,grade,property,score,gpa);
-            QueryWrapper<Grade> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("openid",openid);
-            queryWrapper.eq("subject",subject);
-            int count = gradeMapper.selectCount(queryWrapper);
-            if(count == 0){
-                //数据库里这个人没有这个成绩
-                int insert = gradeMapper.insert(gradeObj);
-                if(insert == 1){
-                    System.out.println(openid + "---" + "插入成绩成功---" + subject);
-                }else{
-                    log.info(openid +  "未能成功插入成绩");
+                Grade gradeObj = new Grade(openid,term,subject,grade,property,score,gpa);
+                QueryWrapper<Grade> queryWrapper = new QueryWrapper<>();
+                queryWrapper.eq("openid",openid);
+                queryWrapper.eq("subject",subject);
+                int count = gradeMapper.selectCount(queryWrapper);
+                if(count == 0){
+                    //数据库里这个人没有这个成绩
+                    int insert = gradeMapper.insert(gradeObj);
+                    if(insert == 1){
+                        System.out.println(openid + "---" + "插入成绩成功---" + subject);
+                    }else{
+                        log.info(openid +  "未能成功插入成绩");
+                    }
                 }
             }
+
         }
-        System.out.println(openid + "---成绩总数：" + total);
-        return total > 0 ? total : -1;
+        System.out.println(openid + "---成绩爬完了");
+        return 0;
     }
 
     @Override
