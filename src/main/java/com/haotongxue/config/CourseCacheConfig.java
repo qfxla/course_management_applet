@@ -22,9 +22,8 @@ public class CourseCacheConfig {
 
     @Bean("courseCache")
     public LoadingRedisCache getCourseCache(){
-        int min = DateConvert.cacheMin();
         return myRedis.newBuilder()
-                .expireAfterWrite(min,TimeUnit.MINUTES)
+                .expireAfterWrite(15,TimeUnit.DAYS)
                 .build(key -> {
                     String cacheType = key.substring(0, 4);
                     String realKey = key.substring(4);

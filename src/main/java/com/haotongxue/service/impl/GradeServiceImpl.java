@@ -68,7 +68,7 @@ public class GradeServiceImpl extends ServiceImpl<GradeMapper, Grade> implements
 //            } catch (Exception e) {
 //                e.printStackTrace();
 //            }
-            page = webClient.getPage("http://edu-admin.zhku.edu.cn/jsxsd/kscj/cjcx_list");
+            page = webClient.getPage("https://edu-admin.zhku.edu.cn/jsxsd/kscj/cjcx_list?kksj=2021-2022-1");
         } catch (IOException e) {
             e.printStackTrace();
         }
