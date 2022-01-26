@@ -12,6 +12,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "reptile")
 @RequestMapping("/reptile")
 public interface RemoteReptileCalling {
+    /**
+     * 爬取所有东西
+     * @param currentOpenid
+     * @return
+     */
     @PostMapping("/all")
     public R reptileAll(@RequestParam String currentOpenid);
+
+    /**
+     * 爬取课表
+     * @param currentOpenid
+     * @return
+     */
+    @PostMapping("/course")
+    public R reptileCourse(@RequestParam String currentOpenid);
 }

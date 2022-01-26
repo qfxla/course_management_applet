@@ -12,6 +12,7 @@ import com.haotongxue.exceptionhandler.CourseException;
 import com.haotongxue.handler.ReptileHandler;
 import com.haotongxue.handler.WatchIsPaingHandler;
 import com.haotongxue.mapper.*;
+import com.haotongxue.openfeign.RemoteReptileCalling;
 import com.haotongxue.runnable.ReReptileRunnable;
 import com.haotongxue.runnable.ReptileRunnable;
 import com.haotongxue.service.*;
@@ -53,6 +54,8 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
     @Resource(name = "courseInfo")
     LoadingRedisCache cache;
 
+    @Autowired
+    private RemoteReptileCalling remoteReptileCalling;
 
     @Autowired
     private IInfoCourseService iInfoCourseService;
@@ -284,13 +287,14 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
             i7 = userInfoMapper.deleteByInfoId(infoList);
         }
         logger.info("删除成功，开始爬");
-        WebClient webClient = WebClientUtils.getWebClient();
-        User user = (User)loginCache.get(openId);
-        HtmlPage afterLogin = LoginUtils.login(webClient, user.getNo(), user.getPassword());
-        ReReptileRunnable reReptileRunnable = new ReReptileRunnable(webClient,user.getNo(),user.getPassword(),UserContext.getCurrentOpenid());
-        WatchIsPaingHandler.watchIsPa(reReptileRunnable);   //监视正常爬是否超过2分钟
-        reptileHandler.pa(new ReptileRunnable(webClient,user.getNo(),user.getPassword(),UserContext.getCurrentOpenid(),reReptileRunnable));
-
+//        WebClient webClient = WebClientUtils.getWebClient();
+//        User user = (User)loginCache.get(openId);
+//        HtmlPage afterLogin = LoginUtils.login(webClient, user.getNo(), user.getPassword());
+//        ReReptileRunnable reReptileRunnable = new ReReptileRunnable(webClient,user.getNo(),user.getPassword(),UserContext.getCurrentOpenid());
+//        WatchIsPaingHandler.watchIsPa(reReptileRunnable);   //监视正常爬是否超过2分钟
+//        reptileHandler.pa(new ReptileRunnable(webClient,user.getNo(),user.getPassword(),UserContext.getCurrentOpenid(),reReptileRunnable));
+        //换成远程调用
+        remoteReptileCalling.reptileCourse(openId);
         return true;
     }
 
