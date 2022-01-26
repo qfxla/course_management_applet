@@ -12,6 +12,7 @@ import com.haotongxue.exceptionhandler.CourseException;
 import com.haotongxue.handler.ReptileHandler;
 import com.haotongxue.handler.WatchIsPaingHandler;
 import com.haotongxue.mapper.*;
+import com.haotongxue.openfeign.RemoteReptileCalling;
 import com.haotongxue.runnable.ReReptileRunnable;
 import com.haotongxue.runnable.ReptileRunnable;
 import com.haotongxue.service.*;
@@ -47,14 +48,8 @@ public class UserController {
     @Autowired
     IUserService userService;
 
-//    @Resource(name = "loginCache")
-//    LoadingCache<String,Object> cache;
-
     @Resource(name = "loginCache")
     LoadingRedisCache cache;
-
-//    @Resource(name = "courseCache")
-//    LoadingCache<String,Object> courseCache;
 
     @Resource(name = "courseCache")
     LoadingRedisCache courseCache;
@@ -95,6 +90,9 @@ public class UserController {
     private IOfficialUserService officialUserService;
 
     @Autowired
+    RemoteReptileCalling remoteReptileCalling;
+
+    @Autowired
     private GradeService gradeService;
 
 
@@ -111,10 +109,6 @@ public class UserController {
         //boolean isRefreshInfo = false;
         if (loginDTO.getPassword() == null && loginDTO.getNo() == null){
             isQuickLogin = true;
-//            if (!cache.asMap().containsKey(openid)){
-//                //每三天用户信息就要更新一次，起码确保头像是最新的
-//                isRefreshInfo = true;
-//            }
         }
         User user = (User) cache.get(openid);
         boolean isDoPa = false; //是否执行学校系统登录验证
@@ -125,7 +119,6 @@ public class UserController {
             if (isQuickLogin){
                 return R.error().code(ResultCode.QUICK_LOGIN_ERROR);
             }
-
             webClient = WebClientUtils.getWebClient();
             try {
                 LoginUtils.login(webClient, loginDTO.getNo(), loginDTO.getPassword());
@@ -153,41 +146,24 @@ public class UserController {
             }
             //设置unionId
             user.setUnionId(unionid);
-
-            userService.save(user);
             user.setSubscribe(1);
-            user.setUnionId("");
+            userService.save(user);
             cache.put(openid,user);
         }
-//        else {
-//            //如果为0，则爬虫还没执行成功
-//            isDoPa = user.getIsPa() == 0;
-//            if (!user.getUnionId().equals(unionid)){
-//                user.setUnionId(unionid);
-//                userService.updateById(user);
-//            }
-//        }
-        if (isDoPa && user.getIsPaing() == 0){
-            log.info(openid + "开始爬虫");
-            ReReptileRunnable reReptileRunnable = new ReReptileRunnable(webClient,user.getNo(),user.getPassword(),UserContext.getCurrentOpenid());
-            watchIsPaingHandler.watchIsPa(reReptileRunnable);
-            log.info(openid + "正常爬虫");
-            ReptileRunnable reptileRunnable = new ReptileRunnable(webClient,user.getNo(),user.getPassword(),UserContext.getCurrentOpenid(),reReptileRunnable);
-            reptileHandler.pa(reptileRunnable);
+        else {
+            //如果为0，则爬虫还没执行成功
+            //isDoPa = user.getIsPa() == 0;
+            if (!user.getUnionId().equals(unionid)){
+                user.setUnionId(unionid);
+                userService.updateById(user);
+            }
         }
-        String token = JwtUtils.generate(openid);
+        if (isDoPa && user.getIsPaing() == 0){
+            //调用远程爬的接口
+            remoteReptileCalling.reptileAll(openid);
+        }
         boolean isHaiZhu = user.getIsHaizhu().equals(1);
-//        if (isRefreshInfo){
-//            //设置unionId
-//            user.setUnionId(unionid);
-//            userService.updateById(user);
-//
-//            return R.ok().code(ResultCode.NEED_REFRESH_INFO)
-//                    .data("Authority",token)
-//                    .data("subscribe",user.getSubscribe() == 1)
-//                    .data("isConcern",!user.getUnionId().equals(""))
-//                    .data("isHaiZhu",isHaiZhu);
-//        }
+        String token = JwtUtils.generate(openid);
         return R.ok()
                 .data("Authority",token)
                 .data("openid",openid)
@@ -365,13 +341,12 @@ public class UserController {
     @ApiOperation("删除某个人的数据，包括选课和倒计时")
     @GetMapping("/delSomeOneData")
     public R delSomeOneData(@RequestParam("openid")String openid){
+        cache.invalidate(String.valueOf(openid));
         User user = userService.getById(openid);
         if (user == null){
             return R.error().data("msg","无该openid");
         }
         String openId = user.getOpenid();
-
-        cache.invalidate(openid);
         for (int i = 1;i <= 20;i++){
             courseCache.invalidate("cour" + openId + ":" + i);
         }
@@ -395,6 +370,7 @@ public class UserController {
         userSelectedMapper.deleteByOpenId(openId);
 
         userMapper.deleteByInfoId(openid);
+
         return R.ok().data("msg","清除成功");
     }
 

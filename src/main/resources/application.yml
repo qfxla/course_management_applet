@@ -65,7 +65,16 @@ mybatis-plus:
       logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
   mapper-locations: classpath:com/haotongxue/mapper/xml/*.xml
 
+
 #小程序信息
 wechat:
   appid: wx07ba00d351fa34c4
   secret: 70426973c5a4eda1ad65c8d79d76a594
+
+#设置feign客户端超时时间(OpenFeign默认支持ribbon)
+ribbon:
+  #指的是建立连接所用的时间，适用于网络状况正常的情况下,两端连接所用的时间
+  ReadTimeout: 5000
+  #指的是建立连接后从服务器读取到可用资源所用的时间
+  ConnectTimeout: 5000
+
