@@ -13,8 +13,6 @@ import com.haotongxue.handler.ReptileHandler;
 import com.haotongxue.handler.WatchIsPaingHandler;
 import com.haotongxue.mapper.*;
 import com.haotongxue.openfeign.RemoteReptileCalling;
-import com.haotongxue.runnable.ReReptileRunnable;
-import com.haotongxue.runnable.ReptileRunnable;
 import com.haotongxue.service.*;
 import com.haotongxue.utils.*;
 import io.swagger.annotations.Api;
@@ -132,6 +130,8 @@ public class UserController {
                     }
                 }
                 return R.error().code(ResultCode.EDU_PROBLEM);
+            }finally {
+                webClient.close();
             }
             user = new User();
             BeanUtils.copyProperties(loginDTO,user);
@@ -319,7 +319,7 @@ public class UserController {
     public R passwordCheck(){
         String currentOpenid = UserContext.getCurrentOpenid();
         User user = (User) cache.get(currentOpenid);
-        if (user == null){
+        if (user == null || user.getIsPaing().equals(1)){
             return R.error();
         }
         try (WebClient webClient = WebClientUtils.getWebClient()) {
