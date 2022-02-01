@@ -327,7 +327,7 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
                 courseException.setMsg("更新isPa失败");
                 throw courseException;
             }
-                        cache.invalidate(currentOpenid);
+            cache.invalidate(currentOpenid);
         } catch (Exception e) {
             e.printStackTrace();
         }finally {

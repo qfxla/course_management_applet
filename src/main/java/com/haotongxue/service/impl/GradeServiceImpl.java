@@ -72,6 +72,10 @@ public class GradeServiceImpl extends ServiceImpl<GradeMapper, Grade> implements
                 e.printStackTrace();
             }
             assert page != null;
+            if(page.asText().contains("未查询到数据")){
+                System.out.println(openid + "---没有考试，换下一个学期");
+                continue;
+            }
             DomElement dataList = page.getElementById("dataList");
             DomNodeList<HtmlElement> tr = dataList.getElementsByTagName("tr");
             boolean flag = true;
