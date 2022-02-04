@@ -5,29 +5,26 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.haotongxue.cacheUtil.LoadingRedisCache;
 import com.haotongxue.entity.Class;
 import com.haotongxue.entity.StudentStatus;
+import com.haotongxue.entity.vo.ESVO;
+import com.haotongxue.entity.vo.ESWithHighLightVO;
 import com.haotongxue.entity.vo.StudentVOTwo;
 import com.haotongxue.mapper.StudentStatusMapper;
 import com.haotongxue.service.IStudentStatusService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.haotongxue.utils.ESUtils;
 import com.haotongxue.utils.GradeUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpHost;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.client.indices.CreateIndexRequest;
-import org.elasticsearch.client.indices.CreateIndexResponse;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +33,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * <p>
@@ -87,6 +83,7 @@ public class StudentStatusServiceImpl extends ServiceImpl<StudentStatusMapper, S
             studentVOTwo.setCollegeId(String.valueOf(item.getCollegeId()));
             studentVOTwo.setMajorId(item.getMajorId());
             studentVOTwo.setClassId(item.getClassId());
+            studentVOTwo.setSex(item.getSex());
             //获得班级名字
             Class aClass = classCache.get(item.getClassId());
             studentVOTwo.setClassName(aClass.getName());
@@ -96,12 +93,12 @@ public class StudentStatusServiceImpl extends ServiceImpl<StudentStatusMapper, S
     }
 
     @Override
-    public SearchHit[] getStudent(String grade, String collegeId, String majorId, String classId) throws IOException {
+    public List<ESVO> getStudent(String grade, String collegeId, String majorId, String classId, Integer page) throws IOException {
         SearchRequest request = new SearchRequest("studentstatus");
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         //设置分页
-        searchSourceBuilder.from(0);
-        searchSourceBuilder.size(500);
+        searchSourceBuilder.from((page-1)*25);
+        searchSourceBuilder.size(25);
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         if (!StringUtils.isEmpty(grade)){
             boolQueryBuilder.must(QueryBuilders.termQuery("grade",grade));
@@ -121,49 +118,63 @@ public class StudentStatusServiceImpl extends ServiceImpl<StudentStatusMapper, S
         //发请求
         SearchResponse search = client.search(request, RequestOptions.DEFAULT);
 
-        return search.getHits().getHits();
+        return ESUtils.transformNormal(search.getHits().getHits());
     }
 
     @Override
-    public SearchHit[] getStudent(String[] nos) throws IOException {
+    public List<ESVO> getStudent(String[] nos) throws IOException {
         SearchRequest request = new SearchRequest("studentstatus");
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         //设置分页
         searchSourceBuilder.from(0);
-        searchSourceBuilder.size(1);
+        searchSourceBuilder.size(1000);
         searchSourceBuilder.query(QueryBuilders.termsQuery("no",nos));
         request.source(searchSourceBuilder);
 
         //发请求
         SearchResponse search = client.search(request, RequestOptions.DEFAULT);
-        return search.getHits().getHits();
+        return ESUtils.transformNormal(search.getHits().getHits());
     }
 
     @Override
-    public SearchHit[] getStudentByFuzzySearch(String content) throws IOException {
+    public ESVO getStudent(String no) throws IOException {
         SearchRequest request = new SearchRequest("studentstatus");
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         //设置分页
         searchSourceBuilder.from(0);
-        searchSourceBuilder.size(500);
-        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        boolQueryBuilder
-                .should(QueryBuilders.matchQuery("className",content))
-                .should(QueryBuilders.matchQuery("name",content));
-        //构建高亮体
-        HighlightBuilder highlightBuilder = new HighlightBuilder();
-        highlightBuilder.preTags("<span style=\"color:red\">");
-        highlightBuilder.postTags("</span>");
-        //高亮字段
-        highlightBuilder.field("className").field("name");
-        searchSourceBuilder.highlighter(highlightBuilder);
-        searchSourceBuilder.query(boolQueryBuilder);
+        searchSourceBuilder.size(1);
+        searchSourceBuilder.query(QueryBuilders.termQuery("no",no));
         request.source(searchSourceBuilder);
 
         //发请求
         SearchResponse search = client.search(request, RequestOptions.DEFAULT);
+        return ESUtils.transformNormalOne(search.getHits().getHits());
+    }
 
-        return search.getHits().getHits();
+    @Override
+    public List<ESWithHighLightVO> getStudentByFuzzySearch(String content,Integer page) throws IOException {
+        SearchRequest request = new SearchRequest("studentstatus");
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        //设置分页
+        searchSourceBuilder.from((page-1)*25);
+        searchSourceBuilder.size(25);
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        boolQueryBuilder
+                .should(QueryBuilders.matchQuery("className",content))
+                .should(QueryBuilders.matchQuery("name",content));
+        searchSourceBuilder.query(boolQueryBuilder);
+
+        //设置高亮显示
+        HighlightBuilder highlightBuilder = new HighlightBuilder().field("*");
+        highlightBuilder.preTags("<span style='color:red'>");
+        highlightBuilder.postTags("</span>");
+
+        searchSourceBuilder.highlighter(highlightBuilder);
+        request.source(searchSourceBuilder);
+
+        //发请求
+        SearchResponse search = client.search(request, RequestOptions.DEFAULT);
+        return ESUtils.transform(search.getHits().getHits());
     }
 
     public void addStudentToES(StudentVOTwo studentVOTwo){

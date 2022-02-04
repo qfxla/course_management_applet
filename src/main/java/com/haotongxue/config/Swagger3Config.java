@@ -24,7 +24,7 @@ public class Swagger3Config {
     public Docket createRestApi(){
         //返回文档概要信息
         return new Docket(DocumentationType.OAS_30)
-                .enable(false)
+                .enable(true)
                 .apiInfo(apiInfo())
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.haotongxue.controller"))
