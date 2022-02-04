@@ -143,6 +143,7 @@ public class CountDownServiceImpl extends ServiceImpl<CountDownMapper, CountDown
                                     Selected selected = new Selected();
                                     selected.setSelectedName(courseName);
                                     selected.setSelectedScore(Float.valueOf(score));
+                                    System.out.println(selected.getSelectedName());
                                     selectedService.save(selected);
                                     userSelected.setSelectedId(selected.getSelectedId());
                                     userSelectedService.save(userSelected);

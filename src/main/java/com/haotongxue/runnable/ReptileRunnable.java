@@ -69,9 +69,21 @@ public class ReptileRunnable implements Runnable{
         } catch (Exception e){
             log.info("爬虫失败，继续爬倒计时、选课、成绩、姓名");
         }
-        userService.triggerSearchCountDown(currentOpenid,webClient);    //倒计时 + 选课
-        gradeService.paGrade(currentOpenid,webClient);
-        gradeService.searchName(currentOpenid,webClient);
+        try {
+            userService.triggerSearchCountDown(currentOpenid,webClient);    //倒计时 + 选课
+        }catch (Exception e){
+
+        }
+        try {
+            gradeService.paGrade(currentOpenid,webClient);
+        }catch (Exception e){
+
+        }
+        try {
+            gradeService.searchName(currentOpenid,webClient);
+        }catch (Exception e){
+
+        }
 
         webClient.getCurrentWindow().getJobManager().removeAllJobs();
         webClient.close();
