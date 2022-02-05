@@ -5,12 +5,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.haotongxue.cacheUtil.LoadingRedisCache;
 import com.haotongxue.entity.*;
 import com.haotongxue.entity.dto.BrowsingHistoryDTO;
+import com.haotongxue.entity.dto.ConcernDTO;
 import com.haotongxue.entity.dto.DetailPrivacySettingDTO;
 import com.haotongxue.entity.vo.*;
-import com.haotongxue.service.IBrowsingHistoryService;
-import com.haotongxue.service.IPrivacySettingService;
-import com.haotongxue.service.IPrivacyTargetService;
-import com.haotongxue.service.IStudentStatusService;
+import com.haotongxue.service.*;
 import com.haotongxue.utils.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -47,6 +45,9 @@ public class MiTaController {
     IBrowsingHistoryService browsingHistoryService;
 
     @Autowired
+    IConcernService concernService;
+
+    @Autowired
     IPrivacyTargetService targetService;
 
     @Resource(name = "loginCache")
@@ -60,6 +61,9 @@ public class MiTaController {
 
     @Resource(name = "privacySettingCache")
     LoadingRedisCache<PrivacySetting> privacySettingCache;
+
+    @Resource(name = "concernCache")
+    LoadingRedisCache<Concern> concernCache;
 
     /**
      * 获取用户默认分类
@@ -296,6 +300,66 @@ public class MiTaController {
             return R.ok().data("Authority", JwtUtils.generate(one.getOpenid())).message("可以访问");
         }
         return R.ok().code(ResultCode.NO_AUTHORITY_TO_SEE).message("没有权限");
+    }
+
+    @ApiOperation("关注")
+    @PutMapping("/authority/concern")
+    public R concern(@RequestHeader @ApiParam("传Authority（测试用）") String Authority,
+                     @RequestBody ConcernDTO concernDTO){
+        String currentOpenid = UserContext.getCurrentOpenid();
+        StudentStatus studentStatus = studentStatusCache.get(currentOpenid);
+        String no = studentStatus.getNo();
+        String concernedNo = concernDTO.getConcernedNo();
+        QueryWrapper<Concern> wrapper = new QueryWrapper<>();
+        wrapper.eq("no",no).eq("concerned_no",concernedNo);
+        if (concernService.count(wrapper) == 0){
+            Concern concern = new Concern();
+            concern.setNo(no);
+            concern.setConcernedNo(concernedNo);
+            if (concernService.save(concern)){
+                concernCache.invalidate(no);
+                return R.ok();
+            }
+        }
+        return R.error().message("关注失败或重复关注");
+    }
+
+    @ApiOperation("取消关注")
+    @DeleteMapping("/authority/concern")
+    public R cancelConcern(@RequestHeader @ApiParam("传Authority（测试用）") String Authority,
+                           @RequestParam String concernId){
+        String currentOpenid = UserContext.getCurrentOpenid();
+        StudentStatus studentStatus = studentStatusCache.get(currentOpenid);
+        String no = studentStatus.getNo();
+        if (concernService.removeById(concernId)){
+            concernCache.invalidate(no);
+            return R.ok();
+        }
+        return R.error().message("取消关注失败，可能还没关注！");
+    }
+
+    @ApiOperation("获取关注列表")
+    @GetMapping("authority/concern")
+    public R getConcernList(@RequestHeader @ApiParam("传Authority（测试用）") String Authority){
+        String currentOpenid = UserContext.getCurrentOpenid();
+        StudentStatus studentStatus = studentStatusCache.get(currentOpenid);
+        String no = studentStatus.getNo();
+        List<Concern> list = concernCache.getForList(no);
+        if (list.isEmpty()){
+            return R.error().message("关注列表为空");
+        }
+        String[] nos = new String[list.size()];
+        for (int i=0;i<list.size();i++){
+            nos[i] = list.get(i).getConcernedNo();
+        }
+        List<ESVO> student;
+        try {
+            student = studentStatusService.getStudent(nos);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return R.error().message("捕获到ES异常");
+        }
+        return R.ok().data("list",student);
     }
 }
 

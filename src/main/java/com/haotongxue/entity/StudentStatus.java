@@ -25,7 +25,7 @@ public class StudentStatus implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "openid", type = IdType.ASSIGN_ID)
+    @TableId(value = "openid", type = IdType.INPUT)
     private String openid;
 
     private Integer collegeId;
