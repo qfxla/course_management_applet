@@ -90,7 +90,7 @@ public class LoadingRedisCache<T> {
     }
 
     public void invalidate(String key){
-        redisTemplate.delete(key);
+        redisTemplate.delete(prefix+key);
     }
 
 

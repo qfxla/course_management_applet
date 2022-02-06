@@ -127,7 +127,8 @@ public class MiTaController {
      */
     @ApiOperation("更改隐私设置：1.公开 2.私密 3 只给谁看 4 不给谁看")
     @GetMapping("/authority/privacySetting")
-    public R updatePrivacySetting(@RequestParam Integer setting){
+    public R updatePrivacySetting(@RequestHeader @ApiParam("传Authority（测试用）") String Authority,
+                                  @RequestParam Integer setting){
         String currentOpenid = UserContext.getCurrentOpenid();
         StudentStatus studentStatus = studentStatusCache.get(currentOpenid);
         PrivacySetting privacySetting = new PrivacySetting();
@@ -158,7 +159,8 @@ public class MiTaController {
 
     @ApiOperation("把某些人设为只给他们看或不给他们看")
     @PostMapping("/authority/detailPrivacySetting")
-    public R detailPrivacySetting(@RequestBody DetailPrivacySettingDTO dto){
+    public R detailPrivacySetting(@RequestHeader @ApiParam("传Authority（测试用）") String Authority,
+                                  @RequestBody DetailPrivacySettingDTO dto){
         String currentOpenid = UserContext.getCurrentOpenid();
         StudentStatus studentStatus = studentStatusCache.get(currentOpenid);
         String no = studentStatus.getNo();
@@ -179,7 +181,8 @@ public class MiTaController {
 
     @ApiOperation("删除只给谁看或不给谁看")
     @DeleteMapping("/authority/detailPrivacySetting")
-    public R deleteDetailPrivacySetting(@RequestParam @ApiParam("id") Integer id){
+    public R deleteDetailPrivacySetting(@RequestHeader @ApiParam("传Authority（测试用）") String Authority,
+                                        @RequestParam @ApiParam("id") Integer id){
         if (targetService.removeById(id)){
             return R.ok();
         }
@@ -188,7 +191,8 @@ public class MiTaController {
 
     @ApiOperation("查看只给谁看或不给谁看具体的人")
     @GetMapping("/authority/detailPrivacySetting")
-    public R getDetailPrivacySetting(@RequestParam @ApiParam("隐私设置") Integer setting){
+    public R getDetailPrivacySetting(@RequestHeader @ApiParam("传Authority（测试用）") String Authority,
+                                     @RequestParam @ApiParam("隐私设置") Integer setting){
         String currentOpenid = UserContext.getCurrentOpenid();
         StudentStatus studentStatus = studentStatusCache.get(currentOpenid);
         String no = studentStatus.getNo();
@@ -250,7 +254,7 @@ public class MiTaController {
 
     @ApiOperation("删除所有的浏览记录")
     @DeleteMapping("/authority/browsingHistory")
-    public R deleteBrowsingHistory(){
+    public R deleteBrowsingHistory(@RequestHeader @ApiParam("传Authority（测试用）") String Authority){
         String currentOpenid = UserContext.getCurrentOpenid();
         StudentStatus studentStatus = studentStatusCache.get(currentOpenid);
         String no = studentStatus.getNo();
