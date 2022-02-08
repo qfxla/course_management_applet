@@ -65,6 +65,9 @@ public class MiTaController {
     @Resource(name = "concernCache")
     LoadingRedisCache<Concern> concernCache;
 
+    @Resource(name = "isConcernCache")
+    LoadingRedisCache<Concern> isConcernCache;
+
     /**
      * 获取用户默认分类
      * @return
@@ -89,15 +92,18 @@ public class MiTaController {
     }
 
     @ApiOperation("条件查询学生")
-    @GetMapping("/student")
-    public R getStudent(@RequestParam String grade,
+    @GetMapping("/authority/student")
+    public R getStudent(@RequestHeader @ApiParam("传Authority（测试用）") String Authority,
+                        @RequestParam String grade,
                         @RequestParam String collegeId,
                         @RequestParam String majorId,
                         @RequestParam String classId,
                         @RequestParam Integer currentPage){
-        List<ESVO> list;
+        List<IsConcernVO> list;
+        String currentOpenid = UserContext.getCurrentOpenid();
+        StudentStatus studentStatus = studentStatusCache.get(currentOpenid);
         try {
-            list = studentStatusService.getStudent(grade, collegeId, majorId, classId, currentPage);
+            list = studentStatusService.getStudent(grade, collegeId, majorId, classId, currentPage,studentStatus.getNo());
         } catch (IOException e) {
             e.printStackTrace();
             return R.error();
@@ -106,12 +112,15 @@ public class MiTaController {
     }
 
     @ApiOperation("模糊查询学生")
-    @GetMapping("/studentByName")
-    public R getStudentByFuzzySearch(@RequestParam String content,
+    @GetMapping("/authority/studentByName")
+    public R getStudentByFuzzySearch(@RequestHeader @ApiParam("传Authority（测试用）") String Authority,
+                                     @RequestParam String content,
                                      @RequestParam Integer currentPage){
-        List<ESWithHighLightVO> list;
+        List<IsConcernVO> list;
+        String currentOpenid = UserContext.getCurrentOpenid();
+        StudentStatus studentStatus = studentStatusCache.get(currentOpenid);
         try {
-            list = studentStatusService.getStudentByFuzzySearch(content,currentPage);
+            list = studentStatusService.getStudentByFuzzySearch(content,currentPage,studentStatus.getNo());
         } catch (IOException e) {
             e.printStackTrace();
             return R.error();
@@ -182,8 +191,17 @@ public class MiTaController {
     @ApiOperation("删除只给谁看或不给谁看")
     @DeleteMapping("/authority/detailPrivacySetting")
     public R deleteDetailPrivacySetting(@RequestHeader @ApiParam("传Authority（测试用）") String Authority,
-                                        @RequestParam @ApiParam("id") Integer id){
-        if (targetService.removeById(id)){
+                                        @RequestParam @ApiParam("目标学号") String targetNo,
+                                        @RequestParam @ApiParam("对应的隐私设置") Integer setting){
+        String currentOpenid = UserContext.getCurrentOpenid();
+        StudentStatus studentStatus = studentStatusCache.get(currentOpenid);
+        String no = studentStatus.getNo();
+        QueryWrapper<PrivacyTarget> privacyTargetQueryWrapper = new QueryWrapper<>();
+        privacyTargetQueryWrapper
+                .eq("no",no)
+                .eq("target_no",targetNo)
+                .eq("privacy_setting",setting);
+        if (targetService.remove(privacyTargetQueryWrapper)){
             return R.ok();
         }
         return R.error();
@@ -197,10 +215,26 @@ public class MiTaController {
         StudentStatus studentStatus = studentStatusCache.get(currentOpenid);
         String no = studentStatus.getNo();
         QueryWrapper<PrivacyTarget> privacyTargetQueryWrapper = new QueryWrapper<>();
-        privacyTargetQueryWrapper.eq("no",no);
-        privacyTargetQueryWrapper.eq("privacy_setting",setting);
+        privacyTargetQueryWrapper
+                .select("target_no")
+                .eq("no",no)
+                .eq("privacy_setting",setting);
         List<PrivacyTarget> list = targetService.list(privacyTargetQueryWrapper);
-        return R.ok().data("list",list);
+        if (list.isEmpty()){
+            return R.error().message("没有数据");
+        }
+        String[] nos = new String[list.size()];
+        for (int i=0;i<list.size();i++){
+            nos[i] = list.get(i).getTargetNo();
+        }
+        List<ESVO> student;
+        try {
+            student = studentStatusService.getStudent(nos);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return R.error().message("捕获ES异常");
+        }
+        return R.ok().data("list",student);
     }
 
     @ApiOperation("添加浏览记录")
@@ -331,12 +365,14 @@ public class MiTaController {
     @ApiOperation("取消关注")
     @DeleteMapping("/authority/concern")
     public R cancelConcern(@RequestHeader @ApiParam("传Authority（测试用）") String Authority,
-                           @RequestParam String concernId){
+                           @RequestParam @ApiParam("对方的学号") String targetNo){
         String currentOpenid = UserContext.getCurrentOpenid();
         StudentStatus studentStatus = studentStatusCache.get(currentOpenid);
         String no = studentStatus.getNo();
-        if (concernService.removeById(concernId)){
-            concernCache.invalidate(no);
+        QueryWrapper<Concern> concernQueryWrapper = new QueryWrapper<>();
+        concernQueryWrapper.eq("no",no).eq("concerned_no",targetNo);
+        if (concernService.remove(concernQueryWrapper)){
+            isConcernCache.invalidate(no+targetNo);
             return R.ok();
         }
         return R.error().message("取消关注失败，可能还没关注！");

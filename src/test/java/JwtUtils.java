@@ -69,6 +69,7 @@ public final class JwtUtils {
 
     public static void main(String[] args) {
         String token = generate("ohpVk5XeOL8loKJw1rTBvQ7C4ygI");
+        //String token = generate("ohpVk5SF3oodWNsodPzlmbiiHPXY");
         System.out.println(token);
     }
 }
