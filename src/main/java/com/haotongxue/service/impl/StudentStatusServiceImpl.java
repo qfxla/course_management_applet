@@ -6,13 +6,14 @@ import com.haotongxue.cacheUtil.LoadingRedisCache;
 import com.haotongxue.entity.Class;
 import com.haotongxue.entity.StudentStatus;
 import com.haotongxue.entity.vo.ESVO;
-import com.haotongxue.entity.vo.ESWithHighLightVO;
+import com.haotongxue.entity.vo.IsConcernVO;
 import com.haotongxue.entity.vo.StudentVOTwo;
 import com.haotongxue.mapper.StudentStatusMapper;
 import com.haotongxue.service.IStudentStatusService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.haotongxue.utils.ESUtils;
 import com.haotongxue.utils.GradeUtils;
+import com.haotongxue.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.index.IndexRequest;
@@ -56,6 +57,9 @@ public class StudentStatusServiceImpl extends ServiceImpl<StudentStatusMapper, S
     @Autowired
     private RestHighLevelClient client;
 
+    @Autowired
+    private ESUtils esUtils;
+
     @Override
     public void prepareES() {
         QueryWrapper<StudentStatus> studentStatusQueryWrapper = new QueryWrapper<>();
@@ -93,7 +97,7 @@ public class StudentStatusServiceImpl extends ServiceImpl<StudentStatusMapper, S
     }
 
     @Override
-    public List<ESVO> getStudent(String grade, String collegeId, String majorId, String classId, Integer page) throws IOException {
+    public List<IsConcernVO> getStudent(String grade, String collegeId, String majorId, String classId, Integer page,String no) throws IOException {
         SearchRequest request = new SearchRequest("studentstatus");
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         //设置分页
@@ -118,7 +122,7 @@ public class StudentStatusServiceImpl extends ServiceImpl<StudentStatusMapper, S
         //发请求
         SearchResponse search = client.search(request, RequestOptions.DEFAULT);
 
-        return ESUtils.transformNormal(search.getHits().getHits());
+        return esUtils.transformIsConcern(no,search.getHits().getHits(),false);
     }
 
     @Override
@@ -152,7 +156,7 @@ public class StudentStatusServiceImpl extends ServiceImpl<StudentStatusMapper, S
     }
 
     @Override
-    public List<ESWithHighLightVO> getStudentByFuzzySearch(String content,Integer page) throws IOException {
+    public List<IsConcernVO> getStudentByFuzzySearch(String content, Integer page, String no) throws IOException {
         SearchRequest request = new SearchRequest("studentstatus");
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         //设置分页
@@ -174,7 +178,7 @@ public class StudentStatusServiceImpl extends ServiceImpl<StudentStatusMapper, S
 
         //发请求
         SearchResponse search = client.search(request, RequestOptions.DEFAULT);
-        return ESUtils.transform(search.getHits().getHits());
+        return esUtils.transformIsConcern(no,search.getHits().getHits(),true);
     }
 
     public void addStudentToES(StudentVOTwo studentVOTwo){

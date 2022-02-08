@@ -4,6 +4,7 @@ import com.haotongxue.entity.StudentStatus;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.haotongxue.entity.vo.ESVO;
 import com.haotongxue.entity.vo.ESWithHighLightVO;
+import com.haotongxue.entity.vo.IsConcernVO;
 import org.elasticsearch.search.SearchHit;
 
 import java.io.IOException;
@@ -20,11 +21,11 @@ import java.util.List;
 public interface IStudentStatusService extends IService<StudentStatus> {
     void prepareES();
 
-    List<ESVO> getStudent(String grade, String collegeId, String majorId, String classId, Integer page) throws IOException;
+    List<IsConcernVO> getStudent(String grade, String collegeId, String majorId, String classId, Integer page, String no) throws IOException;
 
     List<ESVO> getStudent(String[] nos) throws IOException;
 
     ESVO getStudent(String no) throws IOException;
 
-    List<ESWithHighLightVO> getStudentByFuzzySearch(String content,Integer page) throws IOException;
+    List<IsConcernVO> getStudentByFuzzySearch(String content, Integer page, String no) throws IOException;
 }

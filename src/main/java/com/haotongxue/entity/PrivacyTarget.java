@@ -2,6 +2,7 @@ package com.haotongxue.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
@@ -33,8 +34,11 @@ public class PrivacyTarget implements Serializable {
     @ApiModelProperty("隐私设置的编号")
     private Integer privacySetting;
 
-    @ApiModelProperty("目标openid")
+    @ApiModelProperty("目标no")
     private String targetNo;
+
+    @TableLogic
+    private Integer isDeleted;
 
     public PrivacyTarget() {
     }

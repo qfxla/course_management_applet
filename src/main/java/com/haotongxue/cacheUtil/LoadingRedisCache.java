@@ -55,31 +55,13 @@ public class LoadingRedisCache<T> {
         return returnList;
     }
 
-//    /**
-//     * 通过多个条件查询
-//     * @param keys
-//     * @return
-//     */
-//    public List<T> getForCondition(String ...keys){
-//        StringBuilder stringBuilder = new StringBuilder();
-//        for (String key : keys) {
-//            stringBuilder.append(key);
-//        }
-//        Set<String> set = redisTemplate.keys(stringBuilder.toString());
-//        List<T> returnList = null;
-//        List<Object> list = null;
-//        if (set == null){
-//            list = (List<Object>) redisLoader.load(keys);
-//            put(stringBuilder.toString(),list);
-//        }
-//        if (list != null){
-//            returnList = new ArrayList<>();
-//            for (Object o : list){
-//                returnList.add((T) o);
-//            }
-//        }
-//        return returnList;
-//    }
+    /**
+     * 是否包含某个key
+     * @return
+     */
+    public boolean contain(String key){
+        return redisTemplate.hasKey(prefix+key);
+    }
 
     public void put(String key,Object object){
         if (duration != 0){
