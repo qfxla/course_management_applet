@@ -21,5 +21,6 @@ public interface UserMapper extends BaseMapper<User> {
     List<String> selectZeroPa();
     List<User> selectPaing();
     String getOfOpenidByOpenid(String openId);
+    List<Integer> getHasCourseWeekList(String no,int xingqi, int section);
 
 }

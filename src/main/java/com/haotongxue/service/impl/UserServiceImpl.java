@@ -210,4 +210,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             e.printStackTrace();
         }
     }
+
+
+    @Override
+    public List<Integer> getHasCourseWeekList(String no,int xingqi, int section) {
+        List<Integer> hasCourseWeekList = userMapper.getHasCourseWeekList(no, xingqi, section);
+        return hasCourseWeekList;
+    }
 }
