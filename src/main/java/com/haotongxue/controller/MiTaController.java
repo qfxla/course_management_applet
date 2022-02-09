@@ -281,7 +281,7 @@ public class MiTaController {
         StudentStatus studentStatus = studentStatusCache.get(currentOpenid);
         String no = studentStatus.getNo();
         QueryWrapper<BrowsingHistory> wrapper = new QueryWrapper<>();
-        wrapper.select("read_no").eq("readed_no",no);
+        wrapper.eq("readed_no",no);
         BrowsingHistoryVOList browsingHistoryVOList =  browsingHistoryService.sliceByCreateTime(wrapper,false);
         return R.ok().data("stu",browsingHistoryVOList);
     }
