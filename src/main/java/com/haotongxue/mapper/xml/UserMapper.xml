@@ -33,4 +33,16 @@
           AND t_info.xingqi = #{xingqi}
         GROUP BY t_info_week.week_id
     </select>
+
+    <select id="getHasCourseWeekList" resultType="java.lang.Integer">
+        SELECT t_info_week.week_id FROM t_user_info
+            LEFT JOIN t_user ON t_user_info.openid = t_user.openid
+            LEFT JOIN t_info ON t_user_info.info_id = t_info.info_id
+            LEFT JOIN t_info_section ON t_user_info.info_id = t_info_section.info_id
+            LEFT JOIN t_info_week ON t_user_info.info_id = t_info_week.info_id
+        WHERE t_user.no = #{no}
+          AND t_info_section.section_id = #{section}
+          AND t_info.xingqi = #{xingqi}
+        GROUP BY t_info_week.week_id
+    </select>
 </mapper>
