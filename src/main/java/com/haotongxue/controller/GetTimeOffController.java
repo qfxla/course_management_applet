@@ -329,7 +329,7 @@ public class GetTimeOffController {
 
         //创建一个文件
 //        File file = new File("X:/" + id + ".xls");
-        File file = new File("/root/timeoffxls/" + id + ".xls");
+        File file = new File("/root/timeoffxls/" + orgName + "成员无课时间一览表(\"仲园课程表\"小程序提供)" + id + ".xls");
         boolean newFileFlag = file.createNewFile();
         if(newFileFlag){
             System.out.println("文件成功创建---"  +  file.getPath());
