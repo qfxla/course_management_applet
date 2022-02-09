@@ -46,8 +46,8 @@ import static org.apache.poi.ss.usermodel.HorizontalAlignment.CENTER;
  */
 @Slf4j
 @RestController
-//@RequestMapping("/zkCourse/timeoff/authority")
-@RequestMapping("/zkCourse/timeoff")
+@RequestMapping("/zkCourse/timeoff/authority")
+//@RequestMapping("/zkCourse/timeoff")
 public class GetTimeOffController {
 
     @Autowired
