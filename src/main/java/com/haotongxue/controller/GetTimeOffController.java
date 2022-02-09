@@ -266,7 +266,6 @@ public class GetTimeOffController {
                 memberDTO = new MemberDTO();
                 memberDTO.setRealName(realName);
             }
-//                beginInsert(noList,no,num,sheet,secStyle,detailStyle,seArr,secArr,sepList,sepIdx,start,end,count);
             if(noList.indexOf(no) != 0){
                 start = totalBeginNum + 1;
             }
@@ -289,29 +288,21 @@ public class GetTimeOffController {
                         sepIdx = sepIdx + count + 1;
                     }
                     System.out.print("星期" + i + "的" + "第" + secArr[n] + "节：");
-//                    List<Integer> hasCourseWeekList = userService.getHasCourseWeekList(no, i, secArr[n]);
-//                    String str;
                     String str;
                     if(cacheFlag){
                         str = memberDTO.getHasCourseArr()[n][i-1];
                     }else {
                         List<Integer> hasCourseWeekList = userService.getHasCourseWeekList(no, i, secArr[n]);
                         String weekStr;
-                        if(hasCourseWeekList.size() > 0){
+                        if(hasCourseWeekList != null && hasCourseWeekList.size() > 0){
                             weekStr = getWeekStr(hasCourseWeekList) + "有课";
                         }else {
+                            //当前星期的当前节次没有课
                             weekStr = "无课";
                         }
                         hasCourseArr[n][i-1] = weekStr;
                         str = weekStr;
                     }
-//                    if (hasCourseWeekList != null && hasCourseWeekList.size() > 0){
-//                        String weekStr = getWeekStr(hasCourseWeekList);
-//                        str = realName + "：第" + weekStr + "有课";
-//                    }else {
-//                        //当前星期的当前节次没有课
-//                        str = realName + "：" + "无课";
-//                    }
                     HSSFCell cell2 = seRow.createCell(i);
                     cell2.setCellValue(realName + "：" + str);
                     cell2.setCellStyle(detailStyle);
@@ -350,55 +341,6 @@ public class GetTimeOffController {
             throw new CourseException(555,"文件居然已经存在");
         }
     }
-
-//    public void beginInsert(List<String> noList,String no,int num,
-//                            HSSFSheet sheet,CellStyle secStyle,CellStyle detailStyle,
-//                            String[] seArr,int[] secArr,List<Integer> sepList,int sepIdx,int start,int end,int count){
-//        if(noList.indexOf(no) != 0){
-//            start = totalBeginNum + 1;
-//        }
-//        num++;
-//        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-//        queryWrapper.select("openid").eq("no",no).last("limit 1");
-//        String openid = userMapper.selectOne(queryWrapper).getOpenid();
-//        QueryWrapper<StudentStatus> queryWrapper1 = new QueryWrapper<>();
-//        queryWrapper1.select("name").eq("openid",openid).last("limit 1");
-//        String realName = studentStatusMapper.selectOne(queryWrapper1).getName();
-//        for (int n = 0; n < 5; n++) {
-//            HSSFRow seRow = sheet.createRow(start - 1 + num);
-//            for (int i = 1; i < 8; i++) {
-//                HSSFCell cell = seRow.createCell(0);
-//                cell.setCellStyle(secStyle);
-//                cell.setCellValue(seArr[n]);
-//                if(i == 1 && noList.indexOf(no) == 0){
-//                    sepList.add(sepIdx);
-//                    sheet.addMergedRegion(CellRangeAddress.valueOf("A" + start + ":" + "A" + end));
-//                    sheet.addMergedRegion(CellRangeAddress.valueOf("A" + sepIdx + ":" + "H" + sepIdx));
-//
-//                    start = end + 2;
-//                    end = start + count - 1;
-//                    sepIdx = sepIdx + count + 1;
-//                }
-//                System.out.print("星期" + i + "的" + "第" + secArr[n] + "节：");
-//                List<Integer> hasCourseWeekList = userService.getHasCourseWeekList(no, i, secArr[n]);
-//                String str;
-//                if (hasCourseWeekList != null && hasCourseWeekList.size() > 0){
-//                    String weekStr = getWeekStr(hasCourseWeekList);
-//                    str = realName + "：第" + weekStr + "有课";
-//                }else {
-//                    //当前星期的当前节次没有课
-//                    str = realName + "：" + "无课";
-//                }
-//                HSSFCell cell2 = seRow.createCell(i);
-//                cell2.setCellValue(str);
-//                cell2.setCellStyle(detailStyle);
-//                System.out.println(str);
-//            }
-//            if(noList.indexOf(no) != 0) {
-//                start = start + count + 1;
-//            }
-//        }
-//    }
 
     public static String getWeekStr(List<Integer> weekList){
         List<String> weekStrList = new ArrayList<>();
