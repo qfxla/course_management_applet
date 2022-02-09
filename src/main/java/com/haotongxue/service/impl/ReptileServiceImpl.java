@@ -489,8 +489,6 @@ public class ReptileServiceImpl implements ReptileService, JavaScriptErrorListen
         if(end == -1){
             System.out.println("可能要报错了。。");
             System.out.println(weekAndSection);
-//            log.info("要报错了。。。。");
-//            log.info(weekAndSection);
         }
         String section = weekAndSection.substring(begin, end);
         int len = section.length();

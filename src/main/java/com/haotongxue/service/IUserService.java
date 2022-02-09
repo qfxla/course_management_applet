@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.haotongxue.entity.WeChatLoginResponse;
 import com.haotongxue.utils.R;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -24,5 +25,6 @@ public interface IUserService extends IService<User> {
 
     boolean studentEvaluate(WebClient webClient);
 
+    List<Integer> getHasCourseWeekList(String no,int xingqi,int section);
 
 }
