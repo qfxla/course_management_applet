@@ -355,6 +355,7 @@ public class MiTaController {
             concern.setNo(no);
             concern.setConcernedNo(concernedNo);
             if (concernService.save(concern)){
+                isConcernCache.put(no+concernedNo,concern);
                 concernCache.invalidate(no);
                 return R.ok();
             }
@@ -373,6 +374,7 @@ public class MiTaController {
         concernQueryWrapper.eq("no",no).eq("concerned_no",targetNo);
         if (concernService.remove(concernQueryWrapper)){
             isConcernCache.invalidate(no+targetNo);
+            concernCache.invalidate(no);
             return R.ok();
         }
         return R.error().message("取消关注失败，可能还没关注！");

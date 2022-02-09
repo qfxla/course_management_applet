@@ -85,7 +85,7 @@ public class ESUtils {
                 isConcernVO.setESObject(transformToESVO(hit));
             }
             String targetNo = (String) hit.getSourceAsMap().get("no");
-            isConcernVO.setConcern(isConcernCache.contain(no+targetNo));
+            isConcernVO.setConcern(isConcernCache.get(no+targetNo) != null);
             isConcernVOS.add(isConcernVO);
         }
         return isConcernVOS;

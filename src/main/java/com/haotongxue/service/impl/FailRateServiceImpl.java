@@ -14,7 +14,6 @@ import com.haotongxue.service.ISubjectService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -68,7 +67,6 @@ public class FailRateServiceImpl extends ServiceImpl<FailRateMapper, FailRate> i
                 String subject = grade.getSubject();
                 String property = grade.getProperty();
                 String term = grade.getTerm();
-                String year = term.substring(0,4);
                 StudentStatus studentStatus = studentStatusCache.get(grade.getOpenid());
                 if (studentStatus == null){
                     return;
@@ -88,49 +86,54 @@ public class FailRateServiceImpl extends ServiceImpl<FailRateMapper, FailRate> i
                             subjectEntity.setMarjorId(majorId);
                             subjectEntity.setProperty(property);
                             subjectService.save(subjectEntity);
+
+                            //保存科目后，统计挂科率
+                            String subjectId = subjectEntity.getSubjectId();
+                            QueryWrapper<FailRate> failRateQueryWrapper = new QueryWrapper<>();
+                            failRateQueryWrapper.eq("term",term).eq("subject_id",subjectId);
+                            FailRate failRate = failRateService.getOne(failRateQueryWrapper);
+                            if (failRate == null){
+                                failRate = failRateService.getOne(failRateQueryWrapper);
+                                if (failRate == null){
+                                    failRate = new FailRate();
+                                    failRate.setSubjectId(subjectId);
+                                    failRate.setTerm(term);
+                                    int totalCount = failRateMapper.countTotal(subject,property,majorId,term);
+                                    int failCount = 0;
+                                    try{
+                                        failCount = failRateMapper.countFail(subject,property,majorId,term);
+                                        log.info(failCount+"");
+                                    }catch (Exception e){
+                                        log.info(subject+" "+property+" "+majorId+" "+term);
+                                    }
+                                    failRate.setTotalCount(totalCount);
+                                    failRate.setFailCount(failCount);
+                                    double rate = (double) failCount/totalCount * 100;
+                                    String failRateStr = String.valueOf(rate).substring(0, 3);
+                                    failRate.setFailRate(failRateStr);
+                                    failRateService.save(failRate);
+                                }
+                            }
                         }
                     }
                 }
-                String subjectId = subjectEntity.getSubjectId();
-                QueryWrapper<FailRate> failRateQueryWrapper = new QueryWrapper<>();
-                failRateQueryWrapper.eq("year",year).eq("subject_id",subjectId);
-                FailRate failRate = failRateService.getOne(failRateQueryWrapper);
-                if (failRate == null){
-                    synchronized (failRateLock){
-                        failRate = failRateService.getOne(failRateQueryWrapper);
-                        if (failRate == null){
-                            failRate = new FailRate();
-                            failRate.setSubjectId(subjectId);
-                            failRate.setYear(year);
-                            int totalCount = failRateMapper.countTotal(subject,property,term);
-                            //int failCount = failRateMapper.countFail(subject,property,term);
-                        }
-                    }
-                }else {
-                    Integer failCount = failRate.getFailCount();
-                    Integer totalCount = failRate.getTotalCount();
-                    failCount += 1;
-                    totalCount += 1;
-                    failRate.setFailCount(failCount);
-                    failRate.setTotalCount(totalCount);
-                }
-                failRateService.saveOrUpdate(failRate);
+
                 log.info("处理了条"+ count.incrementAndGet() +"成绩");
             });
         }
-        List<FailRate> failRates = failRateService.list();
-        count.set(0);
-        for (FailRate failRate : failRates){
-            executorService.execute(() -> {
-                int totalCount = failRate.getTotalCount();
-                int failCount = failRate.getFailCount();
-                double rate = (double) failCount/totalCount * 100;
-                String failRateStr = String.valueOf(rate).substring(0, 3);
-                failRate.setFailRate(failRateStr);
-                failRateService.updateById(failRate);
-                log.info("算完"+ count.incrementAndGet() +"条比率");
-            });
-        }
+//        List<FailRate> failRates = failRateService.list();
+//        count.set(0);
+//        for (FailRate failRate : failRates){
+//            executorService.execute(() -> {
+//                int totalCount = failRate.getTotalCount();
+//                int failCount = failRate.getFailCount();
+//                double rate = (double) failCount/totalCount * 100;
+//                String failRateStr = String.valueOf(rate).substring(0, 3);
+//                failRate.setFailRate(failRateStr);
+//                failRateService.updateById(failRate);
+//                log.info("算完"+ count.incrementAndGet() +"条比率");
+//            });
+//        }
         executorService.shutdown();
     }
 }

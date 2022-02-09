@@ -29,7 +29,7 @@ public class FailRate implements Serializable {
     @TableId(value = "fail_id", type = IdType.ASSIGN_ID)
     private String failId;
 
-    private String year;
+    private String term;
 
     @ApiModelProperty("科目id")
     private String subjectId;
