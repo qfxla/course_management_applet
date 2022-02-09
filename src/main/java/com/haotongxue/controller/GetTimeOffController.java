@@ -293,7 +293,7 @@ public class GetTimeOffController {
 //                    String str;
                     String str;
                     if(cacheFlag){
-                         str = memberDTO.getHasCourseArr()[n][i-1];
+                        str = memberDTO.getHasCourseArr()[n][i-1];
                     }else {
                         List<Integer> hasCourseWeekList = userService.getHasCourseWeekList(no, i, secArr[n]);
                         String weekStr;
