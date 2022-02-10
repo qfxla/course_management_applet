@@ -13,6 +13,7 @@ import com.haotongxue.mapper.UserMapper;
 import com.haotongxue.service.IUserService;
 import com.haotongxue.utils.R;
 import com.haotongxue.utils.SnowflakeIdWorker;
+import com.haotongxue.utils.UserContext;
 import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
@@ -28,9 +29,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,8 +47,8 @@ import static org.apache.poi.ss.usermodel.HorizontalAlignment.CENTER;
  */
 @Slf4j
 @RestController
-@RequestMapping("/zkCourse/timeoff/authority")
-//@RequestMapping("/zkCourse/timeoff")
+//@RequestMapping("/zkCourse/timeoff/authority")
+@RequestMapping("/zkCourse/timeoff")
 public class GetTimeOffController {
 
     @Autowired
@@ -72,11 +73,50 @@ public class GetTimeOffController {
     public static final String[] weekArr = new String[]{"","一","二","三","四","五","六","日"};
     public static final String[] seArr = new String[]{"1-2节","3-4节","6-7节","8-9节","10-12节"};
     public static final int[] secArr = new int[]{1,3,6,8,10};
+//    public static final String pathName = "X:/";
+    public static final String pathName = "/root/timeoffxls";
+    public static final String suffix = "成员无课时间一览表（“仲园课程表”小程序提供）";
 
-    private final ExecutorService executorService = new ThreadPoolExecutor(16,16,0,
-            TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<>());
+    @RequestMapping("/downloadXls")
+    public void downloadXls(String orgName, String Id, HttpServletResponse response) {
+        String fileName = orgName + Id + ".xls";
+        String path = pathName + fileName;
+        try {
+            // path是指想要下载的文件的路径
+            File file = new File(path);
+            log.info(file.getPath());
+            // 获取文件名
+            String filename = orgName + suffix + ".xls";
+            // 获取文件后缀名
+//            String ext = filename.substring(filename.lastIndexOf(".") + 1).toLowerCase();
+//            log.info("文件后缀名：" + ext);
 
+            // 将文件写入输入流
+            FileInputStream fileInputStream = new FileInputStream(file);
+            InputStream fis = new BufferedInputStream(fileInputStream);
+            byte[] buffer = new byte[fis.available()];
+            int read = fis.read(buffer);
+            System.out.println("read---" + read);
+            fis.close();
+
+            // 清空response
+            response.reset();
+            // 设置response的Header
+            response.setCharacterEncoding("UTF-8");
+            //Content-Disposition的作用：告知浏览器以何种方式显示响应返回的文件，用浏览器打开还是以附件的形式下载到本地保存
+            //attachment表示以附件方式下载   inline表示在线打开   "Content-Disposition: inline; filename=文件名.mp3"
+            // filename表示文件的默认名称，因为网络传输只支持URL编码的相关支付，因此需要将文件名URL编码后进行传输,前端收到后需要反编码才能获取到真正的名称
+            response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, "UTF-8"));
+            // 告知浏览器文件的大小
+            response.addHeader("Content-Length", "" + file.length());
+            OutputStream outputStream = new BufferedOutputStream(response.getOutputStream());
+            response.setContentType("application/octet-stream");
+            outputStream.write(buffer);
+            outputStream.flush();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
 
     @PostMapping("/preHeat")
     public R preHeat(@RequestParam("no") String no){
@@ -116,25 +156,44 @@ public class GetTimeOffController {
 
     @GetMapping("/getTimeOff")
     public R getTimeOff(@RequestBody OragDTO oragDTO){
+        String openId = UserContext.getCurrentOpenid();
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("openid",openId).select("no");
+        User user = userMapper.selectOne(queryWrapper);
+        String no = user.getNo();
         log.info("~~~~~");
+        long id = 0;
         try {
             SnowflakeIdWorker idWorker = new SnowflakeIdWorker(1, 1);
-            long id = idWorker.nextId();
+            id = idWorker.nextId();
             String orgName = oragDTO.getOrgName();
+            List<String> noList = oragDTO.getNoList();
             Organization organization = new Organization();
             organization.setName(orgName);
             organization.setXlsId(String.valueOf(id));
+            organization.setNo(no);
+            organization.setStatus(0);
+            organization.setAck_num(0);
+            organization.setTotal_num(noList.size());
             organizationMapper.insert(organization);
-            List<String> noList = oragDTO.getNoList();
-            boolean flag = makeXls(id,orgName,noList);
+            try {
+                makeXls(id,orgName,noList);
+            }catch (Exception e){
+                e.printStackTrace();
+                return R.error();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
         log.info("~~~~~");
-        return R.ok();
+        if(id != 0){
+            return R.ok().data("data",id);
+        }else {
+            throw new CourseException(555,"try失败了");
+        }
     }
 
-    public boolean makeXls (long id,String orgName,List<String> noList) throws Exception{
+    public void makeXls (long id,String orgName,List<String> noList) throws Exception{
         int count = noList.size();
         int totalRow = count * 5 + totalBeginNum + 4 + 1;   //61
         HSSFWorkbook workbook = new HSSFWorkbook();
@@ -331,15 +390,14 @@ public class GetTimeOffController {
         }
 
         //创建一个文件
-        File file = new File("X:/" + id + ".xls");
-//        File file = new File("/root/timeoffxls/" + orgName + "成员无课时间一览表(\"仲园课程表\"小程序提供)" + id + ".xls");
+        String path = pathName + orgName + id + ".xls";
+        File file = new File(path);
         boolean newFileFlag = file.createNewFile();
         if(newFileFlag){
             System.out.println("文件成功创建---"  +  file.getPath());
             FileOutputStream stream = FileUtils.openOutputStream(file);
             workbook.write(stream);
             stream.close();
-            return true;
         }else {
             throw new CourseException(555,"文件居然已经存在");
         }

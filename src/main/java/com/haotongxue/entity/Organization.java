@@ -5,34 +5,40 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 
+
+
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author DJT
  * @since 2021-12-07
  */
-@Getter
-@Setter
+@Data
 @TableName("t_organization")
+@AllArgsConstructor
+@NoArgsConstructor
 @ApiModel(value = "Organization对象", description = "")
 public class Organization implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
+    @TableId(value = "xls_id")
+    private String xlsId;
 
-    @ApiModelProperty("组织名称")
     private String name;
 
-    @ApiModelProperty("xls编号")
-    private String xlsId;
+    private String no;
+
+    private int ack_num;
+
+    private int total_num;
+
+    private int status;
 
 }
