@@ -121,7 +121,7 @@ public class getFreeRoomServiceImpl implements getFreeRoomService {
     }
 
 //    //白云校区
-    @Scheduled(initialDelay = 5000,fixedDelay = 3000000)
+//    @Scheduled(initialDelay = 5000,fixedDelay = 3000000)
     @Override
     public void paFreeRoom2() throws Exception {
         ExecutorService newCachedThreadPool = Executors.newCachedThreadPool();
