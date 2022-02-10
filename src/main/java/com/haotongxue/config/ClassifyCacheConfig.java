@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Configuration
@@ -67,6 +68,7 @@ public class ClassifyCacheConfig {
                                 classVO.setClassName(classEntity.getName());
                                 classVOS.add(classVO);
                             }
+                            classVOS.sort((o1, o2) -> o1.getClassName().compareTo(o2.getClassName()));
                             majorVO.setList(classVOS);
                             majorVOS.add(majorVO);
                         }

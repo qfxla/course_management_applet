@@ -3,11 +3,12 @@ package com.haotongxue.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.io.Serializable;
 
 /**
  * <p>
@@ -15,31 +16,23 @@ import lombok.Setter;
  * </p>
  *
  * @author DJT
- * @since 2022-01-19
+ * @since 2021-12-07
  */
 @Getter
 @Setter
-@TableName("t_student_status")
-@ApiModel(value = "StudentStatus对象", description = "")
-public class StudentStatus implements Serializable {
+@TableName("t_organization")
+@ApiModel(value = "Organization对象", description = "")
+public class Organization implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "openid", type = IdType.INPUT)
-    private String openid;
+    @TableId(value = "id", type = IdType.AUTO)
+    private Integer id;
 
-    private Integer collegeId;
-
-    private String classId;
-
-    private String majorId;
-
+    @ApiModelProperty("组织名称")
     private String name;
 
-    private String sex;
-
-    @ApiModelProperty("学号")
-    private String no;
-
+    @ApiModelProperty("xls编号")
+    private String xlsId;
 
 }

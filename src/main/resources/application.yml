@@ -41,16 +41,16 @@ spring:
     nacos:
       discovery:
         server-addr: 120.77.156.205:9100
-        ip: 112.74.188.40 #铭涵
-#        ip: 120.77.183.115 #涛涛
-#        ip: 159.75.241.252 #川川
+        #ip: 112.74.188.40 #铭涵
+        ip: 120.77.183.115 #涛涛
+        #ip: 159.75.241.252 #川川
     sentinel:
       transport:
         port: 8719
         dashboard: 159.75.241.252:8080
-#        clientIp: 159.75.241.252 #川川
-#        clientIp: 120.77.183.115 #涛涛
-        clientIp: 112.74.188.40 #铭涵
+        #clientIp: 159.75.241.252 #川川
+        clientIp: 120.77.183.115 #涛涛
+        #clientIp: 112.74.188.40 #铭涵
   application:
     name: zkcourse
 
@@ -74,7 +74,7 @@ wechat:
 #设置feign客户端超时时间(OpenFeign默认支持ribbon)
 ribbon:
   #指的是建立连接所用的时间，适用于网络状况正常的情况下,两端连接所用的时间
-  ReadTimeout: 5000
+  ReadTimeout: 6000
   #指的是建立连接后从服务器读取到可用资源所用的时间
-  ConnectTimeout: 5000
+  ConnectTimeout: 10000
 
