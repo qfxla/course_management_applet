@@ -52,6 +52,9 @@ public class UserController {
     @Resource(name = "courseCache")
     LoadingRedisCache courseCache;
 
+    @Resource(name = "studentStatusCache")
+    LoadingRedisCache<StudentStatus> studentStatusCache;
+
     @Autowired
     EduLoginService eduLoginService;
 
@@ -86,6 +89,9 @@ public class UserController {
 
     @Autowired
     private IOfficialUserService officialUserService;
+
+    @Autowired
+    private IStudentStatusService studentStatusService;
 
     @Autowired
     RemoteReptileCalling remoteReptileCalling;
@@ -370,6 +376,14 @@ public class UserController {
         userSelectedMapper.deleteByOpenId(openId);
 
         userMapper.deleteByInfoId(openid);
+
+        StudentStatus studentStatus = studentStatusCache.get(openid);
+        try {
+            studentStatusService.deleteStudentToES(studentStatus.getNo());
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.info("删除ES的student失败了-->"+openId);
+        }
 
         return R.ok().data("msg","清除成功");
     }

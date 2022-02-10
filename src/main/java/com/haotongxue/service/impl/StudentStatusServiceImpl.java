@@ -16,6 +16,8 @@ import com.haotongxue.utils.GradeUtils;
 import com.haotongxue.utils.UserContext;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.delete.DeleteRequest;
+import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
@@ -142,6 +144,13 @@ public class StudentStatusServiceImpl extends ServiceImpl<StudentStatusMapper, S
 
     @Override
     public ESVO getStudent(String no) throws IOException {
+        //发请求得到响应
+        SearchResponse search = getStudentRes(no);
+        return ESUtils.transformNormalOne(search.getHits().getHits());
+    }
+
+    @Override
+    public SearchResponse getStudentRes(String no) throws IOException {
         SearchRequest request = new SearchRequest("studentstatus");
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         //设置分页
@@ -149,10 +158,8 @@ public class StudentStatusServiceImpl extends ServiceImpl<StudentStatusMapper, S
         searchSourceBuilder.size(1);
         searchSourceBuilder.query(QueryBuilders.termQuery("no",no));
         request.source(searchSourceBuilder);
-
         //发请求
-        SearchResponse search = client.search(request, RequestOptions.DEFAULT);
-        return ESUtils.transformNormalOne(search.getHits().getHits());
+        return client.search(request, RequestOptions.DEFAULT);
     }
 
     @Override
@@ -181,6 +188,7 @@ public class StudentStatusServiceImpl extends ServiceImpl<StudentStatusMapper, S
         return esUtils.transformIsConcern(no,search.getHits().getHits(),true);
     }
 
+    @Override
     public void addStudentToES(StudentVOTwo studentVOTwo){
         IndexRequest request = new IndexRequest("studentstatus","_doc");
         String s = JSON.toJSONString(studentVOTwo);
@@ -197,5 +205,13 @@ public class StudentStatusServiceImpl extends ServiceImpl<StudentStatusMapper, S
                 e.printStackTrace();
             }
         });
+    }
+
+    @Override
+    public void deleteStudentToES(String no) throws Exception {
+        SearchResponse studentRes = getStudentRes(no);
+        String id = studentRes.getHits().getHits()[0].getId();
+        DeleteRequest deleteRequest = new DeleteRequest("studentstatus","_doc",id);
+        client.delete(deleteRequest, RequestOptions.DEFAULT);
     }
 }
