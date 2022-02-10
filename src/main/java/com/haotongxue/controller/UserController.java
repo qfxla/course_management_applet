@@ -347,7 +347,7 @@ public class UserController {
             return R.error().data("msg","无该openid");
         }
         String openId = user.getOpenid();
-        for (int i = 1;i <= 20;i++){
+        for (int i = 1;i <=     20;i++){
             courseCache.invalidate("cour" + openId + ":" + i);
         }
         QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
