@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -345,7 +346,7 @@ public class UserController {
     }
 
     @ApiOperation("删除某个人的数据，包括选课和倒计时")
-    @GetMapping("/delSomeOneData")
+    @DeleteMapping("/delSomeOneData")
     public R delSomeOneData(@RequestParam("openid")String openid){
         cache.invalidate(String.valueOf(openid));
         User user = userService.getById(openid);
