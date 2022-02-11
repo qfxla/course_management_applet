@@ -14,7 +14,6 @@ import lombok.*;
 
 @TableName("t_invite")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
 public class Invite {
 
@@ -29,4 +28,9 @@ public class Invite {
 
     private Integer status;
 
+    public Invite(String xlsId, String no, Integer status) {
+        this.xlsId = xlsId;
+        this.no = no;
+        this.status = status;
+    }
 }
