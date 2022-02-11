@@ -267,18 +267,18 @@ public class MiTaController {
         return R.ok();
     }
 
-    @ApiOperation("是否有访客")
+    @ApiOperation("是否有新访客")
     @GetMapping("/authority/hasBrowsingHistory")
     public R hasBrowsingHistory(@RequestHeader @ApiParam("传Authority（测试用）") String Authority){
         String currentOpenid = UserContext.getCurrentOpenid();
         StudentStatus studentStatus = studentStatusCache.get(currentOpenid);
         String no = studentStatus.getNo();
         if (redisTemplate.hasKey("visted"+no)){
-            redisTemplate.delete("visted"+no);
             return R.ok().message("有访客");
         }
         return R.error().message("没有访客");
     }
+
 
     @ApiOperation("查看我的浏览记录")
     @GetMapping("/authority/browsingHistory/mine")
@@ -301,6 +301,7 @@ public class MiTaController {
         QueryWrapper<BrowsingHistory> wrapper = new QueryWrapper<>();
         wrapper.eq("readed_no",no);
         BrowsingHistoryVOList browsingHistoryVOList =  browsingHistoryService.sliceByCreateTime(wrapper,false);
+        redisTemplate.delete("visted"+no);
         return R.ok().data("stu",browsingHistoryVOList);
     }
 
