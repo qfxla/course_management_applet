@@ -14,6 +14,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -66,6 +67,9 @@ public class MiTaController {
 
     @Resource(name = "isConcernCache")
     LoadingRedisCache<Concern> isConcernCache;
+
+    @Autowired
+    RedisTemplate<String,Object> redisTemplate;
 
     /**
      * 获取用户默认分类
@@ -257,8 +261,23 @@ public class MiTaController {
             }
         }
         browsingHistory = new BrowsingHistory(no,dto.getNo());
-        browsingHistoryService.save(browsingHistory);
+        if (browsingHistoryService.save(browsingHistory)){
+            redisTemplate.opsForValue().set("visted"+no,"");
+        }
         return R.ok();
+    }
+
+    @ApiOperation("是否有访客")
+    @GetMapping("/authority/hasBrowsingHistory")
+    public R hasBrowsingHistory(@RequestHeader @ApiParam("传Authority（测试用）") String Authority){
+        String currentOpenid = UserContext.getCurrentOpenid();
+        StudentStatus studentStatus = studentStatusCache.get(currentOpenid);
+        String no = studentStatus.getNo();
+        if (redisTemplate.hasKey("visted"+no)){
+            redisTemplate.delete("visted"+no);
+            return R.ok().message("有访客");
+        }
+        return R.error().message("没有访客");
     }
 
     @ApiOperation("查看我的浏览记录")
