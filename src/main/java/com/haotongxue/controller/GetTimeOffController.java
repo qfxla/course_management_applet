@@ -234,6 +234,7 @@ public class GetTimeOffController {
                 String officialOpenId = officialUser.getOpenid();
                 String msg = "您创建的" + orgName + "成员无课时间一览表所邀请的所有成员已全部接收邀请";
                 //此处要发送到消息队列，通知负责人所有成员已经全部确认
+                return R.ok().data("data",officialOpenId + "--" + msg);
             }
             if(organization.getAck_num() > organization.getTotal_num()){
                 throw new CourseException(555,"数据出现异常");
@@ -262,7 +263,7 @@ public class GetTimeOffController {
         QueryWrapper<Organization> queryWrapper2 = new QueryWrapper<>();
         queryWrapper2.eq("xls_id",xlsId);
         Organization organization = organizationMapper.selectOne(queryWrapper2);
-        organization.setTotal_num(organization.getTotal_num() - 1); //一人拒绝，总人数减1
+        organization.setStatus(3);
         organizationMapper.updateById(organization);
         QueryWrapper<StudentStatus> queryWrapper3 = new QueryWrapper<>();
         queryWrapper3.eq("no",no);
@@ -286,7 +287,7 @@ public class GetTimeOffController {
         String officialOpenId = officialUser.getOpenid();
         String msg = className + realName + "拒绝了您" + orgName + "成员无课时间一览表的邀请";
         //此处要发送到消息队列，通知负责人xxx拒绝了
-        return R.ok();
+        return R.ok().data("data",officialOpenId + "--" + msg);
     }
 
     @GetMapping("/getTimeOff")
@@ -337,6 +338,7 @@ public class GetTimeOffController {
                 String officialOpenId = officialUser.getOpenid();
                 String msg = className + reName + "邀请你加入" + newOrgName + "成员无课时间一览表";
                 //此处要发送到消息队列，通知成员前往确认
+                return R.ok().data("data",officialOpenId + "--" + msg);
             }
 
             try {
