@@ -36,7 +36,7 @@ public class Selected implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-      @TableId(value = "selected_id", type = IdType.ASSIGN_ID)
+    @TableId(value = "selected_id", type = IdType.ASSIGN_ID)
     private String selectedId;
 
     private String selectedName;

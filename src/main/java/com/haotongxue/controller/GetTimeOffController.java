@@ -3,6 +3,7 @@ package com.haotongxue.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.haotongxue.entity.*;
 import com.haotongxue.entity.Class;
+import com.haotongxue.entity.dto.InviteMeDTO;
 import com.haotongxue.entity.dto.MemberDTO;
 import com.haotongxue.entity.dto.OragDTO;
 import com.haotongxue.exceptionhandler.CourseException;
@@ -31,6 +32,7 @@ import java.io.*;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -44,8 +46,8 @@ import static org.apache.poi.ss.usermodel.HorizontalAlignment.CENTER;
  */
 @Slf4j
 @RestController
-//@RequestMapping("/zkCourse/timeoff/authority")
-@RequestMapping("/zkCourse/timeoff")
+@RequestMapping("/zkCourse/timeoff/authority")
+//@RequestMapping("/zkCourse/timeoff")
 public class GetTimeOffController {
 
     @Autowired
@@ -79,19 +81,20 @@ public class GetTimeOffController {
     public static final String[] weekArr = new String[]{"","一","二","三","四","五","六","日"};
     public static final String[] seArr = new String[]{"1-2节","3-4节","6-7节","8-9节","10-12节"};
     public static final int[] secArr = new int[]{1,3,6,8,10};
-//    public static final String pathName = "X:/";
-    public static final String pathName = "/root/timeoffxls";
+    public static final String pathName = "X:/";
+//    public static final String pathName = "/root/timeoffxls";
     public static final String suffix = "成员无课时间一览表（“仲园课程表”小程序提供）";
 
     @RequestMapping("/downloadXls")
-    public R downloadXls(String orgName, String xlsId, HttpServletResponse response) {
-        //首先判断是否支付成功
+    public R downloadXls(String xlsId, HttpServletResponse response) {
+        //首先判断是否支付成功和是否到人数了
         QueryWrapper<Organization> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("xls_id",xlsId).select("ack_num","total_num","status");
+        queryWrapper.eq("xls_id",xlsId);
         Organization organization = organizationMapper.selectOne(queryWrapper);
-        if(organization.getAck_num() != organization.getTotal_num() || organization.getStatus() != 2){
+        if(organization.getAckNum() != organization.getTotalNum() || organization.getStatus() != 2){
             return R.error().data("data","未支付 或 确认人数!=总人数");
         }
+        String orgName = organization.getName();
         String fileName = orgName + xlsId + ".xls";
         String path = pathName + fileName;
         try {
@@ -170,8 +173,8 @@ public class GetTimeOffController {
 
     @GetMapping("/getMyCreated")
     public R getMyCreated(){
-//        String openId = UserContext.getCurrentOpenid();
-        String openId = "ohpVk5TmJDKSy5Wm3rGAvLQnUneQ";
+        String openId = UserContext.getCurrentOpenid();
+//        String openId = "ohpVk5TmJDKSy5Wm3rGAvLQnUneQ";
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("openid",openId).select("no");
         User user = userMapper.selectOne(queryWrapper);
@@ -184,8 +187,9 @@ public class GetTimeOffController {
 
     @GetMapping("/getMyInvited")
     public R getMyInvited(){
-//        String openId = UserContext.getCurrentOpenid();
-        String openId = "ohpVk5TmJDKSy5Wm3rGAvLQnUneQ";
+        String openId = UserContext.getCurrentOpenid();
+//        String openId = "ohpVk5TmJDKSy5Wm3rGAvLQnUneQ";
+//        String openId = "ohpVk5RM2Mn6d1FlKBNQA1FuWtcU";
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("openid",openId).select("no");
         User user = userMapper.selectOne(queryWrapper);
@@ -193,7 +197,27 @@ public class GetTimeOffController {
         QueryWrapper<Invite> queryWrapper1 = new QueryWrapper<>();
         queryWrapper1.eq("no",no);
         List<Invite> inviteList = inviteMapper.selectList(queryWrapper1);
-        return R.ok().data("data",inviteList);
+        List<InviteMeDTO> inviteMeDTOList = new ArrayList<>();
+        for (Invite invite : inviteList) {
+            String xlsId = invite.getXlsId();
+            QueryWrapper<Organization> queryWrapper2 = new QueryWrapper<>();
+            queryWrapper2.eq("xls_id",xlsId);
+            Organization organization = organizationMapper.selectOne(queryWrapper2);
+            String mainNo = organization.getNo();
+            QueryWrapper<StudentStatus> queryWrapper3 = new QueryWrapper<>();
+            queryWrapper3.eq("no",mainNo).last("limit 1");
+            StudentStatus studentStatus = studentStatusMapper.selectOne(queryWrapper3);
+            String majorId = studentStatus.getMajorId();
+            String classId = studentStatus.getClassId();
+            QueryWrapper<Class> queryWrapper4 = new QueryWrapper<>();
+            queryWrapper4.eq("class_id",classId).eq("major_id",majorId);
+            Class aClass = classMapper.selectOne(queryWrapper4);
+            String className = aClass.getName() + "班";
+            String realName = studentStatus.getName();
+            InviteMeDTO inviteMeDTO = new InviteMeDTO(className + realName, organization.getName(), invite.getStatus());
+            inviteMeDTOList.add(inviteMeDTO);
+        }
+        return R.ok().data("data",inviteMeDTOList);
     }
 
     @GetMapping("/getMyMembers")
@@ -204,23 +228,30 @@ public class GetTimeOffController {
         return R.ok().data("data",inviteList);
     }
 
-    @PostMapping("/agreeInvited")
+    @PostMapping("/agreeInvited")   //202020834307
     public R agreeInvite(@RequestParam("xlsId") String xlsId){
-//        String openId = UserContext.getCurrentOpenid();
-        String openId = "ohpVk5TmJDKSy5Wm3rGAvLQnUneQ";
+        String openId = UserContext.getCurrentOpenid();
+//        String openId = "ohpVk5TmJDKSy5Wm3rGAvLQnUneQ";
+//        String openId = "ohpVk5RM2Mn6d1FlKBNQA1FuWtcU";
+//        String openId = "ohpVk5StwY5t0z0xInelQ2Yx3OT4";   //haoran
+//        String openId = "ohpVk5a0KIJzvoBrZ25Hu3cDXoyE";     //lena
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("openid",openId).select("no");
+        queryWrapper.eq("openid",openId).select("no").last("limit 1");
         User user = userMapper.selectOne(queryWrapper);
         String no = user.getNo();
         QueryWrapper<Invite> queryWrapper1 = new QueryWrapper<>();
-        queryWrapper1.eq("xls_id",xlsId).eq("no",no).select("status");
+        queryWrapper1.eq("xls_id",xlsId).eq("no",no).last("limit 1");
         Invite invite = inviteMapper.selectOne(queryWrapper1);
         if(invite.getStatus() != 2){
             invite.setStatus(1);
+            System.out.println(invite);
+            inviteMapper.updateById(invite);
+            System.out.println(xlsId);
             QueryWrapper<Organization> queryWrapper2 = new QueryWrapper<>();
             queryWrapper2.eq("xls_id",xlsId);
             Organization organization = organizationMapper.selectOne(queryWrapper2);
-            if(organization.getTotal_num() - organization.getAck_num() == 1){
+            System.out.println(organization);
+            if(organization.getTotalNum() - organization.getAckNum() == 1){
                 organization.setStatus(1);
                 String mainer_no = organization.getNo();
                 QueryWrapper<User> queryWrapper5 = new QueryWrapper<>();
@@ -234,12 +265,12 @@ public class GetTimeOffController {
                 String officialOpenId = officialUser.getOpenid();
                 String msg = "您创建的" + orgName + "成员无课时间一览表所邀请的所有成员已全部接收邀请";
                 //此处要发送到消息队列，通知负责人所有成员已经全部确认
-                return R.ok().data("data",officialOpenId + "--" + msg);
+                System.out.println(msg);
             }
-            if(organization.getAck_num() > organization.getTotal_num()){
+            if(organization.getAckNum() > organization.getTotalNum()){
                 throw new CourseException(555,"数据出现异常");
             }
-            organization.setAck_num(organization.getAck_num() + 1);
+            organization.setAckNum(organization.getAckNum() + 1);
             organizationMapper.updateById(organization);
             return R.ok();
         }else {
@@ -247,10 +278,11 @@ public class GetTimeOffController {
         }
     }
 
-    @PostMapping("/rejectInvited")
+    @PostMapping("/rejectInvited")  //201810214719
     public R rejectInvited(@RequestParam("xlsId") String xlsId){
-//        String openId = UserContext.getCurrentOpenid();
-        String openId = "ohpVk5TmJDKSy5Wm3rGAvLQnUneQ";
+        String openId = UserContext.getCurrentOpenid();
+//        String openId = "ohpVk5TmJDKSy5Wm3rGAvLQnUneQ";
+//        String openId = "ohpVk5a0KIJzvoBrZ25Hu3cDXoyE";
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("openid",openId).select("no");
         User user = userMapper.selectOne(queryWrapper);
@@ -266,7 +298,7 @@ public class GetTimeOffController {
         organization.setStatus(3);
         organizationMapper.updateById(organization);
         QueryWrapper<StudentStatus> queryWrapper3 = new QueryWrapper<>();
-        queryWrapper3.eq("no",no);
+        queryWrapper3.eq("no",no).last("limit 1");
         StudentStatus studentStatus = studentStatusMapper.selectOne(queryWrapper3);
         String majorId = studentStatus.getMajorId();
         String classId = studentStatus.getClassId();
@@ -287,13 +319,18 @@ public class GetTimeOffController {
         String officialOpenId = officialUser.getOpenid();
         String msg = className + realName + "拒绝了您" + orgName + "成员无课时间一览表的邀请";
         //此处要发送到消息队列，通知负责人xxx拒绝了
-        return R.ok().data("data",officialOpenId + "--" + msg);
+        if(officialOpenId == null){
+            officialOpenId = "未关注公众号";
+        }
+        System.out.println(officialOpenId + "---" + msg);
+        return R.ok();
     }
 
     @GetMapping("/getTimeOff")
     public R getTimeOff(@RequestBody OragDTO oragDTO){
-//        String openId = UserContext.getCurrentOpenid();
-        String openId = "ohpVk5TmJDKSy5Wm3rGAvLQnUneQ";
+        ArrayList<User> failedUserList = new ArrayList<>();
+        String openId = UserContext.getCurrentOpenid();
+//        String openId = "ohpVk5TmJDKSy5Wm3rGAvLQnUneQ";
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("openid",openId).select("no");
         User mainerUser = userMapper.selectOne(queryWrapper);
@@ -311,12 +348,12 @@ public class GetTimeOffController {
             organization.setXlsId(String.valueOf(xlsId));
             organization.setNo(mainerNo);
             organization.setStatus(0);
-            organization.setAck_num(0);
-            organization.setTotal_num(noList.size());
+            organization.setAckNum(0);
+            organization.setTotalNum(noList.size());
             organizationMapper.insert(organization);
 
             QueryWrapper<StudentStatus> queryWrapper3 = new QueryWrapper<>();
-            queryWrapper3.eq("no",mainerNo);
+            queryWrapper3.eq("openid",openId);
             StudentStatus studentStatus = studentStatusMapper.selectOne(queryWrapper3);
             String majorId = studentStatus.getMajorId();
             String classId = studentStatus.getClassId();
@@ -324,8 +361,10 @@ public class GetTimeOffController {
             QueryWrapper<Class> queryWrapper4 = new QueryWrapper<>();
             queryWrapper4.eq("class_id",classId).eq("major_id",majorId);
             Class aClass = classMapper.selectOne(queryWrapper4);
-            String className = aClass.getName();
+            String className = aClass.getName() + "班";
             for (String no : noList) {
+//                String officialOpenId;
+                String msg;
                 Invite invite = new Invite(String.valueOf(xlsId),no,0);
                 inviteMapper.insert(invite);
                 QueryWrapper<User> queryWrapper5 = new QueryWrapper<>();
@@ -335,14 +374,21 @@ public class GetTimeOffController {
                 QueryWrapper<OfficialUser> queryWrapper6 = new QueryWrapper<>();
                 queryWrapper6.eq("unionid",unionId).select("openid");
                 OfficialUser officialUser = officialUserMapper.selectOne(queryWrapper6);
+                if(officialUser == null){
+                    failedUserList.add(user);
+//                    officialOpenId = "未关注公众号";
+                }else {
+//                    officialOpenId = officialUser.getOpenid();
+                }
+                assert officialUser != null;
                 String officialOpenId = officialUser.getOpenid();
-                String msg = className + reName + "邀请你加入" + newOrgName + "成员无课时间一览表";
+                msg = className + reName + "邀请您加入" + newOrgName + "成员无课时间一览表";
                 //此处要发送到消息队列，通知成员前往确认
-                return R.ok().data("data",officialOpenId + "--" + msg);
+                System.out.println(msg + "---" + officialOpenId);
             }
 
             try {
-                makeXls(mainerNo,xlsId,orgName,noList);
+                makeXls(xlsId,orgName,noList);
             }catch (Exception e){
                 e.printStackTrace();
                 return R.error();
@@ -352,13 +398,26 @@ public class GetTimeOffController {
         }
         log.info("~~~~~");
         if(xlsId != 0){
-            return R.ok().data("data",xlsId);
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("xlsId",xlsId);
+            map.put("failed",failedUserList);
+            return R.ok().data("data",map);
         }else {
             throw new CourseException(555,"try失败了");
         }
     }
 
-    public void makeXls (String mainNo,long xlsId,String orgName,List<String> noList) throws Exception{
+    @PostMapping("/simulatePay")
+    public R simulatePay(@RequestParam("xlsId") String xlsId){
+        QueryWrapper<Organization> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("xls_id",xlsId);
+        Organization organization = organizationMapper.selectOne(queryWrapper);
+        organization.setStatus(2);
+        organizationMapper.updateById(organization);
+        return R.ok();
+    }
+
+    public void makeXls (long xlsId,String orgName,List<String> noList) throws Exception{
         int count = noList.size();
         int totalRow = count * 5 + totalBeginNum + 4 + 1;   //61
         HSSFWorkbook workbook = new HSSFWorkbook();
