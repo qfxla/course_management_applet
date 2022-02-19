@@ -5,6 +5,7 @@ import com.haotongxue.entity.*;
 import com.haotongxue.entity.Class;
 import com.haotongxue.entity.dto.InviteMeDTO;
 import com.haotongxue.entity.dto.MemberDTO;
+import com.haotongxue.entity.dto.MyOragDTO;
 import com.haotongxue.entity.dto.OragDTO;
 import com.haotongxue.exceptionhandler.CourseException;
 import com.haotongxue.mapper.*;
@@ -12,17 +13,14 @@ import com.haotongxue.service.IUserService;
 import com.haotongxue.utils.R;
 import com.haotongxue.utils.SnowflakeIdWorker;
 import com.haotongxue.utils.UserContext;
-import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.elasticsearch.monitor.os.OsStats;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -31,8 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -81,59 +77,13 @@ public class GetTimeOffController {
     public static final String[] weekArr = new String[]{"","一","二","三","四","五","六","日"};
     public static final String[] seArr = new String[]{"1-2节","3-4节","6-7节","8-9节","10-12节"};
     public static final int[] secArr = new int[]{1,3,6,8,10};
-    public static final String pathName = "X:/";
-//    public static final String pathName = "/root/timeoffxls";
+//    public static final String pathName = "X:/";
+    public static final String pathName = "/root/timeoffxls";
     public static final String suffix = "成员无课时间一览表（“仲园课程表”小程序提供）";
 
-    @RequestMapping("/downloadXls")
-    public R downloadXls(String xlsId, HttpServletResponse response) {
-        //首先判断是否支付成功和是否到人数了
-        QueryWrapper<Organization> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("xls_id",xlsId);
-        Organization organization = organizationMapper.selectOne(queryWrapper);
-        if(organization.getAckNum() != organization.getTotalNum() || organization.getStatus() != 2){
-            return R.error().data("data","未支付 或 确认人数!=总人数");
-        }
-        String orgName = organization.getName();
-        String fileName = orgName + xlsId + ".xls";
-        String path = pathName + fileName;
-        try {
-            // path是指想要下载的文件的路径
-            File file = new File(path);
-            log.info(file.getPath());
-            // 获取文件名
-            String filename = orgName + suffix + ".xls";
-            // 获取文件后缀名
-//            String ext = filename.substring(filename.lastIndexOf(".") + 1).toLowerCase();
-//            log.info("文件后缀名：" + ext);
-
-            // 将文件写入输入流
-            FileInputStream fileInputStream = new FileInputStream(file);
-            InputStream fis = new BufferedInputStream(fileInputStream);
-            byte[] buffer = new byte[fis.available()];
-            int read = fis.read(buffer);
-            System.out.println("read---" + read);
-            fis.close();
-
-            // 清空response
-            response.reset();
-            // 设置response的Header
-            response.setCharacterEncoding("UTF-8");
-            //Content-Disposition的作用：告知浏览器以何种方式显示响应返回的文件，用浏览器打开还是以附件的形式下载到本地保存
-            //attachment表示以附件方式下载   inline表示在线打开   "Content-Disposition: inline; filename=文件名.mp3"
-            // filename表示文件的默认名称，因为网络传输只支持URL编码的相关支付，因此需要将文件名URL编码后进行传输,前端收到后需要反编码才能获取到真正的名称
-            response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, "UTF-8"));
-            // 告知浏览器文件的大小
-            response.addHeader("Content-Length", "" + file.length());
-            OutputStream outputStream = new BufferedOutputStream(response.getOutputStream());
-            response.setContentType("application/octet-stream");
-            outputStream.write(buffer);
-            outputStream.flush();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return R.ok();
-    }
+//    @RequestMapping("/downloadXls")
+//    public R downloadXls(String xlsId, HttpServletResponse response) {
+//    }
 
     @PostMapping("/preHeat")
     public R preHeat(@RequestParam("no") String no){
@@ -166,7 +116,7 @@ public class GetTimeOffController {
             memberDTO.setHasCourseArr(hasCourseArr);
             System.out.println(memberDTO);
             redisTemplate.opsForValue().set(key,memberDTO);
-            redisTemplate.expire(key, 1, TimeUnit.HOURS);
+            redisTemplate.expire(key, 3, TimeUnit.DAYS);
             return R.ok();
         }
     }
@@ -222,10 +172,31 @@ public class GetTimeOffController {
 
     @GetMapping("/getMyMembers")
     public R getMyMembers(@RequestParam("xlsId") String xlsId){
+        List<String> memberList = new ArrayList<>();
         QueryWrapper<Invite> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("xls_id",xlsId).select("no","status");
         List<Invite> inviteList = inviteMapper.selectList(queryWrapper);
-        return R.ok().data("data",inviteList);
+        for (Invite invite : inviteList) {
+            String no = invite.getNo();
+            QueryWrapper<StudentStatus> queryWrapper3 = new QueryWrapper<>();
+            queryWrapper3.eq("no",no).last("limit 1");
+            StudentStatus studentStatus = studentStatusMapper.selectOne(queryWrapper3);
+            String majorId = studentStatus.getMajorId();
+            String classId = studentStatus.getClassId();
+            QueryWrapper<Class> queryWrapper4 = new QueryWrapper<>();
+            queryWrapper4.eq("class_id",classId).eq("major_id",majorId);
+            Class aClass = classMapper.selectOne(queryWrapper4);
+            String className = aClass.getName() + "班";
+            String realName = studentStatus.getName();
+            memberList.add(className + realName);
+        }
+        QueryWrapper<Organization> queryWrapper1 = new QueryWrapper<>();
+        queryWrapper1.eq("xls_id",xlsId).last("limit 1");
+        Organization organization = organizationMapper.selectOne(queryWrapper1);
+        int ackNum = organization.getAckNum();
+        int totalNum = organization.getTotalNum();
+        MyOragDTO myOragDTO = new MyOragDTO(ackNum, totalNum, memberList);
+        return R.ok().data("data",myOragDTO);
     }
 
     @PostMapping("/agreeInvited")   //202020834307
@@ -253,19 +224,19 @@ public class GetTimeOffController {
             System.out.println(organization);
             if(organization.getTotalNum() - organization.getAckNum() == 1){
                 organization.setStatus(1);
-                String mainer_no = organization.getNo();
-                QueryWrapper<User> queryWrapper5 = new QueryWrapper<>();
-                queryWrapper5.eq("no",mainer_no).last("limit 1");
-                User mainUser = userMapper.selectOne(queryWrapper5);
-                String mainUserUnionId = mainUser.getUnionId();
-                QueryWrapper<OfficialUser> queryWrapper6 = new QueryWrapper<>();
-                queryWrapper6.eq("unionid",mainUserUnionId).select("openid");
-                OfficialUser officialUser = officialUserMapper.selectOne(queryWrapper6);
-                String orgName = "“" + organization.getName() + "”";
-                String officialOpenId = officialUser.getOpenid();
-                String msg = "您创建的" + orgName + "成员无课时间一览表所邀请的所有成员已全部接收邀请";
-                //此处要发送到消息队列，通知负责人所有成员已经全部确认
-                System.out.println(msg);
+//                String mainer_no = organization.getNo();
+//                QueryWrapper<User> queryWrapper5 = new QueryWrapper<>();
+//                queryWrapper5.eq("no",mainer_no).last("limit 1");
+//                User mainUser = userMapper.selectOne(queryWrapper5);
+//                String mainUserUnionId = mainUser.getUnionId();
+//                QueryWrapper<OfficialUser> queryWrapper6 = new QueryWrapper<>();
+//                queryWrapper6.eq("unionid",mainUserUnionId).select("openid");
+//                OfficialUser officialUser = officialUserMapper.selectOne(queryWrapper6);
+//                String orgName = "“" + organization.getName() + "”";
+//                String officialOpenId = officialUser.getOpenid();
+//                String msg = "您创建的" + orgName + "成员无课时间一览表所邀请的所有成员已全部接收邀请";
+//                //此处要发送到消息队列，通知负责人所有成员已经全部确认
+//                System.out.println(msg);
             }
             if(organization.getAckNum() > organization.getTotalNum()){
                 throw new CourseException(555,"数据出现异常");
@@ -297,38 +268,37 @@ public class GetTimeOffController {
         Organization organization = organizationMapper.selectOne(queryWrapper2);
         organization.setStatus(3);
         organizationMapper.updateById(organization);
-        QueryWrapper<StudentStatus> queryWrapper3 = new QueryWrapper<>();
-        queryWrapper3.eq("no",no).last("limit 1");
-        StudentStatus studentStatus = studentStatusMapper.selectOne(queryWrapper3);
-        String majorId = studentStatus.getMajorId();
-        String classId = studentStatus.getClassId();
-        QueryWrapper<Class> queryWrapper4 = new QueryWrapper<>();
-        queryWrapper4.eq("class_id",classId).eq("major_id",majorId);
-        Class aClass = classMapper.selectOne(queryWrapper4);
-        String className = aClass.getName();
-        String realName = studentStatus.getName();
-        String orgName = "“" + organization.getName() + "”";
-        String mainer_no = organization.getNo();
-        QueryWrapper<User> queryWrapper5 = new QueryWrapper<>();
-        queryWrapper5.eq("no",mainer_no).last("limit 1");
-        User mainUser = userMapper.selectOne(queryWrapper5);
-        String mainUserUnionId = mainUser.getUnionId();
-        QueryWrapper<OfficialUser> queryWrapper6 = new QueryWrapper<>();
-        queryWrapper6.eq("unionid",mainUserUnionId).select("openid");
-        OfficialUser officialUser = officialUserMapper.selectOne(queryWrapper6);
-        String officialOpenId = officialUser.getOpenid();
-        String msg = className + realName + "拒绝了您" + orgName + "成员无课时间一览表的邀请";
-        //此处要发送到消息队列，通知负责人xxx拒绝了
-        if(officialOpenId == null){
-            officialOpenId = "未关注公众号";
-        }
-        System.out.println(officialOpenId + "---" + msg);
+//        QueryWrapper<StudentStatus> queryWrapper3 = new QueryWrapper<>();
+//        queryWrapper3.eq("no",no).last("limit 1");
+//        StudentStatus studentStatus = studentStatusMapper.selectOne(queryWrapper3);
+//        String majorId = studentStatus.getMajorId();
+//        String classId = studentStatus.getClassId();
+//        QueryWrapper<Class> queryWrapper4 = new QueryWrapper<>();
+//        queryWrapper4.eq("class_id",classId).eq("major_id",majorId);
+//        Class aClass = classMapper.selectOne(queryWrapper4);
+//        String className = aClass.getName();
+//        String realName = studentStatus.getName();
+//        String orgName = "“" + organization.getName() + "”";
+//        String mainer_no = organization.getNo();
+//        QueryWrapper<User> queryWrapper5 = new QueryWrapper<>();
+//        queryWrapper5.eq("no",mainer_no).last("limit 1");
+//        User mainUser = userMapper.selectOne(queryWrapper5);
+//        String mainUserUnionId = mainUser.getUnionId();
+//        QueryWrapper<OfficialUser> queryWrapper6 = new QueryWrapper<>();
+//        queryWrapper6.eq("unionid",mainUserUnionId).select("openid");
+//        OfficialUser officialUser = officialUserMapper.selectOne(queryWrapper6);
+//        String officialOpenId = officialUser.getOpenid();
+//        String msg = className + realName + "拒绝了您" + orgName + "成员无课时间一览表的邀请";
+//        //此处要发送到消息队列，通知负责人xxx拒绝了
+//        if(officialOpenId == null){
+//            officialOpenId = "未关注公众号";
+//        }
+//        System.out.println(officialOpenId + "---" + msg);
         return R.ok();
     }
 
     @GetMapping("/getTimeOff")
     public R getTimeOff(@RequestBody OragDTO oragDTO){
-        ArrayList<User> failedUserList = new ArrayList<>();
         String openId = UserContext.getCurrentOpenid();
 //        String openId = "ohpVk5TmJDKSy5Wm3rGAvLQnUneQ";
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
@@ -341,7 +311,6 @@ public class GetTimeOffController {
             SnowflakeIdWorker idWorker = new SnowflakeIdWorker(1, 1);
             xlsId = idWorker.nextId();
             String orgName = oragDTO.getOrgName();
-            String newOrgName = "“" + orgName + "”";
             List<String> noList = oragDTO.getNoList();
             Organization organization = new Organization();
             organization.setName(orgName);
@@ -351,70 +320,146 @@ public class GetTimeOffController {
             organization.setAckNum(0);
             organization.setTotalNum(noList.size());
             organizationMapper.insert(organization);
-
-            QueryWrapper<StudentStatus> queryWrapper3 = new QueryWrapper<>();
-            queryWrapper3.eq("openid",openId);
-            StudentStatus studentStatus = studentStatusMapper.selectOne(queryWrapper3);
-            String majorId = studentStatus.getMajorId();
-            String classId = studentStatus.getClassId();
-            String reName = studentStatus.getName();
-            QueryWrapper<Class> queryWrapper4 = new QueryWrapper<>();
-            queryWrapper4.eq("class_id",classId).eq("major_id",majorId);
-            Class aClass = classMapper.selectOne(queryWrapper4);
-            String className = aClass.getName() + "班";
+//        ArrayList<User> failedUserList = new ArrayList<>();
+//            String newOrgName = "“" + orgName + "”";
+//            QueryWrapper<StudentStatus> queryWrapper3 = new QueryWrapper<>();
+//            queryWrapper3.eq("openid",openId);
+//            StudentStatus studentStatus = studentStatusMapper.selectOne(queryWrapper3);
+//            String majorId = studentStatus.getMajorId();
+//            String classId = studentStatus.getClassId();
+//            String reName = studentStatus.getName();
+//            QueryWrapper<Class> queryWrapper4 = new QueryWrapper<>();
+//            queryWrapper4.eq("class_id",classId).eq("major_id",majorId);
+//            Class aClass = classMapper.selectOne(queryWrapper4);
+//            String className = aClass.getName() + "班";
             for (String no : noList) {
 //                String officialOpenId;
-                String msg;
+//                String msg;
                 Invite invite = new Invite(String.valueOf(xlsId),no,0);
                 inviteMapper.insert(invite);
-                QueryWrapper<User> queryWrapper5 = new QueryWrapper<>();
-                queryWrapper5.eq("no",no).last("limit 1");
-                User user = userMapper.selectOne(queryWrapper5);
-                String unionId = user.getUnionId();
-                QueryWrapper<OfficialUser> queryWrapper6 = new QueryWrapper<>();
-                queryWrapper6.eq("unionid",unionId).select("openid");
-                OfficialUser officialUser = officialUserMapper.selectOne(queryWrapper6);
-                if(officialUser == null){
-                    failedUserList.add(user);
-//                    officialOpenId = "未关注公众号";
-                }else {
-//                    officialOpenId = officialUser.getOpenid();
-                }
-                assert officialUser != null;
-                String officialOpenId = officialUser.getOpenid();
-                msg = className + reName + "邀请您加入" + newOrgName + "成员无课时间一览表";
-                //此处要发送到消息队列，通知成员前往确认
-                System.out.println(msg + "---" + officialOpenId);
+//                QueryWrapper<User> queryWrapper5 = new QueryWrapper<>();
+//                queryWrapper5.eq("no",no).last("limit 1");
+//                User user = userMapper.selectOne(queryWrapper5);
+//                String unionId = user.getUnionId();
+//                QueryWrapper<OfficialUser> queryWrapper6 = new QueryWrapper<>();
+//                queryWrapper6.eq("unionid",unionId).select("openid");
+//                OfficialUser officialUser = officialUserMapper.selectOne(queryWrapper6);
+//                if(officialUser == null){
+//                    failedUserList.add(user);
+////                    officialOpenId = "未关注公众号";
+//                }else {
+////                    officialOpenId = officialUser.getOpenid();
+//                }
+//                assert officialUser != null;
+//                String officialOpenId = officialUser.getOpenid();
+//                msg = className + reName + "邀请您加入" + newOrgName + "成员无课时间一览表";
+//                //此处要发送到消息队列，通知成员前往确认
+//                System.out.println(msg + "---" + officialOpenId);
             }
 
-            try {
-                makeXls(xlsId,orgName,noList);
-            }catch (Exception e){
-                e.printStackTrace();
-                return R.error();
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
         log.info("~~~~~");
         if(xlsId != 0){
-            HashMap<String, Object> map = new HashMap<>();
-            map.put("xlsId",xlsId);
-            map.put("failed",failedUserList);
-            return R.ok().data("data",map);
+//            HashMap<String, Object> map = new HashMap<>();
+//            map.put("xlsId",xlsId);
+//            map.put("failed",failedUserList);
+            return R.ok().data("data",xlsId);
         }else {
             throw new CourseException(555,"try失败了");
         }
     }
 
-    @PostMapping("/simulatePay")
-    public R simulatePay(@RequestParam("xlsId") String xlsId){
-        QueryWrapper<Organization> queryWrapper = new QueryWrapper<>();
+    @PostMapping("/addMember")
+    public R addMember(@RequestParam("no") String no,
+                       @RequestParam("xlsId") String xlsId){
+        QueryWrapper<Invite> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("xls_id",xlsId);
+        Invite invite = new Invite(xlsId,no,0);
+        int insert = inviteMapper.insert(invite);
+        return R.ok();
+    }
+
+    @PostMapping("/delMember")
+    public R delMember(@RequestParam("no") String no,
+                       @RequestParam("xlsId") String xlsId){
+        QueryWrapper<Invite> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("xls_id",xlsId).eq("no",no);
+        int delete = inviteMapper.delete(queryWrapper);
+        return R.ok();
+    }
+
+    @PostMapping("/simulatePay")
+    public R simulatePay(@RequestParam("xlsIdStr") String xlsIdStr, HttpServletResponse response){
+        QueryWrapper<Organization> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("xls_id", xlsIdStr);
         Organization organization = organizationMapper.selectOne(queryWrapper);
         organization.setStatus(2);
         organizationMapper.updateById(organization);
-        return R.ok();
+        if(organizationMapper.selectOne(queryWrapper).getStatus() != 2){
+            return R.ok().data("data","支付失败");
+        }
+        //首先判断是否支付成功和是否到人数了
+        QueryWrapper<Organization> queryWrapper4 = new QueryWrapper<>();
+        queryWrapper4.eq("xls_id", xlsIdStr);
+        Organization organization1 = organizationMapper.selectOne(queryWrapper4);
+        if(organization1.getAckNum() != organization1.getTotalNum() || organization1.getStatus() != 2){
+            return R.error().data("data","未支付 或 确认人数!=总人数");
+        }
+        String orgName = organization1.getName();
+        String fileName = orgName + xlsIdStr + ".xls";
+        String path = pathName + fileName;
+        List<String> noList = new ArrayList<>();
+        QueryWrapper<Invite> queryWrapper1 = new QueryWrapper<>();
+        queryWrapper1.eq("xls_id", xlsIdStr);
+        List<Invite> inviteList = inviteMapper.selectList(queryWrapper1);
+        for (Invite invite : inviteList) {
+            noList.add(invite.getNo());
+        }
+        long xlsId = Long.parseLong(xlsIdStr);
+        try {
+            makeXls(xlsId,orgName,noList);
+        }catch (Exception e){
+            e.printStackTrace();
+            return R.error();
+        }
+        try {
+            // path是指想要下载的文件的路径
+            File file = new File(path);
+            log.info(file.getPath());
+            // 获取文件名
+            String filename = orgName + suffix + ".xls";
+            // 获取文件后缀名
+//            String ext = filename.substring(filename.lastIndexOf(".") + 1).toLowerCase();
+//            log.info("文件后缀名：" + ext);
+
+            // 将文件写入输入流
+            FileInputStream fileInputStream = new FileInputStream(file);
+            InputStream fis = new BufferedInputStream(fileInputStream);
+            byte[] buffer = new byte[fis.available()];
+            int read = fis.read(buffer);
+            System.out.println("read---" + read);
+            fis.close();
+
+            // 清空response
+            response.reset();
+            // 设置response的Header
+            response.setCharacterEncoding("UTF-8");
+            //Content-Disposition的作用：告知浏览器以何种方式显示响应返回的文件，用浏览器打开还是以附件的形式下载到本地保存
+            //attachment表示以附件方式下载   inline表示在线打开   "Content-Disposition: inline; filename=文件名.mp3"
+            // filename表示文件的默认名称，因为网络传输只支持URL编码的相关支付，因此需要将文件名URL编码后进行传输,前端收到后需要反编码才能获取到真正的名称
+            response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename, "UTF-8"));
+            // 告知浏览器文件的大小
+            response.addHeader("Content-Length", "" + file.length());
+            OutputStream outputStream = new BufferedOutputStream(response.getOutputStream());
+            response.setContentType("application/octet-stream");
+            outputStream.write(buffer);
+            outputStream.flush();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return R.ok().data("data","支付成功，文件已生成。");
     }
 
     public void makeXls (long xlsId,String orgName,List<String> noList) throws Exception{
