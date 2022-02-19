@@ -190,10 +190,7 @@ public class StudentStatusServiceImpl extends ServiceImpl<StudentStatusMapper, S
 
     @Override
     public void addStudentToES(StudentVOTwo studentVOTwo){
-        IndexRequest request = new IndexRequest("studentstatus","_doc");
-        String s = JSON.toJSONString(studentVOTwo);
-        request.source(s, XContentType.JSON);
-        client.indexAsync(request, RequestOptions.DEFAULT, new ActionListener<IndexResponse>() {
+        esUtils.esAddAsync("studentstatus",studentVOTwo,new ActionListener<IndexResponse>() {
             @Override
             public void onResponse(IndexResponse indexResponse) {
 

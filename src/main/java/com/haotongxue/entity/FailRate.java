@@ -1,14 +1,14 @@
 package com.haotongxue.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.ibatis.type.JdbcType;
+import org.apache.ibatis.type.MappedJdbcTypes;
 
 /**
  * <p>
@@ -41,7 +41,8 @@ public class FailRate implements Serializable {
     private Integer failCount;
 
     @ApiModelProperty("挂科率")
-    private String failRate;
+    @TableField(jdbcType = JdbcType.DOUBLE)
+    private Double failRate;
 
     @TableLogic
     private Integer isDeleted;

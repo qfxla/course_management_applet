@@ -33,7 +33,7 @@ public class Subject implements Serializable {
     private String subjectName;
 
     @ApiModelProperty("专业id")
-    private String marjorId;
+    private String majorId;
 
     private String property;
 

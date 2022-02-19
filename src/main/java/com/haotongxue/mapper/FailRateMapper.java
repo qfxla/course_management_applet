@@ -14,12 +14,12 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface FailRateMapper extends BaseMapper<FailRate> {
 
-    int countTotal(@Param("subject") String subject,
+    Integer countTotal(@Param("subject") String subject,
                    @Param("property") String property,
                    @Param("majorId") String majorId,
                    @Param("term") String term);
 
-    int countFail(@Param("subject") String subject,
+    Integer countFail(@Param("subject") String subject,
                   @Param("property") String property,
                   @Param("majorId") String majorId,
                   @Param("term") String term);

@@ -1,13 +1,22 @@
 package com.haotongxue.utils;
 
+import com.alibaba.fastjson.JSON;
 import com.haotongxue.cacheUtil.LoadingRedisCache;
 import com.haotongxue.entity.Concern;
 import com.haotongxue.entity.vo.ESVO;
 import com.haotongxue.entity.vo.ESWithHighLightVO;
 import com.haotongxue.entity.vo.IsConcernVO;
+import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.text.Text;
+import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -16,11 +25,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Component
 public class ESUtils {
 
     @Resource(name = "isConcernCache")
     LoadingRedisCache<Concern> isConcernCache;
+
+    @Autowired
+    private RestHighLevelClient client;
 
     /**
      * 有高亮的转换
@@ -95,6 +108,13 @@ public class ESUtils {
         ESVO esvo = new ESVO();
         esvo.setSource(hits[0].getSourceAsMap());
         return esvo;
+    }
+
+    public void esAddAsync(String index, Object entity, ActionListener<IndexResponse> listener){
+        IndexRequest request = new IndexRequest(index,"_doc");
+        String s = JSON.toJSONString(entity);
+        request.source(s, XContentType.JSON);
+        client.indexAsync(request, RequestOptions.DEFAULT, listener);
     }
 
 }

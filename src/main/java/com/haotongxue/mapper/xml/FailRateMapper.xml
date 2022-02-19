@@ -3,12 +3,12 @@
 <mapper namespace="com.haotongxue.mapper.FailRateMapper">
 
     <select id="countTotal" resultType="java.lang.Integer">
-        select count(*) from t_grade grade join t_student_status stu on grade.openid = stu.openid
-        where `subject` = #{subject} and property = #{property} and stu.major_id = #{majorId} and grade.term = #{term}
+        select count(distinct `no`) from t_grade grade join t_student_status stu on grade.openid = stu.openid
+        where grade.`subject` = #{subject} and grade.property = #{property} and stu.major_id = #{majorId} and grade.term = #{term}
     </select>
 
     <select id="countFail" resultType="java.lang.Integer">
-        select * from t_grade grade join t_student_status stu on grade.openid = stu.openid
-        where `subject` = #{subject} and property = #{property} and stu.major_id = #{majorId} and grade.term = #{term} and (grade.grade &lt; 60 or grade.grade = '不及格')
+        select count(distinct `no`) from t_grade grade join t_student_status stu on grade.openid = stu.openid
+        where grade.`subject` = #{subject} and grade.property = #{property} and stu.major_id = #{majorId} and grade.term = #{term} and ((grade.grade &lt; 60) or grade.grade = '不及格')
     </select>
 </mapper>
