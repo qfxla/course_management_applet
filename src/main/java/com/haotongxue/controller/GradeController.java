@@ -31,7 +31,6 @@ public class GradeController {
     @GetMapping("/authority/getGrade")
     public List<Grade> getGrade(@RequestParam("term") int term) {
         String openId = UserContext.getCurrentOpenid();
-//        openId = "ohpVk5SF3oodWNsodPzlmbiiHPXY";
         return gradeService.getGrade(openId, term);
     }
 }

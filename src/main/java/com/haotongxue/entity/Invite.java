@@ -15,6 +15,7 @@ import lombok.*;
 @TableName("t_invite")
 @Data
 @NoArgsConstructor
+@ToString
 public class Invite {
 
     private static final long serialVersionUID = 1L;

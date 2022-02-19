@@ -35,9 +35,9 @@ public class Organization implements Serializable {
 
     private String no;
 
-    private int ack_num;
+    private int ackNum;
 
-    private int total_num;
+    private int totalNum;
 
     private int status;
 

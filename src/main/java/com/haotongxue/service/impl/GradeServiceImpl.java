@@ -231,7 +231,7 @@ public class GradeServiceImpl extends ServiceImpl<GradeMapper, Grade> implements
         }
         if(term == 10){
             return gradeMapper.selectList(new QueryWrapper<Grade>()
-                    .eq("openid",openId).eq("term",termStr).orderByDesc("term").orderByDesc("create_time"));
+                    .eq("openid",openId).eq("term",termStr).orderByDesc("term").orderByDesc("property"));
         }else{
             String key = "QueryUnThisGrade" + openId + ":" + termStr;
             List<Grade> unThisGradeList;
@@ -241,10 +241,10 @@ public class GradeServiceImpl extends ServiceImpl<GradeMapper, Grade> implements
             }else{
                 if(term != 0){
                     unThisGradeList = gradeMapper.selectList(new QueryWrapper<Grade>()
-                            .eq("openid",openId).eq("term",termStr).orderByDesc("term").orderByDesc("create_time"));
+                            .eq("openid",openId).eq("term",termStr).orderByDesc("term").orderByDesc("property"));
                 }else{
                     unThisGradeList = gradeMapper.selectList(new QueryWrapper<Grade>()
-                            .eq("openid",openId).orderByDesc("term").orderByDesc("create_time"));
+                            .eq("openid",openId).orderByDesc("term").orderByDesc("property"));
                 }
                 if(!(unThisGradeList == null || unThisGradeList.size() == 0)){
                     redisTemplate.opsForList().rightPushAll(key,unThisGradeList);
