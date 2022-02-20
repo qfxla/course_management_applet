@@ -117,7 +117,13 @@ public class CoursePlusController {
     @DeleteMapping("/authority")
     public R deleteCourse(@RequestHeader @ApiParam("传Authority（测试用）") String Authority,
                           @RequestParam @ApiParam("课程的id") String id){
+        String currentOpenid = UserContext.getCurrentOpenid();
+        StudentStatus studentStatus = studentStatusCache.get(currentOpenid);
+        String no = studentStatus.getNo();
         coursePlusService.removeById(id);
+        for (int i=1;i<=20;i++){
+            coursePlusCache.invalidate(no+":"+i);
+        }
         return R.ok();
     }
 

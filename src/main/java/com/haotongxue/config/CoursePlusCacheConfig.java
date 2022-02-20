@@ -49,7 +49,7 @@ public class CoursePlusCacheConfig {
                     }
                     for (CoursePlus coursePlus : list){
                         String dayOfWeek = coursePlus.getDayOfWeek();
-                        CoursePlus[] coursePluses = result.get(Integer.parseInt(dayOfWeek));
+                        CoursePlus[] coursePluses = result.get(Integer.parseInt(dayOfWeek)-1);
                         String section = coursePlus.getSection();
                         for (int j=0;j<section.length();j++){
                             char c = section.charAt(j);
