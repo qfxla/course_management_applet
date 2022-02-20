@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +41,11 @@ public class CoursePlusCacheConfig {
                     List<CoursePlus> list = coursePlusService.list(coursePlusQueryWrapper);
                     List<CoursePlus[]> result = new ArrayList<>();
                     for (int i=0;i<7;i++){
-                        result.add(new CoursePlus[12]);
+                        CoursePlus[] coursePluses = new CoursePlus[12];
+                        for (int j=0;j<12;j++){
+                            coursePluses[j] = new CoursePlus("","","","","","","","","","",LocalDateTime.now());
+                        }
+                        result.add(coursePluses);
                     }
                     for (CoursePlus coursePlus : list){
                         String dayOfWeek = coursePlus.getDayOfWeek();

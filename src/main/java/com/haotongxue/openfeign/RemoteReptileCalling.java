@@ -1,14 +1,19 @@
 package com.haotongxue.openfeign;
 
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.haotongxue.entity.User;
+import com.haotongxue.utils.LoginUtils;
 import com.haotongxue.utils.R;
+import com.haotongxue.utils.WebClientUtils;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Component
-@FeignClient(name = "reptileTwo")
+@FeignClient(name = "reptile")
 @RequestMapping("/reptile")
 public interface RemoteReptileCalling {
     /**
@@ -24,6 +29,6 @@ public interface RemoteReptileCalling {
      * @param currentOpenid
      * @return
      */
-    @PostMapping("/course")
-    public R reptileCourse(@RequestParam String currentOpenid);
+    @PutMapping("/course")
+    public R getCourseBySchoolWebsite(@RequestParam String currentOpenid);
 }

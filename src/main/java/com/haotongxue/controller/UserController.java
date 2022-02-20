@@ -50,11 +50,14 @@ public class UserController {
     @Resource(name = "loginCache")
     LoadingRedisCache cache;
 
-    @Resource(name = "courseCache")
-    LoadingRedisCache courseCache;
+    @Resource(name = "coursePlusCache")
+    LoadingRedisCache<List<CoursePlus[]>> coursePlusCache;
 
     @Resource(name = "studentStatusCache")
     LoadingRedisCache<StudentStatus> studentStatusCache;
+
+    @Autowired
+    ICoursePlusService coursePlusService;
 
     @Autowired
     EduLoginService eduLoginService;
@@ -143,9 +146,6 @@ public class UserController {
             user = new User();
             BeanUtils.copyProperties(loginDTO,user);
             user.setOpenid(openid);
-            //记得在爬虫完以后要设置这条数据失效
-            user.setIsPa(0);
-            user.setIsPaing(0);
             if (StuNumUtils.isHaiZhu(user.getNo())){
                 user.setIsHaizhu(1);
             }else {
@@ -157,15 +157,7 @@ public class UserController {
             userService.save(user);
             cache.put(openid,user);
         }
-        else {
-            //如果为0，则爬虫还没执行成功
-            //isDoPa = user.getIsPa() == 0;
-            if (!user.getUnionId().equals(unionid)){
-                user.setUnionId(unionid);
-                userService.updateById(user);
-            }
-        }
-        if (isDoPa && user.getIsPaing() == 0){
+        if (isDoPa){
             //调用远程爬的接口
             remoteReptileCalling.reptileAll(openid);
         }
@@ -263,53 +255,8 @@ public class UserController {
         return R.ok().data("no",no);
     }
 
-    @ApiOperation("删除某个人的数据及缓存")
-    @GetMapping("/deleteLoginCache")
-    public R deleteLoginCache(@RequestParam(value = "openid",defaultValue = "",required = false)String openid){
-        if (openid.equals("")){
-            openid = UserContext.getCurrentOpenid();
-        }
-        User user = userService.getById(openid);
-        if (user == null){
-            return R.error().data("msg","无该openid");
-        }
-        String openId = user.getOpenid();
-        userMapper.deleteByInfoId(openid);
-        cache.invalidate(openid);
-        for (int i = 1;i <= 20;i++){
-            courseCache.invalidate("cour" + openId + ":" + i);
-        }
-        QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
-        wrapper.eq("openid",openId);
-        List<String> infoList = iUserInfoService.list(wrapper).stream().map(UserInfo::getInfoId).collect(Collectors.toList());
-
-        log.info("查找用户的所有info数量"+ infoList.size());
-        if(infoList.size() != 0){
-            infoSectionMapper.deleteByInfoId(infoList);
-            infoWeekMapper.deleteByInfoId(infoList);
-            infoCourseMapper.deleteByInfoId(infoList);
-            infoClassroomMapper.deleteByInfoId(infoList);
-            infoTeacherMapper.deleteByInfoId(infoList);
-            infoMapper.deleteByInfoId(infoList);
-            userInfoMapper.deleteByInfoId(infoList);
-        }
-        return R.ok().data("msg","清除成功");
-    }
-
-//    @ApiOperation("删除所有人的登录缓存")
-//    @GetMapping("/deleteAllLoginCache")
-//    public R deleteAllLoginCache(){
-//        ConcurrentMap<@NonNull String, @NonNull Object> map = cache.asMap();
-//        Set<Map.Entry<@NonNull String, @NonNull Object>> set = map.entrySet();
-//        for (Map.Entry<String, Object> entry : set) {
-//            cache.invalidate(entry.getKey());
-//        }
-//
-//        return R.ok();
-//    }
-
     @ApiOperation("只删某个人的登录缓存")
-    @GetMapping("/authority/justDeleteCache")
+    @DeleteMapping("/authority/justDeleteCache")
     public R justDeleteCache(){
         String openid = UserContext.getCurrentOpenid();
         User user = userService.getById(openid);
@@ -354,24 +301,14 @@ public class UserController {
             return R.error().data("msg","无该openid");
         }
         String openId = user.getOpenid();
-        for (int i = 1;i <=     20;i++){
-            courseCache.invalidate("cour" + openId + ":" + i);
-        }
-        QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
-        wrapper.eq("openid",openId);
-        List<String> infoList = iUserInfoService.list(wrapper).stream().map(UserInfo::getInfoId).collect(Collectors.toList());
-
-        log.info("查找用户的所有info数量"+ infoList.size());
-        if(infoList.size() != 0){
-            infoSectionMapper.deleteByInfoId(infoList);
-            infoWeekMapper.deleteByInfoId(infoList);
-            infoCourseMapper.deleteByInfoId(infoList);
-            infoClassroomMapper.deleteByInfoId(infoList);
-            infoTeacherMapper.deleteByInfoId(infoList);
-            infoMapper.deleteByInfoId(infoList);
-            userInfoMapper.deleteByInfoId(infoList);
+        for (int i = 1;i<=20;i++){
+            coursePlusCache.invalidate(user.getNo()+":"+i);
         }
 
+        //删除课表
+        QueryWrapper<CoursePlus> coursePlusQueryWrapper = new QueryWrapper<>();
+        coursePlusQueryWrapper.eq("no",user.getNo());
+        coursePlusService.remove(coursePlusQueryWrapper);
 
         countDownMapper.deleteByOpenId(openId);
         userSelectedMapper.deleteByOpenId(openId);
@@ -414,50 +351,45 @@ public class UserController {
     }
 
 
-    @ApiOperation("删除所有Paing，返回所有nickname")
-    @GetMapping("/delAllPaing")
-    public List<String> delAllPaing(){
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        QueryWrapper<User> paingUsers = queryWrapper.eq("is_paing", 1);
-        List<String> nickNames = new ArrayList<>();
-        List<User> userList = userMapper.selectList(paingUsers);
-        System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@paing数：" + userList.size());
-        for (User user : userList) {
-            nickNames.add(user.getNickName());
-            nickNames.add(user.getNo());
-            String openId = user.getOpenid();
-            System.out.println("删除所有缓存和数据-----" + openId);
-            cache.invalidate(openId);
-            for (int i = 1;i <= 20;i++){
-                courseCache.invalidate("cour" + openId + ":" + i);
-            }
-            QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
-            wrapper.eq("openid",openId);
-            List<String> infoList = iUserInfoService.list(wrapper).stream().map(UserInfo::getInfoId).collect(Collectors.toList());
-            if(infoList.size() != 0){
-                infoSectionMapper.deleteByInfoId(infoList);
-                infoWeekMapper.deleteByInfoId(infoList);
-                infoCourseMapper.deleteByInfoId(infoList);
-                infoClassroomMapper.deleteByInfoId(infoList);
-                infoTeacherMapper.deleteByInfoId(infoList);
-                infoMapper.deleteByInfoId(infoList);
-                userInfoMapper.deleteByInfoId(infoList);
-            }
-            countDownMapper.deleteByOpenId(openId);
-            userSelectedMapper.deleteByOpenId(openId);
-            userMapper.deleteByInfoId(openId);
-        }
-        if(nickNames.size()!=0){
-            return nickNames;
-        }else {
-            nickNames.add("没有paing");
-            return nickNames;
-        }
-    }
-
-//    @PostMapping("/insertGrade")
-//    public int insertGrade(){
-//        return gradeService.paGrade();
+//    @ApiOperation("删除所有Paing，返回所有nickname")
+//    @GetMapping("/delAllPaing")
+//    public List<String> delAllPaing(){
+//        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+//        QueryWrapper<User> paingUsers = queryWrapper.eq("is_paing", 1);
+//        List<String> nickNames = new ArrayList<>();
+//        List<User> userList = userMapper.selectList(paingUsers);
+//        System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@paing数：" + userList.size());
+//        for (User user : userList) {
+//            nickNames.add(user.getNickName());
+//            nickNames.add(user.getNo());
+//            String openId = user.getOpenid();
+//            System.out.println("删除所有缓存和数据-----" + openId);
+//            cache.invalidate(openId);
+//            for (int i = 1;i <= 20;i++){
+//                courseCache.invalidate("cour" + openId + ":" + i);
+//            }
+//            QueryWrapper<UserInfo> wrapper = new QueryWrapper<>();
+//            wrapper.eq("openid",openId);
+//            List<String> infoList = iUserInfoService.list(wrapper).stream().map(UserInfo::getInfoId).collect(Collectors.toList());
+//            if(infoList.size() != 0){
+//                infoSectionMapper.deleteByInfoId(infoList);
+//                infoWeekMapper.deleteByInfoId(infoList);
+//                infoCourseMapper.deleteByInfoId(infoList);
+//                infoClassroomMapper.deleteByInfoId(infoList);
+//                infoTeacherMapper.deleteByInfoId(infoList);
+//                infoMapper.deleteByInfoId(infoList);
+//                userInfoMapper.deleteByInfoId(infoList);
+//            }
+//            countDownMapper.deleteByOpenId(openId);
+//            userSelectedMapper.deleteByOpenId(openId);
+//            userMapper.deleteByInfoId(openId);
+//        }
+//        if(nickNames.size()!=0){
+//            return nickNames;
+//        }else {
+//            nickNames.add("没有paing");
+//            return nickNames;
+//        }
 //    }
 }
 

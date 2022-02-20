@@ -294,7 +294,7 @@ public class InfoServiceImpl extends ServiceImpl<InfoMapper, Info> implements II
 //        WatchIsPaingHandler.watchIsPa(reReptileRunnable);   //监视正常爬是否超过2分钟
 //        reptileHandler.pa(new ReptileRunnable(webClient,user.getNo(),user.getPassword(),UserContext.getCurrentOpenid(),reReptileRunnable));
         //换成远程调用
-        remoteReptileCalling.reptileCourse(openId);
+        //remoteReptileCalling.reptileCourse(openId);
         return true;
     }
 
